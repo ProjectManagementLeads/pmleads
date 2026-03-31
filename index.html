@@ -6,93 +6,159 @@
 <title>Central Ohio PM Lead Tracker</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f4;color:#1a1a1a;font-size:14px}
-  h1{font-size:18px;font-weight:600}
-  .topbar{background:#fff;border-bottom:1px solid #e5e5e5;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:10}
-  .topbar-actions{display:flex;gap:8px;flex-wrap:wrap}
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 16px}
-  .stat{background:#fff;border-radius:10px;border:1px solid #e5e5e5;padding:10px 14px}
-  .stat-label{font-size:11px;color:#888;margin-bottom:2px}
-  .stat-val{font-size:22px;font-weight:600}
-  .tabs-wrap{overflow-x:auto;background:#fff;border-bottom:1px solid #e5e5e5;padding:0 16px;display:flex;gap:0}
-  .tab{font-size:12px;padding:8px 12px;border:none;border-bottom:2px solid transparent;background:transparent;color:#888;cursor:pointer;white-space:nowrap;font-weight:400}
-  .tab.active{color:#1a1a1a;border-bottom-color:#1a1a1a;font-weight:600}
-  .toolbar{display:flex;gap:8px;padding:10px 16px;flex-wrap:wrap;align-items:center}
-  .toolbar input,.toolbar select{font-size:13px;padding:6px 10px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#1a1a1a;height:34px}
-  .toolbar input{flex:1;min-width:150px}
-  .table-wrap{overflow-x:auto;padding:0 16px 80px}
-  table{width:100%;border-collapse:collapse;font-size:13px;background:#fff;border-radius:10px;overflow:hidden;border:1px solid #e5e5e5}
-  th{font-size:11px;font-weight:600;color:#888;text-align:left;padding:10px 12px;border-bottom:1px solid #e5e5e5;cursor:pointer;white-space:nowrap;background:#fafaf9}
-  th:hover{color:#1a1a1a}
-  td{padding:10px 12px;border-bottom:1px solid #f0f0ee;vertical-align:top}
-  tr:last-child td{border-bottom:none}
-  tr:hover td{background:#fafaf9}
-  .badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500;white-space:nowrap}
-  .area-pill{font-size:11px;padding:2px 7px;border-radius:20px;background:#f0f0ee;color:#666}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:13px;padding:6px 14px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#1a1a1a;cursor:pointer;white-space:nowrap;font-family:inherit;height:34px}
-  .btn:hover{background:#f5f5f4}
+  :root{
+    --blue-900:#042C53;--blue-800:#0C447C;--blue-700:#185FA5;
+    --blue-600:#378ADD;--blue-400:#85B7EB;--blue-200:#B5D4F4;
+    --blue-100:#D6E9FA;--blue-50:#EEF6FD;--white:#fff;
+    --text-dark:#042C53;--text-mid:#185FA5;--text-muted:#378ADD;
+  }
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--blue-50);color:var(--text-dark);font-size:14px;min-height:100vh}
+
+  /* Top bar */
+  .topbar{background:var(--blue-900);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:10;border-bottom:2px solid var(--blue-800)}
+  .topbar-brand{display:flex;align-items:center;gap:10px}
+  .topbar-logo{width:32px;height:32px;background:var(--blue-700);border-radius:8px;display:flex;align-items:center;justify-content:center}
+  .topbar-logo svg{width:18px;height:18px;fill:var(--blue-200)}
+  .topbar h1{font-size:17px;font-weight:600;color:var(--white);letter-spacing:-0.01em}
+  .topbar-sub{font-size:11px;color:var(--blue-400);margin-top:1px}
+  .topbar-actions{display:flex;gap:8px}
+
+  /* Buttons */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:13px;padding:7px 16px;border-radius:8px;cursor:pointer;white-space:nowrap;font-family:inherit;font-weight:500;transition:opacity .15s,background .15s;border:none;height:34px}
+  .btn-ghost{background:rgba(255,255,255,0.1);color:var(--white);border:1px solid rgba(255,255,255,0.2)}
+  .btn-ghost:hover{background:rgba(255,255,255,0.2)}
+  .btn-white{background:var(--white);color:var(--blue-900);border:none}
+  .btn-white:hover{background:var(--blue-100)}
+  .btn-outline{background:var(--white);color:var(--blue-800);border:1px solid var(--blue-200)}
+  .btn-outline:hover{background:var(--blue-50);border-color:var(--blue-400)}
+  .btn-primary{background:var(--blue-700);color:var(--white)}
+  .btn-primary:hover{background:var(--blue-800)}
   .btn-sm{font-size:11px;padding:3px 10px;height:26px}
-  .btn-primary{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
-  .btn-primary:hover{background:#333}
-  .btn-danger{color:#a32d2d;border-color:#f09595}
-  .btn-danger:hover{background:#fcebeb}
-  .btn-ai{background:#f0ebff;color:#3c3489;border-color:#afa9ec;height:auto;padding:7px 14px;font-size:13px}
-  .btn-ai:hover{background:#e4dcff}
-  .empty{text-align:center;padding:3rem;color:#888}
-  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;align-items:center;justify-content:center;padding:16px}
+  .btn-danger-sm{font-size:11px;padding:3px 10px;height:26px;background:#fff;color:#a32d2d;border:1px solid #f09595;border-radius:6px;cursor:pointer;font-family:inherit}
+  .btn-danger-sm:hover{background:#fcebeb}
+  .btn-ai{background:var(--blue-100);color:var(--blue-800);border:1px solid var(--blue-300,#a8cfee);height:auto;padding:8px 16px;font-size:13px;font-weight:500}
+  .btn-ai:hover{background:var(--blue-200)}
+
+  /* Stats */
+  .stats-bar{background:var(--blue-800);padding:14px 20px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .stat{background:rgba(255,255,255,0.08);border-radius:10px;padding:10px 14px;border:1px solid rgba(255,255,255,0.1)}
+  .stat-label{font-size:11px;color:var(--blue-300,#a8cfee);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.04em;font-weight:500}
+  .stat-val{font-size:24px;font-weight:700;color:var(--white)}
+
+  /* Tabs */
+  .tabs-wrap{background:var(--blue-900);overflow-x:auto;padding:0 20px;display:flex;gap:0;border-bottom:1px solid var(--blue-800)}
+  .tab{font-size:12px;padding:10px 14px;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--blue-400);cursor:pointer;white-space:nowrap;font-weight:500;font-family:inherit;transition:color .15s}
+  .tab:hover{color:var(--blue-200)}
+  .tab.active{color:var(--white);border-bottom-color:var(--blue-400)}
+
+  /* Toolbar */
+  .toolbar{display:flex;gap:8px;padding:14px 20px;flex-wrap:wrap;align-items:center;background:var(--white);border-bottom:1px solid var(--blue-100)}
+  .toolbar input,.toolbar select{font-size:13px;padding:6px 10px;border:1px solid var(--blue-200);border-radius:8px;background:var(--blue-50);color:var(--text-dark);height:34px;font-family:inherit}
+  .toolbar input{flex:1;min-width:150px}
+  .toolbar input:focus,.toolbar select:focus{outline:none;border-color:var(--blue-600);background:var(--white)}
+
+  /* Table */
+  .table-wrap{padding:16px 20px 80px}
+  .table-card{background:var(--white);border-radius:12px;border:1px solid var(--blue-100);overflow:hidden;box-shadow:0 2px 8px rgba(4,44,83,0.06)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{font-size:11px;font-weight:600;color:var(--blue-700);text-align:left;padding:11px 14px;border-bottom:1px solid var(--blue-100);cursor:pointer;white-space:nowrap;background:var(--blue-50);text-transform:uppercase;letter-spacing:0.04em}
+  th:hover{color:var(--blue-900)}
+  td{padding:11px 14px;border-bottom:1px solid var(--blue-50);vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:var(--blue-50)}
+  .co-name{font-weight:600;color:var(--blue-900);font-size:13px}
+  .co-addr{font-size:11px;color:var(--text-muted);margin-top:2px}
+
+  /* Badges */
+  .badge{display:inline-block;font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600;white-space:nowrap;letter-spacing:0.01em}
+  .area-pill{font-size:11px;padding:3px 9px;border-radius:20px;background:var(--blue-100);color:var(--blue-800);font-weight:500}
+
+  /* Modal */
+  .overlay{display:none;position:fixed;inset:0;background:rgba(4,44,83,0.5);z-index:100;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px)}
   .overlay.open{display:flex}
-  .modal{background:#fff;border-radius:14px;padding:1.5rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.15)}
-  .modal h2{font-size:16px;font-weight:600;margin-bottom:4px}
-  .modal-sub{font-size:12px;color:#888;margin-bottom:1rem;line-height:1.5}
-  .field{margin-bottom:12px}
-  .field label{display:block;font-size:11px;color:#888;margin-bottom:3px;font-weight:500;text-transform:uppercase;letter-spacing:0.03em}
-  .field input,.field select,.field textarea{width:100%;font-size:13px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#1a1a1a;font-family:inherit}
-  .field textarea{resize:vertical;min-height:60px}
-  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
-  .lookup-box{background:#f7f4ff;border:1px solid #d4caf5;border-radius:10px;padding:12px 14px;margin-bottom:14px}
-  .lookup-box-title{font-size:12px;font-weight:600;color:#3c3489;margin-bottom:4px}
-  .lookup-box-desc{font-size:12px;color:#5a4fa0;margin-bottom:10px;line-height:1.5}
+  .modal{background:var(--white);border-radius:16px;padding:1.75rem;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 16px 48px rgba(4,44,83,0.2);border:1px solid var(--blue-100)}
+  .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+  .modal h2{font-size:17px;font-weight:700;color:var(--blue-900)}
+  .modal-close{background:none;border:none;font-size:20px;color:var(--blue-400);cursor:pointer;line-height:1;padding:0 4px}
+  .modal-close:hover{color:var(--blue-900)}
+  .modal-sub{font-size:12px;color:var(--text-muted);margin-bottom:1.25rem;line-height:1.5}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:11px;color:var(--blue-700);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em}
+  .field input,.field select,.field textarea{width:100%;font-size:13px;padding:9px 11px;border:1px solid var(--blue-200);border-radius:8px;background:var(--blue-50);color:var(--text-dark);font-family:inherit;transition:border-color .15s,background .15s}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--blue-600);background:var(--white)}
+  .field textarea{resize:vertical;min-height:65px}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+
+  /* Lookup box */
+  .lookup-box{background:var(--blue-50);border:1px solid var(--blue-200);border-radius:10px;padding:14px 16px;margin-bottom:16px}
+  .lookup-box-title{font-size:12px;font-weight:700;color:var(--blue-800);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.04em}
+  .lookup-box-desc{font-size:12px;color:var(--blue-700);margin-bottom:10px;line-height:1.5}
   .lookup-row{display:flex;gap:8px;align-items:flex-end}
   .lookup-row .field{flex:1;margin-bottom:0}
-  .area-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #e5e5e5;border-radius:8px;background:#fafaf9;margin-bottom:6px}
-  .count-pill{font-size:11px;padding:1px 6px;border-radius:20px;background:#fff;border:1px solid #e5e5e5;color:#888}
-  @media(max-width:600px){
-    .stats{grid-template-columns:repeat(2,1fr)}
+
+  /* Manage areas rows */
+  .area-row{display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--blue-100);border-radius:8px;background:var(--blue-50);margin-bottom:6px}
+  .count-pill{font-size:11px;padding:2px 7px;border-radius:20px;background:var(--blue-100);color:var(--blue-700);font-weight:600}
+
+  .divider{height:1px;background:var(--blue-100);margin:14px 0}
+  .empty{text-align:center;padding:3.5rem;color:var(--blue-400)}
+  .empty-icon{font-size:32px;margin-bottom:8px;opacity:0.4}
+  .empty-text{font-size:14px;font-weight:500;color:var(--blue-600)}
+  .empty-sub{font-size:12px;color:var(--blue-400);margin-top:4px}
+
+  @media(max-width:640px){
+    .stats-bar{grid-template-columns:repeat(2,1fr)}
     .topbar h1{font-size:15px}
     .hide-mobile{display:none}
+    .table-wrap{padding:12px 12px 80px}
+    .toolbar{padding:10px 12px}
   }
 </style>
 </head>
 <body>
 
+<!-- Top Bar -->
 <div class="topbar">
-  <h1>Central Ohio — PM Lead Tracker</h1>
+  <div class="topbar-brand">
+    <div class="topbar-logo">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22" fill="none" stroke="#B5D4F4" stroke-width="2"/></svg>
+    </div>
+    <div>
+      <div class="topbar h1" style="font-size:17px;font-weight:700;color:#fff;letter-spacing:-0.01em">Central Ohio PM Leads</div>
+      <div class="topbar-sub">Flooring turn pipeline tracker</div>
+    </div>
+  </div>
   <div class="topbar-actions">
-    <button class="btn" onclick="openManageAreas()">Manage areas</button>
-    <button class="btn btn-primary" onclick="openAddLead()">+ Add lead</button>
+    <button class="btn btn-ghost" onclick="openManageAreas()">⚙ Manage areas</button>
+    <button class="btn btn-white" onclick="openAddLead()">+ Add lead</button>
   </div>
 </div>
 
-<div class="stats">
+<!-- Stats -->
+<div class="stats-bar">
   <div class="stat"><div class="stat-label">Total leads</div><div class="stat-val" id="s-total">0</div></div>
   <div class="stat"><div class="stat-label">Contacted</div><div class="stat-val" id="s-contacted">0</div></div>
   <div class="stat"><div class="stat-label">Qualified</div><div class="stat-val" id="s-qualified">0</div></div>
   <div class="stat"><div class="stat-label">Total units</div><div class="stat-val" id="s-units">0</div></div>
 </div>
 
+<!-- Tabs -->
 <div class="tabs-wrap" id="tabs"></div>
 
+<!-- Toolbar -->
 <div class="toolbar">
-  <input type="text" id="search" placeholder="Search company or contact..." oninput="render()">
+  <input type="text" id="search" placeholder="🔍  Search company or contact..." oninput="render()">
   <select id="filter-status" onchange="render()">
     <option value="">All statuses</option>
     <option>New</option><option>Contacted</option><option>Qualified</option><option>Proposal sent</option><option>Closed won</option><option>Dead</option>
   </select>
-  <button class="btn" onclick="exportCSV()">Export CSV</button>
+  <button class="btn btn-outline" onclick="exportCSV()">↓ Export CSV</button>
 </div>
 
+<!-- Table -->
 <div class="table-wrap">
+<div class="table-card">
 <table>
   <thead>
     <tr>
@@ -109,30 +175,32 @@
   <tbody id="tbody"></tbody>
 </table>
 </div>
+</div>
 
 <!-- Add/Edit Lead Modal -->
 <div class="overlay" id="lead-modal" onclick="bgClose(event,'lead-modal')">
 <div class="modal">
-  <h2 id="lead-modal-title">Add lead</h2>
-  <p class="modal-sub">Fill in manually or type the property name below and ask Claude to look it up for you — free, no API key needed.</p>
+  <div class="modal-header">
+    <h2 id="lead-modal-title">Add lead</h2>
+    <button class="modal-close" onclick="closeModal('lead-modal')">×</button>
+  </div>
+  <p class="modal-sub">Fill in manually, or use the AI lookup below to auto-research the property via Claude chat.</p>
 
   <div class="lookup-box">
     <div class="lookup-box-title">✦ AI lookup — free via chat</div>
-    <div class="lookup-box-desc">Type the property name, click "Ask Claude", then paste the details Claude gives you back into the fields below.</div>
+    <div class="lookup-box-desc">Type the property name and click "Ask Claude ↗" — Claude will look it up and return the details for you to paste in.</div>
     <div class="lookup-row">
-      <div class="field">
-        <input id="lookup-input" placeholder="e.g. Worthington Arms Apartments" oninput="onLookupInput()">
-      </div>
+      <div class="field"><input id="lookup-input" placeholder="e.g. Emerson Park Apartments" oninput="onLookupInput()"></div>
       <button class="btn btn-ai" id="lookup-btn" onclick="askClaude()" disabled>Ask Claude ↗</button>
     </div>
   </div>
 
   <div class="field"><label>Property / company name *</label><input id="f-company" placeholder="e.g. Worthington Arms Apartments"></div>
-  <div class="field"><label>Contact name</label><input id="f-contact" placeholder="e.g. Jane Smith"></div>
   <div class="field-row">
+    <div class="field"><label>Contact name</label><input id="f-contact" placeholder="Jane Smith"></div>
     <div class="field"><label>Phone</label><input id="f-phone" type="tel" placeholder="(614) 555-0100"></div>
-    <div class="field"><label>Email</label><input id="f-email" type="email" placeholder="jane@company.com"></div>
   </div>
+  <div class="field"><label>Email</label><input id="f-email" type="email" placeholder="jane@company.com"></div>
   <div class="field"><label>Physical address</label><input id="f-address" placeholder="123 Main St, Westerville, OH 43081"></div>
   <div class="field-row">
     <div class="field"><label>Unit count</label><input id="f-units" type="number" min="0" placeholder="120"></div>
@@ -148,7 +216,7 @@
   </div>
   <div class="field"><label>Notes / next steps</label><textarea id="f-notes" placeholder="e.g. Call back Thursday, ask about summer turns"></textarea></div>
   <div class="modal-actions">
-    <button class="btn" onclick="closeModal('lead-modal')">Cancel</button>
+    <button class="btn btn-outline" onclick="closeModal('lead-modal')">Cancel</button>
     <button class="btn btn-primary" onclick="saveLead()">Save lead</button>
   </div>
 </div>
@@ -157,15 +225,18 @@
 <!-- Manage Areas Modal -->
 <div class="overlay" id="areas-modal" onclick="bgClose(event,'areas-modal')">
 <div class="modal">
-  <h2>Manage areas</h2>
-  <p style="font-size:12px;color:#888;margin-bottom:12px">Add, rename, or remove territories. Removing an area moves its leads to "Other".</p>
-  <div style="display:flex;gap:8px;margin-bottom:12px">
-    <input id="new-area-input" placeholder="New area name..." style="flex:1;font-size:13px;padding:6px 10px;border:1px solid #ddd;border-radius:8px;font-family:inherit" onkeydown="if(event.key==='Enter')addArea()">
+  <div class="modal-header">
+    <h2>Manage areas</h2>
+    <button class="modal-close" onclick="closeModal('areas-modal')">×</button>
+  </div>
+  <p class="modal-sub">Add, rename, or remove territories. Removing an area moves its leads to "Other".</p>
+  <div style="display:flex;gap:8px;margin-bottom:14px">
+    <input id="new-area-input" placeholder="New area or town name..." style="flex:1;font-size:13px;padding:8px 11px;border:1px solid var(--blue-200);border-radius:8px;background:var(--blue-50);color:var(--text-dark);font-family:inherit" onkeydown="if(event.key==='Enter')addArea()">
     <button class="btn btn-primary" onclick="addArea()">Add</button>
   </div>
   <div id="areas-list"></div>
   <div class="modal-actions">
-    <button class="btn" onclick="closeModal('areas-modal')">Cancel</button>
+    <button class="btn btn-outline" onclick="closeModal('areas-modal')">Cancel</button>
     <button class="btn btn-primary" onclick="saveAreas()">Save changes</button>
   </div>
 </div>
@@ -173,12 +244,12 @@
 
 <script>
 const STATUS_COLOR={
-  "New":{bg:"#E6F1FB",color:"#0C447C"},
-  "Contacted":{bg:"#FAEEDA",color:"#633806"},
-  "Qualified":{bg:"#EAF3DE",color:"#27500A"},
-  "Proposal sent":{bg:"#EEEDFE",color:"#3C3489"},
-  "Closed won":{bg:"#E1F5EE",color:"#085041"},
-  "Dead":{bg:"#F1EFE8",color:"#5F5E5A"},
+  "New":          {bg:"#E6F1FB",color:"#0C447C"},
+  "Contacted":    {bg:"#B5D4F4",color:"#042C53"},
+  "Qualified":    {bg:"#378ADD",color:"#fff"},
+  "Proposal sent":{bg:"#185FA5",color:"#fff"},
+  "Closed won":   {bg:"#042C53",color:"#B5D4F4"},
+  "Dead":         {bg:"#e5e5e5",color:"#888"},
 };
 
 let leads=JSON.parse(localStorage.getItem('co_pm_leads')||'[]');
@@ -201,22 +272,17 @@ function onLookupInput(){
 function askClaude(){
   const name=document.getElementById('lookup-input').value.trim();
   if(!name)return;
-  // Also pre-fill the company name field
   document.getElementById('f-company').value=name;
   const msg=`Please look up this property management company or apartment complex for me and give me: contact name, email, phone number, physical address, total unit count, and property style.\n\nProperty name: "${name}"\nLocation: Central Ohio (Columbus metro area)`;
-  if(window.parent && window.parent!==window){
+  if(window.parent&&window.parent!==window){
     window.parent.postMessage({type:'claude-send-message',message:msg},'*');
   } else {
-    // Fallback: copy to clipboard and prompt user
     navigator.clipboard.writeText(msg).then(()=>{
-      alert('Message copied to clipboard!\n\nPaste it into the Claude chat to look up this property.');
-    }).catch(()=>{
-      alert('Ask Claude:\n\n'+msg);
-    });
+      alert('Copied to clipboard! Paste it into the Claude chat to look up this property.');
+    }).catch(()=>{ alert('Ask Claude:\n\n'+msg); });
   }
 }
 
-// ── Tabs ──────────────────────────────────────────────
 function renderTabs(){
   const counts={};
   leads.forEach(l=>counts[l.area]=(counts[l.area]||0)+1);
@@ -224,7 +290,7 @@ function renderTabs(){
   document.getElementById('tabs').innerHTML=all.map(a=>{
     const cnt=a==="All Areas"?leads.length:(counts[a]||0);
     const act=activeArea===a?'active':'';
-    return `<button class="tab ${act}" onclick="setArea('${a.replace(/'/g,"\\'")}')">${a}${cnt>0?' ('+cnt+')':''}</button>`;
+    return `<button class="tab ${act}" onclick="setArea('${a.replace(/'/g,"\\'")}')">${a}${cnt>0?' <span style="opacity:.7">('+cnt+')</span>':''}</button>`;
   }).join('');
 }
 function setArea(a){activeArea=a;render();}
@@ -261,20 +327,21 @@ function render(){
   });
   const tb=document.getElementById('tbody');
   if(!rows.length){
-    tb.innerHTML=`<tr><td colspan="8"><div class="empty">${leads.length?'No leads match your filter.':'No leads yet — tap "+ Add lead" to get started.'}</div></td></tr>`;
+    tb.innerHTML=`<tr><td colspan="8"><div class="empty"><div class="empty-icon">📋</div><div class="empty-text">${leads.length?'No leads match your filter.':'No leads yet'}</div><div class="empty-sub">${leads.length?'Try adjusting your search or filter.':'Click "+ Add lead" to get started.'}</div></div></td></tr>`;
     return;
   }
   tb.innerHTML=rows.map(l=>{
     const sc=STATUS_COLOR[l.status]||STATUS_COLOR["New"];
+    const noteText=(l.style?'['+l.style+'] ':'')+( l.notes||'');
     return `<tr>
-      <td><strong>${esc(l.company)}</strong>${l.address?'<br><span style="font-size:11px;color:#888">'+esc(l.address)+'</span>':''}</td>
-      <td class="hide-mobile">${esc(l.contact)||'—'}</td>
-      <td class="hide-mobile">${esc(l.phone)||'—'}</td>
-      <td style="text-align:right">${l.units||'—'}</td>
+      <td><div class="co-name">${esc(l.company)}</div>${l.address?'<div class="co-addr">'+esc(l.address)+'</div>':''}</td>
+      <td class="hide-mobile">${esc(l.contact)||'<span style="color:#aaa">—</span>'}</td>
+      <td class="hide-mobile">${esc(l.phone)||'<span style="color:#aaa">—</span>'}</td>
+      <td style="text-align:right;font-weight:600;color:var(--blue-700)">${l.units||'<span style="color:#aaa">—</span>'}</td>
       <td><span class="area-pill">${esc(l.area)}</span></td>
       <td><span class="badge" style="background:${sc.bg};color:${sc.color}">${esc(l.status)}</span></td>
-      <td class="hide-mobile" style="font-size:12px;color:#888;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc((l.style?'['+l.style+'] ':'')+( l.notes||''))}">${esc((l.style?'['+l.style+'] ':'')+( l.notes||''))||'—'}</td>
-      <td><button class="btn btn-sm" onclick="openEditLead('${l.id}')">Edit</button></td>
+      <td class="hide-mobile" style="font-size:12px;color:var(--text-muted);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(noteText)}">${esc(noteText)||'<span style="color:#aaa">—</span>'}</td>
+      <td><button class="btn btn-outline btn-sm" onclick="openEditLead('${l.id}')">Edit</button></td>
     </tr>`;
   }).join('');
 }
@@ -324,8 +391,7 @@ function saveLead(){
   if(!co){document.getElementById('f-company').focus();return;}
   const obj={
     id:editId||Date.now()+'',
-    company:co,
-    contact:document.getElementById('f-contact').value.trim(),
+    company:co,contact:document.getElementById('f-contact').value.trim(),
     phone:document.getElementById('f-phone').value.trim(),
     email:document.getElementById('f-email').value.trim(),
     address:document.getElementById('f-address').value.trim(),
@@ -351,10 +417,10 @@ function renderAreasList(){
   leads.forEach(l=>counts[l.area]=(counts[l.area]||0)+1);
   document.getElementById('areas-list').innerHTML=draftAreas.map((a,i)=>`
     <div class="area-row" id="arow-${i}">
-      <span style="flex:1;font-size:13px">${esc(a)}</span>
+      <span style="flex:1;font-size:13px;font-weight:500;color:var(--blue-900)">${esc(a)}</span>
       ${counts[a]?`<span class="count-pill">${counts[a]}</span>`:''}
-      <button class="btn btn-sm" onclick="startRename(${i})">Rename</button>
-      ${a!=='Other'?`<button class="btn btn-sm btn-danger" onclick="removeArea(${i})">✕</button>`:''}
+      <button class="btn btn-outline btn-sm" onclick="startRename(${i})">Rename</button>
+      ${a!=='Other'?`<button class="btn-danger-sm" onclick="removeArea(${i})">✕</button>`:''}
     </div>`).join('');
 }
 
@@ -362,9 +428,9 @@ function startRename(i){
   const row=document.getElementById('arow-'+i);
   const cur=draftAreas[i];
   row.innerHTML=`
-    <input style="flex:1;font-size:13px;padding:4px 8px;border:1px solid #ddd;border-radius:6px;font-family:inherit" value="${esc(cur)}" id="ri-${i}" onkeydown="if(event.key==='Enter')confirmRename(${i});if(event.key==='Escape')renderAreasList()">
-    <button class="btn btn-sm" onclick="confirmRename(${i})">Save</button>
-    <button class="btn btn-sm" onclick="renderAreasList()">Cancel</button>`;
+    <input style="flex:1;font-size:13px;padding:5px 9px;border:1px solid var(--blue-400);border-radius:6px;font-family:inherit;background:var(--white)" value="${esc(cur)}" id="ri-${i}" onkeydown="if(event.key==='Enter')confirmRename(${i});if(event.key==='Escape')renderAreasList()">
+    <button class="btn btn-primary btn-sm" onclick="confirmRename(${i})">Save</button>
+    <button class="btn btn-outline btn-sm" onclick="renderAreasList()">Cancel</button>`;
   document.getElementById('ri-'+i).focus();
 }
 
