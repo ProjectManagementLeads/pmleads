@@ -3,138 +3,309 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Central Ohio PM Lead Tracker</title>
+<title>Central Ohio PM Leads</title>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  :root{
-    --blue-900:#042C53;--blue-800:#0C447C;--blue-700:#185FA5;
-    --blue-600:#378ADD;--blue-400:#85B7EB;--blue-200:#B5D4F4;
-    --blue-100:#D6E9FA;--blue-50:#EEF6FD;--white:#fff;
-    --text-dark:#042C53;--text-mid:#185FA5;--text-muted:#378ADD;
-  }
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--blue-50);color:var(--text-dark);font-size:14px;min-height:100vh}
-
-  /* Top bar */
-  .topbar{background:var(--blue-900);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:10;border-bottom:2px solid var(--blue-800)}
-  .topbar-brand{display:flex;align-items:center;gap:10px}
-  .topbar-logo{width:32px;height:32px;background:var(--blue-700);border-radius:8px;display:flex;align-items:center;justify-content:center}
-  .topbar-logo svg{width:18px;height:18px;fill:var(--blue-200)}
-  .topbar h1{font-size:17px;font-weight:600;color:var(--white);letter-spacing:-0.01em}
-  .topbar-sub{font-size:11px;color:var(--blue-400);margin-top:1px}
-  .topbar-actions{display:flex;gap:8px}
-
-  /* Buttons */
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:13px;padding:7px 16px;border-radius:8px;cursor:pointer;white-space:nowrap;font-family:inherit;font-weight:500;transition:opacity .15s,background .15s;border:none;height:34px}
-  .btn-ghost{background:rgba(255,255,255,0.1);color:var(--white);border:1px solid rgba(255,255,255,0.2)}
-  .btn-ghost:hover{background:rgba(255,255,255,0.2)}
-  .btn-white{background:var(--white);color:var(--blue-900);border:none}
-  .btn-white:hover{background:var(--blue-100)}
-  .btn-outline{background:var(--white);color:var(--blue-800);border:1px solid var(--blue-200)}
-  .btn-outline:hover{background:var(--blue-50);border-color:var(--blue-400)}
-  .btn-primary{background:var(--blue-700);color:var(--white)}
-  .btn-primary:hover{background:var(--blue-800)}
-  .btn-sm{font-size:11px;padding:3px 10px;height:26px}
-  .btn-danger-sm{font-size:11px;padding:3px 10px;height:26px;background:#fff;color:#a32d2d;border:1px solid #f09595;border-radius:6px;cursor:pointer;font-family:inherit}
-  .btn-danger-sm:hover{background:#fcebeb}
-  .btn-ai{background:var(--blue-100);color:var(--blue-800);border:1px solid var(--blue-300,#a8cfee);height:auto;padding:8px 16px;font-size:13px;font-weight:500}
-  .btn-ai:hover{background:var(--blue-200)}
-
-  /* Stats */
-  .stats-bar{background:var(--blue-800);padding:14px 20px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-  .stat{background:rgba(255,255,255,0.08);border-radius:10px;padding:10px 14px;border:1px solid rgba(255,255,255,0.1)}
-  .stat-label{font-size:11px;color:var(--blue-300,#a8cfee);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.04em;font-weight:500}
-  .stat-val{font-size:24px;font-weight:700;color:var(--white)}
-
-  /* Tabs */
-  .tabs-wrap{background:var(--blue-900);overflow-x:auto;padding:0 20px;display:flex;gap:0;border-bottom:1px solid var(--blue-800)}
-  .tab{font-size:12px;padding:10px 14px;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--blue-400);cursor:pointer;white-space:nowrap;font-weight:500;font-family:inherit;transition:color .15s}
-  .tab:hover{color:var(--blue-200)}
-  .tab.active{color:var(--white);border-bottom-color:var(--blue-400)}
-
-  /* Toolbar */
-  .toolbar{display:flex;gap:8px;padding:14px 20px;flex-wrap:wrap;align-items:center;background:var(--white);border-bottom:1px solid var(--blue-100)}
-  .toolbar input,.toolbar select{font-size:13px;padding:6px 10px;border:1px solid var(--blue-200);border-radius:8px;background:var(--blue-50);color:var(--text-dark);height:34px;font-family:inherit}
-  .toolbar input{flex:1;min-width:150px}
-  .toolbar input:focus,.toolbar select:focus{outline:none;border-color:var(--blue-600);background:var(--white)}
-
-  /* Table */
-  .table-wrap{padding:16px 20px 80px}
-  .table-card{background:var(--white);border-radius:12px;border:1px solid var(--blue-100);overflow:hidden;box-shadow:0 2px 8px rgba(4,44,83,0.06)}
-  table{width:100%;border-collapse:collapse;font-size:13px}
-  th{font-size:11px;font-weight:600;color:var(--blue-700);text-align:left;padding:11px 14px;border-bottom:1px solid var(--blue-100);cursor:pointer;white-space:nowrap;background:var(--blue-50);text-transform:uppercase;letter-spacing:0.04em}
-  th:hover{color:var(--blue-900)}
-  td{padding:11px 14px;border-bottom:1px solid var(--blue-50);vertical-align:middle}
-  tr:last-child td{border-bottom:none}
-  tr:hover td{background:var(--blue-50)}
-  .co-name{font-weight:600;color:var(--blue-900);font-size:13px}
-  .co-addr{font-size:11px;color:var(--text-muted);margin-top:2px}
-
-  /* Badges */
-  .badge{display:inline-block;font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600;white-space:nowrap;letter-spacing:0.01em}
-  .area-pill{font-size:11px;padding:3px 9px;border-radius:20px;background:var(--blue-100);color:var(--blue-800);font-weight:500}
-
-  /* Modal */
-  .overlay{display:none;position:fixed;inset:0;background:rgba(4,44,83,0.5);z-index:100;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px)}
-  .overlay.open{display:flex}
-  .modal{background:var(--white);border-radius:16px;padding:1.75rem;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 16px 48px rgba(4,44,83,0.2);border:1px solid var(--blue-100)}
-  .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
-  .modal h2{font-size:17px;font-weight:700;color:var(--blue-900)}
-  .modal-close{background:none;border:none;font-size:20px;color:var(--blue-400);cursor:pointer;line-height:1;padding:0 4px}
-  .modal-close:hover{color:var(--blue-900)}
-  .modal-sub{font-size:12px;color:var(--text-muted);margin-bottom:1.25rem;line-height:1.5}
-  .field{margin-bottom:14px}
-  .field label{display:block;font-size:11px;color:var(--blue-700);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em}
-  .field input,.field select,.field textarea{width:100%;font-size:13px;padding:9px 11px;border:1px solid var(--blue-200);border-radius:8px;background:var(--blue-50);color:var(--text-dark);font-family:inherit;transition:border-color .15s,background .15s}
-  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--blue-600);background:var(--white)}
-  .field textarea{resize:vertical;min-height:65px}
-  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
-
-  /* Lookup box */
-  .lookup-box{background:var(--blue-50);border:1px solid var(--blue-200);border-radius:10px;padding:14px 16px;margin-bottom:16px}
-  .lookup-box-title{font-size:12px;font-weight:700;color:var(--blue-800);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.04em}
-  .lookup-box-desc{font-size:12px;color:var(--blue-700);margin-bottom:10px;line-height:1.5}
-  .lookup-row{display:flex;gap:8px;align-items:flex-end}
-  .lookup-row .field{flex:1;margin-bottom:0}
-
-  /* Manage areas rows */
-  .area-row{display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--blue-100);border-radius:8px;background:var(--blue-50);margin-bottom:6px}
-  .count-pill{font-size:11px;padding:2px 7px;border-radius:20px;background:var(--blue-100);color:var(--blue-700);font-weight:600}
-
-  .divider{height:1px;background:var(--blue-100);margin:14px 0}
-  .empty{text-align:center;padding:3.5rem;color:var(--blue-400)}
-  .empty-icon{font-size:32px;margin-bottom:8px;opacity:0.4}
-  .empty-text{font-size:14px;font-weight:500;color:var(--blue-600)}
-  .empty-sub{font-size:12px;color:var(--blue-400);margin-top:4px}
-
-  @media(max-width:640px){
-    .stats-bar{grid-template-columns:repeat(2,1fr)}
-    .topbar h1{font-size:15px}
-    .hide-mobile{display:none}
-    .table-wrap{padding:12px 12px 80px}
-    .toolbar{padding:10px 12px}
-  }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink:      #1C1C1E;
+  --ink-2:    #3A3A3C;
+  --ink-3:    #8E8E93;
+  --ink-4:    #C7C7CC;
+  --ink-5:    #E5E5EA;
+  --surf:     #F2F2F7;
+  --white:    #FFFFFF;
+  --border:   #D1D1D6;
+  --border-l: #E5E5EA;
+  --blue:     #007AFF;
+  --blue-l:   #EAF3FF;
+  --blue-m:   #B3D3FF;
+  --green:    #34C759;
+  --green-d:  #248A3D;
+  --green-l:  #EDFBF1;
+  --orange-l: #FFF4E0;
+  --orange-d: #C93400;
+  --red:      #FF3B30;
+  --red-l:    #FFF0EF;
+}
+ 
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  background: var(--surf);
+  color: var(--ink);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+ 
+/* ── Topbar ── */
+.topbar {
+  background: rgba(242,242,247,0.92);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--border-l);
+  padding: 0 24px;
+  height: 52px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 30;
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-icon {
+  width: 28px; height: 28px;
+  background: var(--blue); border-radius: 7px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.brand-icon svg { width: 14px; height: 14px; }
+.brand-name { font-size: 15px; font-weight: 600; color: var(--ink); letter-spacing: -0.3px; }
+.top-actions { display: flex; gap: 8px; }
+ 
+/* ── Buttons ── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  font-size: 13px; font-weight: 500; font-family: inherit;
+  padding: 0 14px; height: 32px;
+  border: none; border-radius: 8px;
+  cursor: pointer; white-space: nowrap;
+  letter-spacing: -0.1px;
+  transition: filter .12s, background .12s;
+}
+.btn-primary { background: var(--blue); color: #fff; }
+.btn-primary:hover { filter: brightness(1.1); }
+.btn-primary:disabled { opacity: .45; cursor: not-allowed; }
+.btn-ghost { background: var(--white); color: var(--ink-2); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--surf); }
+.btn-sm { font-size: 12px; padding: 0 10px; height: 26px; border-radius: 6px; }
+.btn-danger-sm {
+  font-size: 12px; padding: 0 10px; height: 26px; border-radius: 6px;
+  background: transparent; color: var(--red); border: 1px solid var(--border);
+  cursor: pointer; font-family: inherit; font-weight: 500;
+  transition: background .12s, border-color .12s;
+}
+.btn-danger-sm:hover { background: var(--red-l); border-color: var(--red); }
+.btn-ai {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 500; font-family: inherit;
+  padding: 0 14px; height: 32px; border-radius: 8px;
+  background: var(--blue-l); color: var(--blue); border: 1px solid var(--blue-m);
+  cursor: pointer; transition: background .12s; white-space: nowrap;
+}
+.btn-ai:hover:not(:disabled) { background: var(--blue-m); }
+.btn-ai:disabled { opacity: .4; cursor: not-allowed; }
+ 
+/* ── Stats ── */
+.stats-bar {
+  background: var(--white);
+  border-bottom: 1px solid var(--border-l);
+  padding: 0 24px;
+  display: grid; grid-template-columns: repeat(4,1fr);
+}
+.stat { padding: 16px 20px 16px 0; border-right: 1px solid var(--border-l); }
+.stat:last-child { border-right: none; padding-right: 0; }
+.stat-label { font-size: 11px; font-weight: 500; color: var(--ink-3); margin-bottom: 4px; }
+.stat-val { font-size: 26px; font-weight: 700; color: var(--ink); letter-spacing: -1px; line-height: 1; }
+ 
+/* ── Tabs ── */
+.tabs-wrap {
+  background: var(--white);
+  border-bottom: 1px solid var(--border-l);
+  padding: 0 24px;
+  display: flex; overflow-x: auto; scrollbar-width: none;
+}
+.tabs-wrap::-webkit-scrollbar { display: none; }
+.tab {
+  font-size: 13px; font-weight: 500; font-family: inherit;
+  padding: 10px 14px;
+  border: none; border-bottom: 2px solid transparent;
+  background: transparent; color: var(--ink-3);
+  cursor: pointer; white-space: nowrap;
+  transition: color .15s, border-color .15s;
+  letter-spacing: -0.1px;
+}
+.tab:hover { color: var(--ink-2); }
+.tab.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 600; }
+.tab-cnt {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 18px; height: 16px; font-size: 10px; font-weight: 600;
+  background: var(--ink-5); color: var(--ink-3);
+  padding: 0 5px; border-radius: 10px; margin-left: 5px; vertical-align: middle;
+}
+.tab.active .tab-cnt { background: var(--blue-l); color: var(--blue); }
+ 
+/* ── Toolbar ── */
+.toolbar {
+  display: flex; gap: 8px; padding: 10px 24px;
+  align-items: center; flex-wrap: wrap;
+  background: var(--white); border-bottom: 1px solid var(--border-l);
+}
+.search-wrap { flex: 1; min-width: 180px; position: relative; }
+.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--ink-3); font-size: 14px; pointer-events: none; }
+.search-input {
+  width: 100%; font-size: 13px; font-family: inherit;
+  padding: 0 11px 0 30px; height: 32px;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: var(--surf); color: var(--ink); outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.search-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-l); }
+.filter-select {
+  font-size: 13px; font-family: inherit;
+  padding: 0 11px; height: 32px;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: var(--surf); color: var(--ink); outline: none; cursor: pointer;
+}
+.filter-select:focus { border-color: var(--blue); }
+ 
+/* ── Table ── */
+.table-wrap { padding: 16px 24px 80px; }
+.table-card {
+  background: var(--white);
+  border: 1px solid var(--border-l);
+  border-radius: 12px; overflow: hidden;
+}
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead { border-bottom: 1px solid var(--border-l); }
+th {
+  font-size: 11px; font-weight: 500; color: var(--ink-3);
+  text-align: left; padding: 10px 14px;
+  cursor: pointer; white-space: nowrap;
+  background: var(--white); user-select: none;
+}
+th:hover { color: var(--ink-2); }
+td { padding: 11px 14px; border-bottom: 1px solid var(--surf); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--surf); }
+.co-name { font-weight: 600; color: var(--ink); letter-spacing: -0.1px; }
+.co-addr { font-size: 11px; color: var(--ink-3); margin-top: 2px; }
+.badge {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 500;
+  padding: 3px 9px; border-radius: 20px; white-space: nowrap;
+}
+.area-chip {
+  display: inline-block; font-size: 11px; font-weight: 500;
+  padding: 3px 9px; border-radius: 20px;
+  background: var(--ink-5); color: var(--ink-2);
+}
+.muted { color: var(--ink-4); }
+ 
+/* ── Empty ── */
+.empty { text-align: center; padding: 56px 20px; }
+.empty-icon { font-size: 32px; margin-bottom: 12px; opacity: .25; }
+.empty-title { font-size: 15px; font-weight: 600; color: var(--ink-2); letter-spacing: -0.2px; }
+.empty-sub { font-size: 13px; color: var(--ink-3); margin-top: 5px; }
+ 
+/* ── Overlay / Modal ── */
+.overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.3);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  z-index: 100; align-items: center; justify-content: center; padding: 16px;
+}
+.overlay.open { display: flex; }
+.modal {
+  background: var(--white); border-radius: 16px;
+  padding: 24px; width: 100%; max-width: 520px;
+  max-height: 92vh; overflow-y: auto;
+  border: 1px solid var(--border-l);
+  box-shadow: 0 24px 64px rgba(0,0,0,.18);
+}
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.modal-title { font-size: 17px; font-weight: 700; color: var(--ink); letter-spacing: -0.4px; }
+.modal-close {
+  background: var(--ink-5); border: none;
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; color: var(--ink-3); cursor: pointer; line-height: 1;
+  transition: background .12s;
+}
+.modal-close:hover { background: var(--border); color: var(--ink); }
+.modal-sub { font-size: 13px; color: var(--ink-3); margin-bottom: 20px; line-height: 1.5; margin-top: 4px; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-l); }
+ 
+/* ── Form fields ── */
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 12px; font-weight: 500; color: var(--ink-2); margin-bottom: 5px; letter-spacing: -0.1px; }
+.field input, .field select, .field textarea {
+  width: 100%; font-size: 14px; font-family: inherit; font-weight: 400;
+  padding: 9px 12px;
+  border: 1px solid var(--border); border-radius: 10px;
+  background: var(--surf); color: var(--ink); outline: none;
+  -webkit-appearance: none; appearance: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-l); background: var(--white);
+}
+.field textarea { resize: vertical; min-height: 72px; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+ 
+/* ── Autofill box ── */
+.autofill-box {
+  background: var(--blue-l); border: 1px solid var(--blue-m);
+  border-radius: 12px; padding: 14px 16px; margin-bottom: 20px;
+}
+.autofill-label { font-size: 11px; font-weight: 600; color: var(--blue); margin-bottom: 3px; }
+.autofill-desc { font-size: 12px; color: var(--ink-2); margin-bottom: 10px; line-height: 1.5; }
+.autofill-row { display: flex; gap: 8px; align-items: center; }
+.autofill-row input {
+  flex: 1; font-size: 13px; font-family: inherit;
+  padding: 0 12px; height: 32px;
+  border: 1px solid var(--blue-m); border-radius: 8px;
+  background: var(--white); color: var(--ink); outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.autofill-row input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-l); }
+.autofill-status { margin-top: 10px; font-size: 12px; min-height: 18px; }
+ 
+/* ── Manage Areas ── */
+.area-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 12px; border-radius: 10px;
+  border: 1px solid var(--border-l);
+  background: var(--surf); margin-bottom: 6px;
+  cursor: grab; user-select: none;
+  transition: background .12s, border-color .12s, opacity .12s;
+}
+.area-row:active { cursor: grabbing; }
+.area-row.dragging { opacity: .35; }
+.area-row.drag-over { border-color: var(--blue); background: var(--blue-l); }
+.drag-handle { color: var(--ink-4); font-size: 14px; cursor: grab; flex-shrink: 0; letter-spacing: -1px; }
+.count-chip { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; background: var(--ink-5); color: var(--ink-3); }
+.area-name-input {
+  flex: 1; font-size: 13px; font-family: inherit;
+  padding: 5px 9px; border: 1px solid var(--blue);
+  border-radius: 8px; background: var(--white); color: var(--ink); outline: none;
+}
+ 
+@media (max-width: 640px) {
+  .stats-bar { grid-template-columns: repeat(2,1fr); }
+  .topbar, .stats-bar, .tabs-wrap, .toolbar, .table-wrap { padding-left: 16px; padding-right: 16px; }
+  .hide-mob { display: none; }
+  .stat-val { font-size: 22px; }
+}
 </style>
 </head>
 <body>
-
-<!-- Top Bar -->
+ 
+<!-- Topbar -->
 <div class="topbar">
-  <div class="topbar-brand">
-    <div class="topbar-logo">
-      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22" fill="none" stroke="#B5D4F4" stroke-width="2"/></svg>
+  <div class="brand">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
     </div>
-    <div>
-      <div class="topbar h1" style="font-size:17px;font-weight:700;color:#fff;letter-spacing:-0.01em">Central Ohio PM Leads</div>
-      <div class="topbar-sub">Flooring turn pipeline tracker</div>
-    </div>
+    <span class="brand-name">Central Ohio PM Leads</span>
   </div>
-  <div class="topbar-actions">
-    <button class="btn btn-ghost" onclick="openManageAreas()">⚙ Manage areas</button>
-    <button class="btn btn-white" onclick="openAddLead()">+ Add lead</button>
+  <div class="top-actions">
+    <button class="btn btn-ghost" onclick="openAreas()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Manage areas
+    </button>
+    <button class="btn btn-primary" onclick="openAdd()">+ Add lead</button>
   </div>
 </div>
-
+ 
 <!-- Stats -->
 <div class="stats-bar">
   <div class="stat"><div class="stat-label">Total leads</div><div class="stat-val" id="s-total">0</div></div>
@@ -142,342 +313,462 @@
   <div class="stat"><div class="stat-label">Qualified</div><div class="stat-val" id="s-qualified">0</div></div>
   <div class="stat"><div class="stat-label">Total units</div><div class="stat-val" id="s-units">0</div></div>
 </div>
-
+ 
 <!-- Tabs -->
 <div class="tabs-wrap" id="tabs"></div>
-
+ 
 <!-- Toolbar -->
 <div class="toolbar">
-  <input type="text" id="search" placeholder="🔍  Search company or contact..." oninput="render()">
-  <select id="filter-status" onchange="render()">
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input class="search-input" id="search" placeholder="Search company or contact…" oninput="render()">
+  </div>
+  <select class="filter-select" id="filter-status" onchange="render()">
     <option value="">All statuses</option>
-    <option>New</option><option>Contacted</option><option>Qualified</option><option>Proposal sent</option><option>Closed won</option><option>Dead</option>
+    <option>New</option><option>Contacted</option><option>Qualified</option>
+    <option>Proposal sent</option><option>Closed won</option><option>Dead</option>
   </select>
-  <button class="btn btn-outline" onclick="exportCSV()">↓ Export CSV</button>
+  <button class="btn btn-ghost" onclick="exportCSV()">↓ Export CSV</button>
 </div>
-
+ 
 <!-- Table -->
 <div class="table-wrap">
-<div class="table-card">
-<table>
-  <thead>
-    <tr>
-      <th onclick="sortBy('company')">Company <span id="arr-company"></span></th>
-      <th onclick="sortBy('contact')" class="hide-mobile">Contact <span id="arr-contact"></span></th>
-      <th onclick="sortBy('phone')" class="hide-mobile">Phone</th>
-      <th onclick="sortBy('units')">Units <span id="arr-units"></span></th>
-      <th onclick="sortBy('area')">Area <span id="arr-area"></span></th>
-      <th onclick="sortBy('status')">Status <span id="arr-status"></span></th>
-      <th class="hide-mobile">Style / Notes</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody id="tbody"></tbody>
-</table>
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th onclick="sortBy('company')">Company <span id="arr-company"></span></th>
+          <th onclick="sortBy('contact')" class="hide-mob">Contact <span id="arr-contact"></span></th>
+          <th class="hide-mob">Phone</th>
+          <th onclick="sortBy('units')" style="text-align:right">Units <span id="arr-units"></span></th>
+          <th onclick="sortBy('area')">Area <span id="arr-area"></span></th>
+          <th onclick="sortBy('status')">Status <span id="arr-status"></span></th>
+          <th class="hide-mob">Notes</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
 </div>
-</div>
-
+ 
 <!-- Add/Edit Lead Modal -->
 <div class="overlay" id="lead-modal" onclick="bgClose(event,'lead-modal')">
-<div class="modal">
-  <div class="modal-header">
-    <h2 id="lead-modal-title">Add lead</h2>
-    <button class="modal-close" onclick="closeModal('lead-modal')">×</button>
-  </div>
-  <p class="modal-sub">Fill in manually, or use the AI lookup below to auto-research the property via Claude chat.</p>
-
-  <div class="lookup-box">
-    <div class="lookup-box-title">✦ AI lookup — free via chat</div>
-    <div class="lookup-box-desc">Type the property name and click "Ask Claude ↗" — Claude will look it up and return the details for you to paste in.</div>
-    <div class="lookup-row">
-      <div class="field"><input id="lookup-input" placeholder="e.g. Emerson Park Apartments" oninput="onLookupInput()"></div>
-      <button class="btn btn-ai" id="lookup-btn" onclick="askClaude()" disabled>Ask Claude ↗</button>
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Add lead</span>
+      <button class="modal-close" onclick="closeModal('lead-modal')">×</button>
+    </div>
+    <p class="modal-sub">Type a property name and hit Autofill — Claude will search and populate the fields automatically.</p>
+ 
+    <div class="autofill-box">
+      <div class="autofill-label">✦ AI Autofill</div>
+      <div class="autofill-desc">Type the property name and click Autofill — Claude searches for the address, phone, and key details and fills the form for you.</div>
+      <div class="autofill-row">
+        <input id="lookup-input" placeholder="e.g. Emerson Park Apartments" oninput="onLookupInput()" onkeydown="if(event.key==='Enter')doAutofill()">
+        <button class="btn-ai" id="autofill-btn" onclick="doAutofill()" disabled>Autofill ✦</button>
+      </div>
+      <div class="autofill-status" id="autofill-status"></div>
+    </div>
+ 
+    <div class="field"><label>Property / company name *</label><input id="f-company" placeholder="e.g. Worthington Arms Apartments"></div>
+    <div class="field-row">
+      <div class="field"><label>Contact name</label><input id="f-contact" placeholder="Jane Smith"></div>
+      <div class="field"><label>Phone</label><input id="f-phone" type="tel" placeholder="(614) 555-0100"></div>
+    </div>
+    <div class="field"><label>Email</label><input id="f-email" type="email" placeholder="jane@company.com"></div>
+    <div class="field"><label>Physical address</label><input id="f-address" placeholder="123 Main St, Westerville, OH 43081"></div>
+    <div class="field-row">
+      <div class="field"><label>Unit count</label><input id="f-units" type="number" min="0" placeholder="120"></div>
+      <div class="field"><label>Property style</label><input id="f-style" placeholder="e.g. Garden-style"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Area</label><select id="f-area"></select></div>
+      <div class="field"><label>Status</label>
+        <select id="f-status">
+          <option>New</option><option>Contacted</option><option>Qualified</option>
+          <option>Proposal sent</option><option>Closed won</option><option>Dead</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>Notes / next steps</label><textarea id="f-notes" placeholder="e.g. Call back Thursday, ask about summer turns"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('lead-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveLead()">Save lead</button>
     </div>
   </div>
-
-  <div class="field"><label>Property / company name *</label><input id="f-company" placeholder="e.g. Worthington Arms Apartments"></div>
-  <div class="field-row">
-    <div class="field"><label>Contact name</label><input id="f-contact" placeholder="Jane Smith"></div>
-    <div class="field"><label>Phone</label><input id="f-phone" type="tel" placeholder="(614) 555-0100"></div>
-  </div>
-  <div class="field"><label>Email</label><input id="f-email" type="email" placeholder="jane@company.com"></div>
-  <div class="field"><label>Physical address</label><input id="f-address" placeholder="123 Main St, Westerville, OH 43081"></div>
-  <div class="field-row">
-    <div class="field"><label>Unit count</label><input id="f-units" type="number" min="0" placeholder="120"></div>
-    <div class="field"><label>Property style</label><input id="f-style" placeholder="e.g. Garden-style"></div>
-  </div>
-  <div class="field-row">
-    <div class="field"><label>Area</label><select id="f-area"></select></div>
-    <div class="field"><label>Status</label>
-      <select id="f-status">
-        <option>New</option><option>Contacted</option><option>Qualified</option><option>Proposal sent</option><option>Closed won</option><option>Dead</option>
-      </select>
-    </div>
-  </div>
-  <div class="field"><label>Notes / next steps</label><textarea id="f-notes" placeholder="e.g. Call back Thursday, ask about summer turns"></textarea></div>
-  <div class="modal-actions">
-    <button class="btn btn-outline" onclick="closeModal('lead-modal')">Cancel</button>
-    <button class="btn btn-primary" onclick="saveLead()">Save lead</button>
-  </div>
 </div>
-</div>
-
+ 
 <!-- Manage Areas Modal -->
 <div class="overlay" id="areas-modal" onclick="bgClose(event,'areas-modal')">
-<div class="modal">
-  <div class="modal-header">
-    <h2>Manage areas</h2>
-    <button class="modal-close" onclick="closeModal('areas-modal')">×</button>
-  </div>
-  <p class="modal-sub">Add, rename, or remove territories. Removing an area moves its leads to "Other".</p>
-  <div style="display:flex;gap:8px;margin-bottom:14px">
-    <input id="new-area-input" placeholder="New area or town name..." style="flex:1;font-size:13px;padding:8px 11px;border:1px solid var(--blue-200);border-radius:8px;background:var(--blue-50);color:var(--text-dark);font-family:inherit" onkeydown="if(event.key==='Enter')addArea()">
-    <button class="btn btn-primary" onclick="addArea()">Add</button>
-  </div>
-  <div id="areas-list"></div>
-  <div class="modal-actions">
-    <button class="btn btn-outline" onclick="closeModal('areas-modal')">Cancel</button>
-    <button class="btn btn-primary" onclick="saveAreas()">Save changes</button>
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Manage areas</span>
+      <button class="modal-close" onclick="closeModal('areas-modal')">×</button>
+    </div>
+    <p class="modal-sub">Add, rename, or remove territories. Drag ⠿ to reorder. Removing an area moves its leads to "Other".</p>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <input id="new-area-input" placeholder="New area or town name…"
+        style="flex:1;font-size:13px;font-family:inherit;padding:0 12px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--surf);color:var(--ink);outline:none"
+        onkeydown="if(event.key==='Enter')addArea()"
+        onfocus="this.style.borderColor='var(--blue)';this.style.boxShadow='0 0 0 3px var(--blue-l)'"
+        onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
+      <button class="btn btn-primary" onclick="addArea()">Add</button>
+    </div>
+    <div id="areas-list"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('areas-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAreas()">Save changes</button>
+    </div>
   </div>
 </div>
-</div>
-
+ 
 <script>
-const STATUS_COLOR={
-  "New":          {bg:"#E6F1FB",color:"#0C447C"},
-  "Contacted":    {bg:"#B5D4F4",color:"#042C53"},
-  "Qualified":    {bg:"#378ADD",color:"#fff"},
-  "Proposal sent":{bg:"#185FA5",color:"#fff"},
-  "Closed won":   {bg:"#042C53",color:"#B5D4F4"},
-  "Dead":         {bg:"#e5e5e5",color:"#888"},
+// ── State ──────────────────────────────────────────────────────────────────
+const STATUS_CFG = {
+  "New":           { bg:"#E5E5EA", color:"#3A3A3C" },
+  "Contacted":     { bg:"#EAF3FF", color:"#007AFF" },
+  "Qualified":     { bg:"#EDFBF1", color:"#248A3D" },
+  "Proposal sent": { bg:"#FFF4E0", color:"#C93400" },
+  "Closed won":    { bg:"#34C759", color:"#FFFFFF" },
+  "Dead":          { bg:"#F2F2F7", color:"#8E8E93" },
 };
-
-let leads=JSON.parse(localStorage.getItem('co_pm_leads')||'[]');
-let areas=JSON.parse(localStorage.getItem('co_pm_areas')||'["Westerville","Bexley","Grove City","Hilliard","Dublin","Upper Arlington","Clintonville","Worthington","New Albany","Other"]');
-let draftAreas=[];
-let activeArea="All Areas";
-let editId=null;
-let sortCol="company",sortDir=1;
-
-function save(){
-  localStorage.setItem('co_pm_leads',JSON.stringify(leads));
-  localStorage.setItem('co_pm_areas',JSON.stringify(areas));
+ 
+let leads = JSON.parse(localStorage.getItem('pm_leads') || '[]');
+let areas = (() => {
+  const s = localStorage.getItem('pm_areas');
+  if (s) return JSON.parse(s);
+  return ["Bexley","Clintonville","Dublin","Grove City","Hilliard","Marysville","New Albany","Plain City","Upper Arlington","Westerville","West Jefferson","Worthington","Other"];
+})();
+let draftAreas = [];
+let activeArea = "All Areas";
+let editId = null;
+let sortCol = "company", sortDir = 1;
+let dragSrcIdx = null;
+ 
+function save() {
+  localStorage.setItem('pm_leads', JSON.stringify(leads));
+  localStorage.setItem('pm_areas', JSON.stringify(areas));
 }
-
-function onLookupInput(){
-  const v=document.getElementById('lookup-input').value.trim();
-  document.getElementById('lookup-btn').disabled=!v;
+ 
+// ── Autofill ───────────────────────────────────────────────────────────────
+function onLookupInput() {
+  document.getElementById('autofill-btn').disabled = !document.getElementById('lookup-input').value.trim();
 }
-
-function askClaude(){
-  const name=document.getElementById('lookup-input').value.trim();
-  if(!name)return;
-  document.getElementById('f-company').value=name;
-  const msg=`Please look up this property management company or apartment complex for me and give me: contact name, email, phone number, physical address, total unit count, and property style.\n\nProperty name: "${name}"\nLocation: Central Ohio (Columbus metro area)`;
-  if(window.parent&&window.parent!==window){
-    window.parent.postMessage({type:'claude-send-message',message:msg},'*');
-  } else {
-    navigator.clipboard.writeText(msg).then(()=>{
-      alert('Copied to clipboard! Paste it into the Claude chat to look up this property.');
-    }).catch(()=>{ alert('Ask Claude:\n\n'+msg); });
+ 
+async function doAutofill() {
+  const name = document.getElementById('lookup-input').value.trim();
+  if (!name) return;
+ 
+  const btn = document.getElementById('autofill-btn');
+  const status = document.getElementById('autofill-status');
+  btn.disabled = true;
+  btn.textContent = 'Searching…';
+  status.innerHTML = '<span style="color:var(--ink-3)">⟳ Looking up ' + esc(name) + '…</span>';
+ 
+  const areaList = areas.filter(a => a !== 'Other').join(', ');
+  const prompt = `You are a research assistant. Search the web for this apartment complex or property management company in Central Ohio and return ONLY a valid JSON object with these exact keys:
+{"company":"full property name","address":"full street address including city, state, zip","phone":"main phone number as (XXX) XXX-XXXX","contact":"leasing manager or primary contact name or empty string","email":"leasing or main email or empty string","units":unit count as number or 0,"style":"property style e.g. garden-style mid-rise townhome or empty string","area":"best match from this list: ${areaList} — or Other if none match"}
+Property: "${name}"
+Location: Central Ohio / Columbus metro area
+Return ONLY the JSON object. No markdown, no explanation, no extra text.`;
+ 
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        tools: [{ type: "web_search_20250305", name: "web_search" }],
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    const tb = (data.content || []).filter(b => b.type === "text").pop();
+    if (!tb) throw new Error("No text block");
+    const d = JSON.parse(tb.text.replace(/```json|```/g, "").trim());
+ 
+    document.getElementById('f-company').value = d.company || name;
+    document.getElementById('f-address').value = d.address || '';
+    document.getElementById('f-phone').value   = d.phone   || '';
+    document.getElementById('f-contact').value = d.contact || '';
+    document.getElementById('f-email').value   = d.email   || '';
+    document.getElementById('f-style').value   = d.style   || '';
+    if (d.units) document.getElementById('f-units').value = d.units;
+    const matchedArea = areas.includes(d.area) ? d.area : 'Other';
+    document.getElementById('f-area').value = matchedArea;
+ 
+    status.innerHTML = '<span style="color:var(--green-d)">✓ Fields filled in — review and adjust as needed.</span>';
+  } catch(e) {
+    console.error(e);
+    document.getElementById('f-company').value = name;
+    status.innerHTML = '<span style="color:var(--red)">Could not autofill — please fill in the fields manually.</span>';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Autofill ✦';
   }
 }
-
-function renderTabs(){
-  const counts={};
-  leads.forEach(l=>counts[l.area]=(counts[l.area]||0)+1);
-  const all=["All Areas",...areas];
-  document.getElementById('tabs').innerHTML=all.map(a=>{
-    const cnt=a==="All Areas"?leads.length:(counts[a]||0);
-    const act=activeArea===a?'active':'';
-    return `<button class="tab ${act}" onclick="setArea('${a.replace(/'/g,"\\'")}')">${a}${cnt>0?' <span style="opacity:.7">('+cnt+')</span>':''}</button>`;
+ 
+// ── Tabs & Stats ───────────────────────────────────────────────────────────
+function renderTabs() {
+  const counts = {};
+  leads.forEach(l => counts[l.area] = (counts[l.area] || 0) + 1);
+  const all = ["All Areas", ...areas];
+  document.getElementById('tabs').innerHTML = all.map(a => {
+    const cnt = a === "All Areas" ? leads.length : (counts[a] || 0);
+    const active = activeArea === a ? ' active' : '';
+    const badge = cnt > 0 ? `<span class="tab-cnt">${cnt}</span>` : '';
+    return `<button class="tab${active}" onclick="setArea('${a.replace(/'/g,"\\'")}'">${esc(a)}${badge}</button>`;
   }).join('');
 }
-function setArea(a){activeArea=a;render();}
-
-function renderStats(){
-  const src=activeArea==="All Areas"?leads:leads.filter(l=>l.area===activeArea);
-  document.getElementById('s-total').textContent=src.length;
-  document.getElementById('s-contacted').textContent=src.filter(l=>["Contacted","Qualified","Proposal sent","Closed won"].includes(l.status)).length;
-  document.getElementById('s-qualified').textContent=src.filter(l=>["Qualified","Proposal sent","Closed won"].includes(l.status)).length;
-  document.getElementById('s-units').textContent=src.reduce((s,l)=>s+(parseInt(l.units)||0),0).toLocaleString();
+ 
+function setArea(a) { activeArea = a; render(); }
+ 
+function renderStats() {
+  const s = activeArea === "All Areas" ? leads : leads.filter(l => l.area === activeArea);
+  document.getElementById('s-total').textContent = s.length;
+  document.getElementById('s-contacted').textContent = s.filter(l => ["Contacted","Qualified","Proposal sent","Closed won"].includes(l.status)).length;
+  document.getElementById('s-qualified').textContent = s.filter(l => ["Qualified","Proposal sent","Closed won"].includes(l.status)).length;
+  document.getElementById('s-units').textContent = s.reduce((t, l) => t + (parseInt(l.units) || 0), 0).toLocaleString();
 }
-
-function sortBy(col){
-  if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=1;}
+ 
+// ── Sort & Render ──────────────────────────────────────────────────────────
+function sortBy(col) {
+  if (sortCol === col) sortDir *= -1; else { sortCol = col; sortDir = 1; }
   render();
 }
-
-function render(){
-  renderTabs();renderStats();
-  const q=document.getElementById('search').value.toLowerCase();
-  const fs=document.getElementById('filter-status').value;
-  let rows=leads.filter(l=>{
-    const am=activeArea==="All Areas"||l.area===activeArea;
-    const sm=!fs||l.status===fs;
-    const tm=!q||(l.company+l.contact+(l.notes||'')).toLowerCase().includes(q);
-    return am&&sm&&tm;
-  }).sort((a,b)=>{
-    if(sortCol==='units')return((a.units||0)-(b.units||0))*sortDir;
-    return(a[sortCol]||'').toString().localeCompare((b[sortCol]||'').toString())*sortDir;
+ 
+function render() {
+  renderTabs(); renderStats();
+  const q = document.getElementById('search').value.toLowerCase();
+  const fs = document.getElementById('filter-status').value;
+ 
+  let rows = leads.filter(l => {
+    if (activeArea !== "All Areas" && l.area !== activeArea) return false;
+    if (fs && l.status !== fs) return false;
+    if (q && !(l.company + l.contact + (l.notes || '')).toLowerCase().includes(q)) return false;
+    return true;
+  }).sort((a, b) => {
+    if (sortCol === 'units') return ((a.units || 0) - (b.units || 0)) * sortDir;
+    return (a[sortCol] || '').toString().localeCompare((b[sortCol] || '').toString()) * sortDir;
   });
-  ['company','contact','units','area','status'].forEach(c=>{
-    const el=document.getElementById('arr-'+c);
-    if(el)el.textContent=sortCol===c?(sortDir===1?'↑':'↓'):'';
+ 
+  ['company','contact','units','area','status'].forEach(c => {
+    const el = document.getElementById('arr-' + c);
+    if (el) el.textContent = sortCol === c ? (sortDir === 1 ? ' ↑' : ' ↓') : '';
   });
-  const tb=document.getElementById('tbody');
-  if(!rows.length){
-    tb.innerHTML=`<tr><td colspan="8"><div class="empty"><div class="empty-icon">📋</div><div class="empty-text">${leads.length?'No leads match your filter.':'No leads yet'}</div><div class="empty-sub">${leads.length?'Try adjusting your search or filter.':'Click "+ Add lead" to get started.'}</div></div></td></tr>`;
+ 
+  const tb = document.getElementById('tbody');
+  if (!rows.length) {
+    tb.innerHTML = `<tr><td colspan="8"><div class="empty">
+      <div class="empty-icon">📋</div>
+      <div class="empty-title">${leads.length ? 'No leads match your filter' : 'No leads yet'}</div>
+      <div class="empty-sub">${leads.length ? 'Try adjusting your search or filter.' : 'Click "+ Add lead" to get started.'}</div>
+    </div></td></tr>`;
     return;
   }
-  tb.innerHTML=rows.map(l=>{
-    const sc=STATUS_COLOR[l.status]||STATUS_COLOR["New"];
-    const noteText=(l.style?'['+l.style+'] ':'')+( l.notes||'');
+ 
+  tb.innerHTML = rows.map(l => {
+    const sc = STATUS_CFG[l.status] || STATUS_CFG["New"];
+    const note = (l.style ? '[' + l.style + '] ' : '') + (l.notes || '');
     return `<tr>
-      <td><div class="co-name">${esc(l.company)}</div>${l.address?'<div class="co-addr">'+esc(l.address)+'</div>':''}</td>
-      <td class="hide-mobile">${esc(l.contact)||'<span style="color:#aaa">—</span>'}</td>
-      <td class="hide-mobile">${esc(l.phone)||'<span style="color:#aaa">—</span>'}</td>
-      <td style="text-align:right;font-weight:600;color:var(--blue-700)">${l.units||'<span style="color:#aaa">—</span>'}</td>
-      <td><span class="area-pill">${esc(l.area)}</span></td>
+      <td><div class="co-name">${esc(l.company)}</div>${l.address ? '<div class="co-addr">' + esc(l.address) + '</div>' : ''}</td>
+      <td class="hide-mob" style="color:var(--ink-2)">${esc(l.contact) || '<span class="muted">—</span>'}</td>
+      <td class="hide-mob" style="color:var(--ink-2)">${esc(l.phone) || '<span class="muted">—</span>'}</td>
+      <td style="text-align:right;font-weight:700">${l.units || '<span class="muted" style="font-weight:400">—</span>'}</td>
+      <td><span class="area-chip">${esc(l.area)}</span></td>
       <td><span class="badge" style="background:${sc.bg};color:${sc.color}">${esc(l.status)}</span></td>
-      <td class="hide-mobile" style="font-size:12px;color:var(--text-muted);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(noteText)}">${esc(noteText)||'<span style="color:#aaa">—</span>'}</td>
-      <td><button class="btn btn-outline btn-sm" onclick="openEditLead('${l.id}')">Edit</button></td>
+      <td class="hide-mob" style="font-size:12px;color:var(--ink-3);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(note)}">${esc(note) || '<span class="muted">—</span>'}</td>
+      <td><button class="btn btn-ghost btn-sm" onclick="openEdit('${l.id}')">Edit</button></td>
     </tr>`;
   }).join('');
 }
-
-function esc(s){return(s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-
-function populateAreaSelect(){
-  const sel=document.getElementById('f-area');
-  sel.innerHTML=areas.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('');
+ 
+function esc(s) {
+  return (s || '').toString()
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-
-function openAddLead(){
-  editId=null;
-  document.getElementById('lead-modal-title').textContent='Add lead';
+ 
+// ── Lead Modal ─────────────────────────────────────────────────────────────
+function populateAreaSelect() {
+  document.getElementById('f-area').innerHTML = areas.map(a => `<option value="${esc(a)}">${esc(a)}</option>`).join('');
+}
+ 
+function openAdd() {
+  editId = null;
+  document.getElementById('modal-title').textContent = 'Add lead';
   populateAreaSelect();
-  ['company','contact','phone','email','address','units','style','notes'].forEach(k=>document.getElementById('f-'+k).value='');
-  document.getElementById('lookup-input').value='';
-  document.getElementById('lookup-btn').disabled=true;
-  document.getElementById('f-status').value='New';
-  document.getElementById('f-area').value=activeArea!=='All Areas'?activeArea:areas[0];
+  ['company','contact','phone','email','address','units','style','notes'].forEach(k => document.getElementById('f-' + k).value = '');
+  document.getElementById('f-status').value = 'New';
+  document.getElementById('f-area').value = activeArea !== 'All Areas' ? activeArea : areas[0];
+  document.getElementById('lookup-input').value = '';
+  document.getElementById('autofill-btn').disabled = true;
+  document.getElementById('autofill-status').innerHTML = '';
   document.getElementById('lead-modal').classList.add('open');
-  document.getElementById('lookup-input').focus();
+  setTimeout(() => document.getElementById('lookup-input').focus(), 60);
 }
-
-function openEditLead(id){
-  const l=leads.find(x=>x.id===id);if(!l)return;
-  editId=id;
-  document.getElementById('lead-modal-title').textContent='Edit lead';
+ 
+function openEdit(id) {
+  const l = leads.find(x => x.id === id); if (!l) return;
+  editId = id;
+  document.getElementById('modal-title').textContent = 'Edit lead';
   populateAreaSelect();
-  document.getElementById('lookup-input').value=l.company||'';
-  document.getElementById('lookup-btn').disabled=!l.company;
-  document.getElementById('f-company').value=l.company||'';
-  document.getElementById('f-contact').value=l.contact||'';
-  document.getElementById('f-phone').value=l.phone||'';
-  document.getElementById('f-email').value=l.email||'';
-  document.getElementById('f-address').value=l.address||'';
-  document.getElementById('f-units').value=l.units||'';
-  document.getElementById('f-style').value=l.style||'';
-  document.getElementById('f-status').value=l.status||'New';
-  document.getElementById('f-area').value=l.area||areas[0];
-  document.getElementById('f-notes').value=l.notes||'';
+  document.getElementById('f-company').value = l.company || '';
+  document.getElementById('f-contact').value = l.contact || '';
+  document.getElementById('f-phone').value   = l.phone   || '';
+  document.getElementById('f-email').value   = l.email   || '';
+  document.getElementById('f-address').value = l.address || '';
+  document.getElementById('f-units').value   = l.units   || '';
+  document.getElementById('f-style').value   = l.style   || '';
+  document.getElementById('f-status').value  = l.status  || 'New';
+  document.getElementById('f-area').value    = l.area    || areas[0];
+  document.getElementById('f-notes').value   = l.notes   || '';
+  document.getElementById('lookup-input').value = l.company || '';
+  document.getElementById('autofill-btn').disabled = !l.company;
+  document.getElementById('autofill-status').innerHTML = '';
   document.getElementById('lead-modal').classList.add('open');
 }
-
-function saveLead(){
-  const co=document.getElementById('f-company').value.trim();
-  if(!co){document.getElementById('f-company').focus();return;}
-  const obj={
-    id:editId||Date.now()+'',
-    company:co,contact:document.getElementById('f-contact').value.trim(),
-    phone:document.getElementById('f-phone').value.trim(),
-    email:document.getElementById('f-email').value.trim(),
-    address:document.getElementById('f-address').value.trim(),
-    units:parseInt(document.getElementById('f-units').value)||0,
-    style:document.getElementById('f-style').value.trim(),
-    area:document.getElementById('f-area').value,
-    status:document.getElementById('f-status').value,
-    notes:document.getElementById('f-notes').value.trim(),
+ 
+function saveLead() {
+  const co = document.getElementById('f-company').value.trim();
+  if (!co) { document.getElementById('f-company').focus(); return; }
+  const obj = {
+    id: editId || Date.now() + '',
+    company: co,
+    contact: document.getElementById('f-contact').value.trim(),
+    phone:   document.getElementById('f-phone').value.trim(),
+    email:   document.getElementById('f-email').value.trim(),
+    address: document.getElementById('f-address').value.trim(),
+    units:   parseInt(document.getElementById('f-units').value) || 0,
+    style:   document.getElementById('f-style').value.trim(),
+    area:    document.getElementById('f-area').value,
+    status:  document.getElementById('f-status').value,
+    notes:   document.getElementById('f-notes').value.trim(),
   };
-  if(editId){const i=leads.findIndex(x=>x.id===editId);if(i>-1)leads[i]=obj;}
+  if (editId) { const i = leads.findIndex(x => x.id === editId); if (i > -1) leads[i] = obj; }
   else leads.unshift(obj);
-  save();closeModal('lead-modal');render();
+  save(); closeModal('lead-modal'); render();
 }
-
-function openManageAreas(){
-  draftAreas=[...areas];renderAreasList();
-  document.getElementById('new-area-input').value='';
+ 
+// ── Manage Areas ───────────────────────────────────────────────────────────
+function openAreas() {
+  draftAreas = [...areas];
+  renderAreasList();
+  document.getElementById('new-area-input').value = '';
   document.getElementById('areas-modal').classList.add('open');
 }
-
-function renderAreasList(){
-  const counts={};
-  leads.forEach(l=>counts[l.area]=(counts[l.area]||0)+1);
-  document.getElementById('areas-list').innerHTML=draftAreas.map((a,i)=>`
-    <div class="area-row" id="arow-${i}">
-      <span style="flex:1;font-size:13px;font-weight:500;color:var(--blue-900)">${esc(a)}</span>
-      ${counts[a]?`<span class="count-pill">${counts[a]}</span>`:''}
-      <button class="btn btn-outline btn-sm" onclick="startRename(${i})">Rename</button>
-      ${a!=='Other'?`<button class="btn-danger-sm" onclick="removeArea(${i})">✕</button>`:''}
+ 
+function renderAreasList() {
+  const counts = {};
+  leads.forEach(l => counts[l.area] = (counts[l.area] || 0) + 1);
+  document.getElementById('areas-list').innerHTML = draftAreas.map((a, i) => `
+    <div class="area-row" id="arow-${i}" draggable="true" data-idx="${i}"
+      ondragstart="onDragStart(event,${i})"
+      ondragover="onDragOver(event,${i})"
+      ondragleave="onDragLeave(event,${i})"
+      ondrop="onDrop(event,${i})"
+      ondragend="onDragEnd()">
+      <span class="drag-handle">⠿</span>
+      <span style="flex:1;font-size:13px;font-weight:500;color:var(--ink)">${esc(a)}</span>
+      ${counts[a] ? `<span class="count-chip">${counts[a]} lead${counts[a] !== 1 ? 's' : ''}</span>` : ''}
+      <button class="btn btn-ghost btn-sm" onclick="startRename(${i})">Rename</button>
+      ${a !== 'Other' ? `<button class="btn-danger-sm" onclick="removeArea(${i})">✕</button>` : ''}
     </div>`).join('');
 }
-
-function startRename(i){
-  const row=document.getElementById('arow-'+i);
-  const cur=draftAreas[i];
-  row.innerHTML=`
-    <input style="flex:1;font-size:13px;padding:5px 9px;border:1px solid var(--blue-400);border-radius:6px;font-family:inherit;background:var(--white)" value="${esc(cur)}" id="ri-${i}" onkeydown="if(event.key==='Enter')confirmRename(${i});if(event.key==='Escape')renderAreasList()">
+ 
+function onDragStart(e, i) {
+  dragSrcIdx = i;
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(() => { const el = document.getElementById('arow-'+i); if(el) el.classList.add('dragging'); }, 0);
+}
+function onDragOver(e, i) {
+  e.preventDefault();
+  if (i === dragSrcIdx) return;
+  document.querySelectorAll('.area-row').forEach(r => r.classList.remove('drag-over'));
+  const el = document.getElementById('arow-'+i); if(el) el.classList.add('drag-over');
+}
+function onDragLeave(e, i) { const el = document.getElementById('arow-'+i); if(el) el.classList.remove('drag-over'); }
+function onDrop(e, i) {
+  e.preventDefault();
+  if (dragSrcIdx === null || dragSrcIdx === i) return;
+  const moved = draftAreas.splice(dragSrcIdx, 1)[0];
+  draftAreas.splice(i, 0, moved);
+  dragSrcIdx = null; renderAreasList();
+}
+function onDragEnd() {
+  dragSrcIdx = null;
+  document.querySelectorAll('.area-row').forEach(r => r.classList.remove('dragging','drag-over'));
+}
+ 
+function startRename(i) {
+  const row = document.getElementById('arow-' + i);
+  row.draggable = false;
+  row.innerHTML = `
+    <span class="drag-handle" style="opacity:.2">⠿</span>
+    <input class="area-name-input" value="${esc(draftAreas[i])}" id="ri-${i}"
+      onkeydown="if(event.key==='Enter')confirmRename(${i});if(event.key==='Escape')renderAreasList()">
     <button class="btn btn-primary btn-sm" onclick="confirmRename(${i})">Save</button>
-    <button class="btn btn-outline btn-sm" onclick="renderAreasList()">Cancel</button>`;
-  document.getElementById('ri-'+i).focus();
+    <button class="btn btn-ghost btn-sm" onclick="renderAreasList()">Cancel</button>`;
+  document.getElementById('ri-' + i).focus();
 }
-
-function confirmRename(i){
-  const v=document.getElementById('ri-'+i).value.trim();
-  if(!v||(draftAreas.includes(v)&&draftAreas[i]!==v)){renderAreasList();return;}
-  draftAreas[i]=v;renderAreasList();
+ 
+function confirmRename(i) {
+  const v = document.getElementById('ri-' + i).value.trim();
+  if (!v || (draftAreas.includes(v) && draftAreas[i] !== v)) { renderAreasList(); return; }
+  draftAreas[i] = v; renderAreasList();
 }
-
-function addArea(){
-  const v=document.getElementById('new-area-input').value.trim();
-  if(!v||draftAreas.includes(v))return;
-  draftAreas.push(v);
-  document.getElementById('new-area-input').value='';
+ 
+function addArea() {
+  const v = document.getElementById('new-area-input').value.trim();
+  if (!v || draftAreas.includes(v)) return;
+  const oi = draftAreas.indexOf('Other');
+  const end = oi > -1 ? oi : draftAreas.length;
+  let pos = draftAreas.slice(0, end).findIndex(a => a.localeCompare(v) > 0);
+  if (pos === -1) pos = end;
+  draftAreas.splice(pos, 0, v);
+  document.getElementById('new-area-input').value = '';
   renderAreasList();
 }
-
-function removeArea(i){
-  const name=draftAreas[i];
-  const cnt=leads.filter(l=>l.area===name).length;
-  if(cnt>0&&!confirm(`"${name}" has ${cnt} lead(s). They will be moved to "Other". Continue?`))return;
-  draftAreas.splice(i,1);
-  if(!draftAreas.includes('Other'))draftAreas.push('Other');
+ 
+function removeArea(i) {
+  const name = draftAreas[i];
+  const cnt = leads.filter(l => l.area === name).length;
+  if (cnt > 0 && !confirm(`"${name}" has ${cnt} lead(s). They will be moved to "Other". Continue?`)) return;
+  draftAreas.splice(i, 1);
+  if (!draftAreas.includes('Other')) draftAreas.push('Other');
   renderAreasList();
 }
-
-function saveAreas(){
-  const newNames=new Set(draftAreas);
-  leads=leads.map(l=>newNames.has(l.area)?l:{...l,area:'Other'});
-  areas=[...draftAreas];
-  if(!areas.includes('Other'))areas.push('Other');
-  if(activeArea!=='All Areas'&&!newNames.has(activeArea))activeArea='All Areas';
-  save();closeModal('areas-modal');render();
+ 
+function saveAreas() {
+  const ns = new Set(draftAreas);
+  leads = leads.map(l => ns.has(l.area) ? l : { ...l, area: 'Other' });
+  areas = [...draftAreas];
+  if (!areas.includes('Other')) areas.push('Other');
+  if (activeArea !== 'All Areas' && !ns.has(activeArea)) activeArea = 'All Areas';
+  save(); closeModal('areas-modal'); render();
 }
-
-function closeModal(id){document.getElementById(id).classList.remove('open');}
-function bgClose(e,id){if(e.target===document.getElementById(id))closeModal(id);}
-
-function exportCSV(){
-  const hdr='Company,Contact,Phone,Email,Address,Units,Style,Area,Status,Notes';
-  const rows=leads.map(l=>[l.company,l.contact,l.phone,l.email,l.address,l.units,l.style,l.area,l.status,l.notes]
-    .map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(','));
-  const blob=new Blob([[hdr,...rows].join('\n')],{type:'text/csv'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download='central_ohio_pm_leads.csv';a.click();
+ 
+// ── Modals ─────────────────────────────────────────────────────────────────
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function bgClose(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
+ 
+// ── CSV Export ─────────────────────────────────────────────────────────────
+function exportCSV() {
+  const hdr = 'Company,Contact,Phone,Email,Address,Units,Style,Area,Status,Notes';
+  const rows = leads.map(l =>
+    [l.company,l.contact,l.phone,l.email,l.address,l.units,l.style,l.area,l.status,l.notes]
+      .map(v => `"${(v||'').toString().replace(/"/g,'""')}"`)
+      .join(',')
+  );
+  const blob = new Blob([[hdr,...rows].join('\n')], { type:'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'central_ohio_pm_leads.csv';
+  a.click();
 }
-
+ 
 render();
 </script>
 </body>
