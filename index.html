@@ -474,7 +474,7 @@ Location: Central Ohio / Columbus metro area
 Return ONLY the JSON object. No markdown, no explanation, no extra text.`;
 
   try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
+    const res = await fetch("/api/autofill", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
