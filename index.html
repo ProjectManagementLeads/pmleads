@@ -27,7 +27,7 @@
   --red:      #FF3B30;
   --red-l:    #FFF0EF;
 }
- 
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
   background: var(--surf);
@@ -36,7 +36,7 @@ body {
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
 }
- 
+
 /* ── Topbar ── */
 .topbar {
   background: rgba(242,242,247,0.92);
@@ -57,7 +57,7 @@ body {
 .brand-icon svg { width: 14px; height: 14px; }
 .brand-name { font-size: 15px; font-weight: 600; color: var(--ink); letter-spacing: -0.3px; }
 .top-actions { display: flex; gap: 8px; }
- 
+
 /* ── Buttons ── */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
@@ -90,7 +90,7 @@ body {
 }
 .btn-ai:hover:not(:disabled) { background: var(--blue-m); }
 .btn-ai:disabled { opacity: .4; cursor: not-allowed; }
- 
+
 /* ── Stats ── */
 .stats-bar {
   background: var(--white);
@@ -102,7 +102,7 @@ body {
 .stat:last-child { border-right: none; padding-right: 0; }
 .stat-label { font-size: 11px; font-weight: 500; color: var(--ink-3); margin-bottom: 4px; }
 .stat-val { font-size: 26px; font-weight: 700; color: var(--ink); letter-spacing: -1px; line-height: 1; }
- 
+
 /* ── Tabs ── */
 .tabs-wrap {
   background: var(--white);
@@ -129,7 +129,7 @@ body {
   padding: 0 5px; border-radius: 10px; margin-left: 5px; vertical-align: middle;
 }
 .tab.active .tab-cnt { background: var(--blue-l); color: var(--blue); }
- 
+
 /* ── Toolbar ── */
 .toolbar {
   display: flex; gap: 8px; padding: 10px 24px;
@@ -153,7 +153,7 @@ body {
   background: var(--surf); color: var(--ink); outline: none; cursor: pointer;
 }
 .filter-select:focus { border-color: var(--blue); }
- 
+
 /* ── Table ── */
 .table-wrap { padding: 16px 24px 80px; }
 .table-card {
@@ -186,13 +186,13 @@ tr:hover td { background: var(--surf); }
   background: var(--ink-5); color: var(--ink-2);
 }
 .muted { color: var(--ink-4); }
- 
+
 /* ── Empty ── */
 .empty { text-align: center; padding: 56px 20px; }
 .empty-icon { font-size: 32px; margin-bottom: 12px; opacity: .25; }
 .empty-title { font-size: 15px; font-weight: 600; color: var(--ink-2); letter-spacing: -0.2px; }
 .empty-sub { font-size: 13px; color: var(--ink-3); margin-top: 5px; }
- 
+
 /* ── Overlay / Modal ── */
 .overlay {
   display: none; position: fixed; inset: 0;
@@ -220,7 +220,7 @@ tr:hover td { background: var(--surf); }
 .modal-close:hover { background: var(--border); color: var(--ink); }
 .modal-sub { font-size: 13px; color: var(--ink-3); margin-bottom: 20px; line-height: 1.5; margin-top: 4px; }
 .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-l); }
- 
+
 /* ── Form fields ── */
 .field { margin-bottom: 14px; }
 .field label { display: block; font-size: 12px; font-weight: 500; color: var(--ink-2); margin-bottom: 5px; letter-spacing: -0.1px; }
@@ -237,7 +237,7 @@ tr:hover td { background: var(--surf); }
 }
 .field textarea { resize: vertical; min-height: 72px; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
- 
+
 /* ── Autofill box ── */
 .autofill-box {
   background: var(--blue-l); border: 1px solid var(--blue-m);
@@ -255,7 +255,7 @@ tr:hover td { background: var(--surf); }
 }
 .autofill-row input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-l); }
 .autofill-status { margin-top: 10px; font-size: 12px; min-height: 18px; }
- 
+
 /* ── Manage Areas ── */
 .area-row {
   display: flex; align-items: center; gap: 8px;
@@ -275,7 +275,7 @@ tr:hover td { background: var(--surf); }
   padding: 5px 9px; border: 1px solid var(--blue);
   border-radius: 8px; background: var(--white); color: var(--ink); outline: none;
 }
- 
+
 @media (max-width: 640px) {
   .stats-bar { grid-template-columns: repeat(2,1fr); }
   .topbar, .stats-bar, .tabs-wrap, .toolbar, .table-wrap { padding-left: 16px; padding-right: 16px; }
@@ -285,7 +285,7 @@ tr:hover td { background: var(--surf); }
 </style>
 </head>
 <body>
- 
+
 <!-- Topbar -->
 <div class="topbar">
   <div class="brand">
@@ -305,7 +305,7 @@ tr:hover td { background: var(--surf); }
     <button class="btn btn-primary" onclick="openAdd()">+ Add lead</button>
   </div>
 </div>
- 
+
 <!-- Stats -->
 <div class="stats-bar">
   <div class="stat"><div class="stat-label">Total leads</div><div class="stat-val" id="s-total">0</div></div>
@@ -313,10 +313,10 @@ tr:hover td { background: var(--surf); }
   <div class="stat"><div class="stat-label">Qualified</div><div class="stat-val" id="s-qualified">0</div></div>
   <div class="stat"><div class="stat-label">Total units</div><div class="stat-val" id="s-units">0</div></div>
 </div>
- 
+
 <!-- Tabs -->
 <div class="tabs-wrap" id="tabs"></div>
- 
+
 <!-- Toolbar -->
 <div class="toolbar">
   <div class="search-wrap">
@@ -330,7 +330,7 @@ tr:hover td { background: var(--surf); }
   </select>
   <button class="btn btn-ghost" onclick="exportCSV()">↓ Export CSV</button>
 </div>
- 
+
 <!-- Table -->
 <div class="table-wrap">
   <div class="table-card">
@@ -351,7 +351,7 @@ tr:hover td { background: var(--surf); }
     </table>
   </div>
 </div>
- 
+
 <!-- Add/Edit Lead Modal -->
 <div class="overlay" id="lead-modal" onclick="bgClose(event,'lead-modal')">
   <div class="modal">
@@ -360,7 +360,7 @@ tr:hover td { background: var(--surf); }
       <button class="modal-close" onclick="closeModal('lead-modal')">×</button>
     </div>
     <p class="modal-sub">Type a property name and hit Autofill — Claude will search and populate the fields automatically.</p>
- 
+
     <div class="autofill-box">
       <div class="autofill-label">✦ AI Autofill</div>
       <div class="autofill-desc">Type the property name and click Autofill — Claude searches for the address, phone, and key details and fills the form for you.</div>
@@ -370,7 +370,7 @@ tr:hover td { background: var(--surf); }
       </div>
       <div class="autofill-status" id="autofill-status"></div>
     </div>
- 
+
     <div class="field"><label>Property / company name *</label><input id="f-company" placeholder="e.g. Worthington Arms Apartments"></div>
     <div class="field-row">
       <div class="field"><label>Contact name</label><input id="f-contact" placeholder="Jane Smith"></div>
@@ -398,7 +398,7 @@ tr:hover td { background: var(--surf); }
     </div>
   </div>
 </div>
- 
+
 <!-- Manage Areas Modal -->
 <div class="overlay" id="areas-modal" onclick="bgClose(event,'areas-modal')">
   <div class="modal">
@@ -422,7 +422,7 @@ tr:hover td { background: var(--surf); }
     </div>
   </div>
 </div>
- 
+
 <script>
 // ── State ──────────────────────────────────────────────────────────────────
 const STATUS_CFG = {
@@ -433,7 +433,7 @@ const STATUS_CFG = {
   "Closed won":    { bg:"#34C759", color:"#FFFFFF" },
   "Dead":          { bg:"#F2F2F7", color:"#8E8E93" },
 };
- 
+
 let leads = JSON.parse(localStorage.getItem('pm_leads') || '[]');
 let areas = (() => {
   const s = localStorage.getItem('pm_areas');
@@ -445,34 +445,34 @@ let activeArea = "All Areas";
 let editId = null;
 let sortCol = "company", sortDir = 1;
 let dragSrcIdx = null;
- 
+
 function save() {
   localStorage.setItem('pm_leads', JSON.stringify(leads));
   localStorage.setItem('pm_areas', JSON.stringify(areas));
 }
- 
+
 // ── Autofill ───────────────────────────────────────────────────────────────
 function onLookupInput() {
   document.getElementById('autofill-btn').disabled = !document.getElementById('lookup-input').value.trim();
 }
- 
+
 async function doAutofill() {
   const name = document.getElementById('lookup-input').value.trim();
   if (!name) return;
- 
+
   const btn = document.getElementById('autofill-btn');
   const status = document.getElementById('autofill-status');
   btn.disabled = true;
   btn.textContent = 'Searching…';
   status.innerHTML = '<span style="color:var(--ink-3)">⟳ Looking up ' + esc(name) + '…</span>';
- 
+
   const areaList = areas.filter(a => a !== 'Other').join(', ');
   const prompt = `You are a research assistant. Search the web for this apartment complex or property management company in Central Ohio and return ONLY a valid JSON object with these exact keys:
 {"company":"full property name","address":"full street address including city, state, zip","phone":"main phone number as (XXX) XXX-XXXX","contact":"leasing manager or primary contact name or empty string","email":"leasing or main email or empty string","units":unit count as number or 0,"style":"property style e.g. garden-style mid-rise townhome or empty string","area":"best match from this list: ${areaList} — or Other if none match"}
 Property: "${name}"
 Location: Central Ohio / Columbus metro area
 Return ONLY the JSON object. No markdown, no explanation, no extra text.`;
- 
+
   try {
     const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -484,12 +484,21 @@ Return ONLY the JSON object. No markdown, no explanation, no extra text.`;
         messages: [{ role: "user", content: prompt }]
       })
     });
-    if (!res.ok) throw new Error("HTTP " + res.status);
     const data = await res.json();
+    if (!res.ok) {
+      const errMsg = data?.error?.message || ("HTTP " + res.status);
+      throw new Error(errMsg);
+    }
     const tb = (data.content || []).filter(b => b.type === "text").pop();
-    if (!tb) throw new Error("No text block");
-    const d = JSON.parse(tb.text.replace(/```json|```/g, "").trim());
- 
+    if (!tb) throw new Error("No text in response — try again.");
+
+    let d;
+    try {
+      d = JSON.parse(tb.text.replace(/```json|```/g, "").trim());
+    } catch(parseErr) {
+      throw new Error("Could not parse response — try again.");
+    }
+
     document.getElementById('f-company').value = d.company || name;
     document.getElementById('f-address').value = d.address || '';
     document.getElementById('f-phone').value   = d.phone   || '';
@@ -499,18 +508,18 @@ Return ONLY the JSON object. No markdown, no explanation, no extra text.`;
     if (d.units) document.getElementById('f-units').value = d.units;
     const matchedArea = areas.includes(d.area) ? d.area : 'Other';
     document.getElementById('f-area').value = matchedArea;
- 
+
     status.innerHTML = '<span style="color:var(--green-d)">✓ Fields filled in — review and adjust as needed.</span>';
   } catch(e) {
     console.error(e);
     document.getElementById('f-company').value = name;
-    status.innerHTML = '<span style="color:var(--red)">Could not autofill — please fill in the fields manually.</span>';
+    status.innerHTML = '<span style="color:var(--red)">⚠ ' + (e.message || 'Autofill failed') + '</span>';
   } finally {
     btn.disabled = false;
     btn.textContent = 'Autofill ✦';
   }
 }
- 
+
 // ── Tabs & Stats ───────────────────────────────────────────────────────────
 function renderTabs() {
   const counts = {};
@@ -523,9 +532,9 @@ function renderTabs() {
     return `<button class="tab${active}" onclick="setArea('${a.replace(/'/g,"\\'")}'">${esc(a)}${badge}</button>`;
   }).join('');
 }
- 
+
 function setArea(a) { activeArea = a; render(); }
- 
+
 function renderStats() {
   const s = activeArea === "All Areas" ? leads : leads.filter(l => l.area === activeArea);
   document.getElementById('s-total').textContent = s.length;
@@ -533,18 +542,18 @@ function renderStats() {
   document.getElementById('s-qualified').textContent = s.filter(l => ["Qualified","Proposal sent","Closed won"].includes(l.status)).length;
   document.getElementById('s-units').textContent = s.reduce((t, l) => t + (parseInt(l.units) || 0), 0).toLocaleString();
 }
- 
+
 // ── Sort & Render ──────────────────────────────────────────────────────────
 function sortBy(col) {
   if (sortCol === col) sortDir *= -1; else { sortCol = col; sortDir = 1; }
   render();
 }
- 
+
 function render() {
   renderTabs(); renderStats();
   const q = document.getElementById('search').value.toLowerCase();
   const fs = document.getElementById('filter-status').value;
- 
+
   let rows = leads.filter(l => {
     if (activeArea !== "All Areas" && l.area !== activeArea) return false;
     if (fs && l.status !== fs) return false;
@@ -554,12 +563,12 @@ function render() {
     if (sortCol === 'units') return ((a.units || 0) - (b.units || 0)) * sortDir;
     return (a[sortCol] || '').toString().localeCompare((b[sortCol] || '').toString()) * sortDir;
   });
- 
+
   ['company','contact','units','area','status'].forEach(c => {
     const el = document.getElementById('arr-' + c);
     if (el) el.textContent = sortCol === c ? (sortDir === 1 ? ' ↑' : ' ↓') : '';
   });
- 
+
   const tb = document.getElementById('tbody');
   if (!rows.length) {
     tb.innerHTML = `<tr><td colspan="8"><div class="empty">
@@ -569,7 +578,7 @@ function render() {
     </div></td></tr>`;
     return;
   }
- 
+
   tb.innerHTML = rows.map(l => {
     const sc = STATUS_CFG[l.status] || STATUS_CFG["New"];
     const note = (l.style ? '[' + l.style + '] ' : '') + (l.notes || '');
@@ -585,17 +594,17 @@ function render() {
     </tr>`;
   }).join('');
 }
- 
+
 function esc(s) {
   return (s || '').toString()
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
- 
+
 // ── Lead Modal ─────────────────────────────────────────────────────────────
 function populateAreaSelect() {
   document.getElementById('f-area').innerHTML = areas.map(a => `<option value="${esc(a)}">${esc(a)}</option>`).join('');
 }
- 
+
 function openAdd() {
   editId = null;
   document.getElementById('modal-title').textContent = 'Add lead';
@@ -609,7 +618,7 @@ function openAdd() {
   document.getElementById('lead-modal').classList.add('open');
   setTimeout(() => document.getElementById('lookup-input').focus(), 60);
 }
- 
+
 function openEdit(id) {
   const l = leads.find(x => x.id === id); if (!l) return;
   editId = id;
@@ -630,7 +639,7 @@ function openEdit(id) {
   document.getElementById('autofill-status').innerHTML = '';
   document.getElementById('lead-modal').classList.add('open');
 }
- 
+
 function saveLead() {
   const co = document.getElementById('f-company').value.trim();
   if (!co) { document.getElementById('f-company').focus(); return; }
@@ -651,7 +660,7 @@ function saveLead() {
   else leads.unshift(obj);
   save(); closeModal('lead-modal'); render();
 }
- 
+
 // ── Manage Areas ───────────────────────────────────────────────────────────
 function openAreas() {
   draftAreas = [...areas];
@@ -659,7 +668,7 @@ function openAreas() {
   document.getElementById('new-area-input').value = '';
   document.getElementById('areas-modal').classList.add('open');
 }
- 
+
 function renderAreasList() {
   const counts = {};
   leads.forEach(l => counts[l.area] = (counts[l.area] || 0) + 1);
@@ -677,7 +686,7 @@ function renderAreasList() {
       ${a !== 'Other' ? `<button class="btn-danger-sm" onclick="removeArea(${i})">✕</button>` : ''}
     </div>`).join('');
 }
- 
+
 function onDragStart(e, i) {
   dragSrcIdx = i;
   e.dataTransfer.effectAllowed = 'move';
@@ -701,7 +710,7 @@ function onDragEnd() {
   dragSrcIdx = null;
   document.querySelectorAll('.area-row').forEach(r => r.classList.remove('dragging','drag-over'));
 }
- 
+
 function startRename(i) {
   const row = document.getElementById('arow-' + i);
   row.draggable = false;
@@ -713,13 +722,13 @@ function startRename(i) {
     <button class="btn btn-ghost btn-sm" onclick="renderAreasList()">Cancel</button>`;
   document.getElementById('ri-' + i).focus();
 }
- 
+
 function confirmRename(i) {
   const v = document.getElementById('ri-' + i).value.trim();
   if (!v || (draftAreas.includes(v) && draftAreas[i] !== v)) { renderAreasList(); return; }
   draftAreas[i] = v; renderAreasList();
 }
- 
+
 function addArea() {
   const v = document.getElementById('new-area-input').value.trim();
   if (!v || draftAreas.includes(v)) return;
@@ -731,7 +740,7 @@ function addArea() {
   document.getElementById('new-area-input').value = '';
   renderAreasList();
 }
- 
+
 function removeArea(i) {
   const name = draftAreas[i];
   const cnt = leads.filter(l => l.area === name).length;
@@ -740,7 +749,7 @@ function removeArea(i) {
   if (!draftAreas.includes('Other')) draftAreas.push('Other');
   renderAreasList();
 }
- 
+
 function saveAreas() {
   const ns = new Set(draftAreas);
   leads = leads.map(l => ns.has(l.area) ? l : { ...l, area: 'Other' });
@@ -749,11 +758,11 @@ function saveAreas() {
   if (activeArea !== 'All Areas' && !ns.has(activeArea)) activeArea = 'All Areas';
   save(); closeModal('areas-modal'); render();
 }
- 
+
 // ── Modals ─────────────────────────────────────────────────────────────────
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 function bgClose(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
- 
+
 // ── CSV Export ─────────────────────────────────────────────────────────────
 function exportCSV() {
   const hdr = 'Company,Contact,Phone,Email,Address,Units,Style,Area,Status,Notes';
@@ -768,7 +777,7 @@ function exportCSV() {
   a.download = 'central_ohio_pm_leads.csv';
   a.click();
 }
- 
+
 render();
 </script>
 </body>
