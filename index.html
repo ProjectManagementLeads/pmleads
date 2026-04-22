@@ -3,290 +3,317 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Central Ohio PM Leads</title>
+<title>PM Leads — Central Ohio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --ink:      #1C1C1E;
-  --ink-2:    #3A3A3C;
-  --ink-3:    #8E8E93;
-  --ink-4:    #C7C7CC;
-  --ink-5:    #E5E5EA;
-  --surf:     #F2F2F7;
-  --white:    #FFFFFF;
-  --border:   #D1D1D6;
-  --border-l: #E5E5EA;
-  --blue:     #007AFF;
-  --blue-l:   #EAF3FF;
-  --blue-m:   #B3D3FF;
-  --green:    #34C759;
-  --green-d:  #248A3D;
-  --green-l:  #EDFBF1;
-  --orange-l: #FFF4E0;
-  --orange-d: #C93400;
-  --red:      #FF3B30;
-  --red-l:    #FFF0EF;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --pink:#FF2D78;--pink2:#FF0060;--pink3:#FF80AB;
+  --purple:#B44FFF;--purple2:#7B2FFF;--purple3:#D494FF;
+  --cyan:#00D4FF;--cyan2:#00A8CC;--cyan3:#80E8FF;
+  --green:#00F5A0;--green2:#00B574;--green3:#80FFD0;
+  --amber:#FFB800;--amber2:#CC8800;--amber3:#FFD966;
+  --orange:#FF6B35;--blue:#4488FF;--blue2:#2255CC;
+  --ink:#FFFFFF;--ink2:#C8D8F0;--ink3:#8AAACE;--ink4:#4A6080;
+  --b:rgba(255,255,255,0.07);--bm:rgba(255,255,255,0.13);
+}
+html{font-size:14px}
+body{
+  font-family:'Inter',sans-serif;
+  background:#03040F;
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;overflow-x:hidden;
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
-  background: var(--surf);
-  color: var(--ink);
-  font-size: 14px;
-  -webkit-font-smoothing: antialiased;
-  min-height: 100vh;
+/* ═══════════════════════════════════════
+   BACKGROUND
+═══════════════════════════════════════ */
+#bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+#stars{position:absolute;inset:0}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d,3s) ease-in-out infinite alternate}
+@keyframes twinkle{0%{opacity:0.1;transform:scale(0.8)}100%{opacity:var(--o,0.8);transform:scale(1.2)}}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);animation:float var(--t,20s) ease-in-out infinite alternate}
+@keyframes float{
+  0%{transform:translate(0,0) scale(1) rotate(0deg)}
+  33%{transform:translate(var(--x1,40px),var(--y1,-30px)) scale(1.1) rotate(5deg)}
+  66%{transform:translate(var(--x2,-20px),var(--y2,20px)) scale(0.93) rotate(-3deg)}
+  100%{transform:translate(var(--x3,30px),var(--y3,15px)) scale(1.07) rotate(2deg)}
+}
+.o1{width:700px;height:700px;background:radial-gradient(circle,rgba(255,45,120,0.55),transparent 65%);top:-250px;left:-150px;--t:22s;--x1:60px;--y1:-40px;--x2:-30px;--y2:30px;--x3:50px;--y3:20px}
+.o2{width:600px;height:600px;background:radial-gradient(circle,rgba(180,79,255,0.5),transparent 65%);top:0;right:-150px;--t:28s;--x1:-50px;--y1:50px;--x2:30px;--y2:-20px;--x3:-40px;--y3:30px}
+.o3{width:500px;height:500px;background:radial-gradient(circle,rgba(0,212,255,0.4),transparent 65%);bottom:-100px;left:20%;--t:32s;--x1:40px;--y1:-50px;--x2:-40px;--y2:30px;--x3:20px;--y3:-20px}
+.o4{width:400px;height:400px;background:radial-gradient(circle,rgba(0,245,160,0.35),transparent 65%);bottom:100px;right:10%;--t:25s;--x1:-30px;--y1:40px;--x2:50px;--y2:-30px;--x3:-20px;--y3:20px}
+.o5{width:350px;height:350px;background:radial-gradient(circle,rgba(255,184,0,0.3),transparent 65%);top:40%;left:40%;--t:19s;--x1:50px;--y1:30px;--x2:-40px;--y2:-40px;--x3:30px;--y3:20px}
+.o6{width:250px;height:250px;background:radial-gradient(circle,rgba(68,136,255,0.35),transparent 65%);top:60%;left:5%;--t:23s;--x1:30px;--y1:-40px;--x2:-20px;--y2:30px;--x3:10px;--y3:-10px}
+#grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px);background-size:50px 50px}
+#scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px);pointer-events:none}
+#vig{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,transparent 40%,rgba(0,0,0,0.7) 100%)}
+
+/* ═══════════════════════════════════════
+   TOPBAR
+═══════════════════════════════════════ */
+.topbar{
+  position:sticky;top:0;z-index:30;
+  background:rgba(3,4,15,0.75);
+  backdrop-filter:saturate(200%) blur(28px);
+  -webkit-backdrop-filter:saturate(200%) blur(28px);
+  border-bottom:1px solid var(--b);
+  padding:0 28px;height:62px;
+  display:flex;align-items:center;justify-content:space-between;
+  overflow:hidden;
 }
 
-/* ── Topbar ── */
-.topbar {
-  background: rgba(242,242,247,0.92);
-  backdrop-filter: saturate(180%) blur(20px);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  border-bottom: 1px solid var(--border-l);
-  padding: 0 24px;
-  height: 52px;
-  display: flex; align-items: center; justify-content: space-between;
-  position: sticky; top: 0; z-index: 30;
+/* Shimmer sweep */
+.topbar::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,0.04) 50%,transparent 60%);
+  background-size:200% 100%;
+  animation:shimmer 6s ease-in-out infinite;
 }
-.brand { display: flex; align-items: center; gap: 10px; }
-.brand-icon {
-  width: 28px; height: 28px;
-  background: var(--blue); border-radius: 7px;
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-.brand-icon svg { width: 14px; height: 14px; }
-.brand-name { font-size: 15px; font-weight: 600; color: var(--ink); letter-spacing: -0.3px; }
-.top-actions { display: flex; gap: 8px; }
+@keyframes shimmer{0%,100%{background-position:200% 0}50%{background-position:-200% 0}}
 
-/* ── Buttons ── */
-.btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  font-size: 13px; font-weight: 500; font-family: inherit;
-  padding: 0 14px; height: 32px;
-  border: none; border-radius: 8px;
-  cursor: pointer; white-space: nowrap;
-  letter-spacing: -0.1px;
-  transition: filter .12s, background .12s;
+.brand{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
+.brand-icon{
+  width:38px;height:38px;border-radius:11px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--pink),var(--purple),var(--cyan));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 28px rgba(255,45,120,0.7),0 0 56px rgba(180,79,255,0.4),0 0 84px rgba(0,212,255,0.2),inset 0 1px 0 rgba(255,255,255,0.3);
+  animation:icon-pulse 2.5s ease-in-out infinite;
+  position:relative;overflow:hidden;
 }
-.btn-primary { background: var(--blue); color: #fff; }
-.btn-primary:hover { filter: brightness(1.1); }
-.btn-primary:disabled { opacity: .45; cursor: not-allowed; }
-.btn-ghost { background: var(--white); color: var(--ink-2); border: 1px solid var(--border); }
-.btn-ghost:hover { background: var(--surf); }
-.btn-sm { font-size: 12px; padding: 0 10px; height: 26px; border-radius: 6px; }
-.btn-danger-sm {
-  font-size: 12px; padding: 0 10px; height: 26px; border-radius: 6px;
-  background: transparent; color: var(--red); border: 1px solid var(--border);
-  cursor: pointer; font-family: inherit; font-weight: 500;
-  transition: background .12s, border-color .12s;
+.brand-icon::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.25),transparent);animation:icon-sweep 3s ease-in-out infinite;}
+@keyframes icon-pulse{
+  0%,100%{box-shadow:0 0 28px rgba(255,45,120,0.7),0 0 56px rgba(180,79,255,0.4),0 0 84px rgba(0,212,255,0.2)}
+  50%{box-shadow:0 0 40px rgba(255,45,120,0.9),0 0 80px rgba(180,79,255,0.6),0 0 120px rgba(0,212,255,0.3)}
 }
-.btn-danger-sm:hover { background: var(--red-l); border-color: var(--red); }
-.btn-ai {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 13px; font-weight: 500; font-family: inherit;
-  padding: 0 14px; height: 32px; border-radius: 8px;
-  background: var(--blue-l); color: var(--blue); border: 1px solid var(--blue-m);
-  cursor: pointer; transition: background .12s; white-space: nowrap;
-}
-.btn-ai:hover:not(:disabled) { background: var(--blue-m); }
-.btn-ai:disabled { opacity: .4; cursor: not-allowed; }
+@keyframes icon-sweep{0%,100%{opacity:0}40%,60%{opacity:1}}
+.brand-icon svg{width:18px;height:18px;position:relative;z-index:1}
+.brand-name{font-size:20px;font-weight:900;letter-spacing:-0.5px;color:#FFFFFF;text-shadow:0 0 30px rgba(255,255,255,0.3);}
+.brand-tag{font-size:11px;color:#8AAACE;padding-left:14px;border-left:1px solid var(--bm);letter-spacing:0.05em;font-weight:500;}
+.top-right{display:flex;align-items:center;gap:12px;position:relative;z-index:1}
+.live-dot{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--green);letter-spacing:0.06em;text-transform:uppercase;}
+.live-dot::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green),0 0 16px rgba(0,245,160,0.5);animation:blink 1.5s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.7)}}
+.top-actions{display:flex;gap:10px}
 
-/* ── Stats ── */
-.stats-bar {
-  background: var(--white);
-  border-bottom: 1px solid var(--border-l);
-  padding: 0 24px;
-  display: grid; grid-template-columns: repeat(4,1fr);
+/* ═══════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  font-size:12px;font-weight:800;font-family:inherit;letter-spacing:0.05em;
+  padding:0 20px;height:38px;border:none;border-radius:10px;
+  cursor:pointer;white-space:nowrap;transition:all .2s;
+  text-transform:uppercase;position:relative;overflow:hidden;
 }
-.stat { padding: 16px 20px 16px 0; border-right: 1px solid var(--border-l); }
-.stat:last-child { border-right: none; padding-right: 0; }
-.stat-label { font-size: 11px; font-weight: 500; color: var(--ink-3); margin-bottom: 4px; }
-.stat-val { font-size: 26px; font-weight: 700; color: var(--ink); letter-spacing: -1px; line-height: 1; }
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.18),transparent);opacity:0;transition:opacity .2s;}
+.btn:hover:not(:disabled)::after{opacity:1}
+.btn-glow{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;box-shadow:0 0 24px rgba(255,45,120,0.5),0 0 48px rgba(180,79,255,0.25),inset 0 1px 0 rgba(255,255,255,0.2);}
+.btn-glow:hover:not(:disabled){transform:translateY(-3px) scale(1.02);box-shadow:0 6px 36px rgba(255,45,120,0.7),0 12px 72px rgba(180,79,255,0.4);}
+.btn-glow:active:not(:disabled){transform:translateY(-1px) scale(1)}
+.btn-ghost-top{background:rgba(255,255,255,0.07);color:var(--ink2);border:1px solid var(--bm);backdrop-filter:blur(10px);text-transform:none;}
+.btn-ghost-top:hover:not(:disabled){background:rgba(255,255,255,0.13);color:var(--ink);border-color:rgba(255,255,255,0.22)}
+.btn-ghost{background:rgba(255,255,255,0.05);color:var(--ink2);border:1px solid var(--b);text-transform:none;font-weight:600;}
+.btn-ghost:hover:not(:disabled){background:rgba(255,255,255,0.09);color:var(--ink)}
+.btn-sm{font-size:11px;padding:0 12px;height:28px;border-radius:7px}
+.btn-danger-sm{font-size:11px;padding:0 12px;height:28px;border-radius:7px;background:rgba(255,68,102,0.1);color:var(--pink);border:1px solid rgba(255,68,102,0.3);cursor:pointer;font-family:inherit;font-weight:700;transition:all .15s;text-transform:none;letter-spacing:0;}
+.btn-danger-sm:hover{background:rgba(255,68,102,0.2);border-color:var(--pink)}
+.btn-ai{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:13px;font-weight:900;font-family:inherit;letter-spacing:0.06em;
+  padding:0 22px;height:44px;border-radius:12px;
+  background:linear-gradient(135deg,var(--pink),var(--purple),var(--cyan));
+  color:#fff;border:none;cursor:pointer;text-transform:uppercase;
+  box-shadow:0 0 28px rgba(255,45,120,0.55),0 0 56px rgba(180,79,255,0.3),0 0 84px rgba(0,212,255,0.15),inset 0 1px 0 rgba(255,255,255,0.25);
+  transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;
+}
+.btn-ai::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.2),transparent);opacity:0;transition:opacity .2s;}
+.btn-ai:hover:not(:disabled){transform:translateY(-3px) scale(1.03);box-shadow:0 8px 40px rgba(255,45,120,0.75),0 16px 80px rgba(180,79,255,0.5);}
+.btn-ai:hover::before{opacity:1}
+.btn-ai:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;transform:none;}
 
-/* ── Tabs ── */
-.tabs-wrap {
-  background: var(--white);
-  border-bottom: 1px solid var(--border-l);
-  padding: 0 24px;
-  display: flex; overflow-x: auto; scrollbar-width: none;
+/* ═══════════════════════════════════════
+   STATS BAR
+═══════════════════════════════════════ */
+.stats-bar{
+  background:rgba(3,4,15,0.6);
+  backdrop-filter:blur(24px);
+  border-bottom:none;
+  display:grid;grid-template-columns:repeat(4,1fr);
+  position:relative;z-index:2;
 }
-.tabs-wrap::-webkit-scrollbar { display: none; }
-.tab {
-  font-size: 13px; font-weight: 500; font-family: inherit;
-  padding: 10px 14px;
-  border: none; border-bottom: 2px solid transparent;
-  background: transparent; color: var(--ink-3);
-  cursor: pointer; white-space: nowrap;
-  transition: color .15s, border-color .15s;
-  letter-spacing: -0.1px;
+/* Rainbow gradient divider line */
+.stats-bar::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--pink),var(--purple),var(--cyan),var(--green),var(--amber),var(--orange),var(--blue),var(--pink));
+  opacity:0.75;
 }
-.tab:hover { color: var(--ink-2); }
-.tab.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 600; }
-.tab-cnt {
-  display: inline-flex; align-items: center; justify-content: center;
-  min-width: 18px; height: 16px; font-size: 10px; font-weight: 600;
-  background: var(--ink-5); color: var(--ink-3);
-  padding: 0 5px; border-radius: 10px; margin-left: 5px; vertical-align: middle;
-}
-.tab.active .tab-cnt { background: var(--blue-l); color: var(--blue); }
+.stat{padding:28px 28px;border-right:1px solid var(--b);position:relative;overflow:hidden;cursor:default;transition:background .3s;}
+.stat:last-child{border-right:none}
+.stat:hover{background:rgba(255,255,255,0.03)}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;animation:line-glow 3s ease-in-out infinite alternate;}
+.stat:nth-child(1)::before{background:linear-gradient(90deg,transparent,var(--pink),var(--pink3),transparent);box-shadow:0 2px 20px rgba(255,45,120,0.8)}
+.stat:nth-child(2)::before{background:linear-gradient(90deg,transparent,var(--cyan),var(--cyan3),transparent);box-shadow:0 2px 20px rgba(0,212,255,0.8)}
+.stat:nth-child(3)::before{background:linear-gradient(90deg,transparent,var(--green),var(--green3),transparent);box-shadow:0 2px 20px rgba(0,245,160,0.8)}
+.stat:nth-child(4)::before{background:linear-gradient(90deg,transparent,var(--amber),var(--amber3),transparent);box-shadow:0 2px 20px rgba(255,184,0,0.8)}
+@keyframes line-glow{0%{opacity:0.6;transform:scaleX(0.7)}100%{opacity:1;transform:scaleX(1)}}
+.stat::after{content:'✦';position:absolute;top:10px;right:14px;font-size:10px;opacity:0;transition:opacity .3s;animation:sparkle-spin 4s linear infinite;}
+.stat:nth-child(1)::after{color:var(--pink)}.stat:nth-child(2)::after{color:var(--cyan)}.stat:nth-child(3)::after{color:var(--green)}.stat:nth-child(4)::after{color:var(--amber)}
+.stat:hover::after{opacity:0.7}
+@keyframes sparkle-spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.stat-bg{position:absolute;top:-50px;left:-30px;width:180px;height:180px;border-radius:50%;filter:blur(50px);pointer-events:none;opacity:0.2;transition:opacity .35s,transform .35s;}
+.stat:hover .stat-bg{opacity:0.55;transform:scale(1.2)}
+.stat:nth-child(1) .stat-bg{background:var(--pink)}.stat:nth-child(2) .stat-bg{background:var(--cyan)}.stat:nth-child(3) .stat-bg{background:var(--green)}.stat:nth-child(4) .stat-bg{background:var(--amber)}
+.stat-label{font-size:10px;font-weight:700;letter-spacing:.15em;color:#9ABBD8;margin-bottom:12px;text-transform:uppercase;position:relative;z-index:1;}
+.stat-val{font-size:44px;font-weight:900;letter-spacing:-3.5px;line-height:1;background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;position:relative;z-index:1;animation:val-glow 3s ease-in-out infinite alternate;}
+.stat:nth-child(1) .stat-val{background-image:linear-gradient(135deg,var(--pink),var(--pink3),#FFAAC8)}
+.stat:nth-child(2) .stat-val{background-image:linear-gradient(135deg,var(--cyan),var(--cyan3),#C0F5FF)}
+.stat:nth-child(3) .stat-val{background-image:linear-gradient(135deg,var(--green),var(--green3),#C0FFE8)}
+.stat:nth-child(4) .stat-val{background-image:linear-gradient(135deg,var(--amber),var(--amber3),#FFF0A0)}
+@keyframes val-glow{0%{filter:drop-shadow(0 0 0px transparent)}100%{filter:drop-shadow(0 0 12px currentColor)}}
 
-/* ── Toolbar ── */
-.toolbar {
-  display: flex; gap: 8px; padding: 10px 24px;
-  align-items: center; flex-wrap: wrap;
-  background: var(--white); border-bottom: 1px solid var(--border-l);
-}
-.search-wrap { flex: 1; min-width: 180px; position: relative; }
-.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--ink-3); font-size: 14px; pointer-events: none; }
-.search-input {
-  width: 100%; font-size: 13px; font-family: inherit;
-  padding: 0 11px 0 30px; height: 32px;
-  border: 1px solid var(--border); border-radius: 8px;
-  background: var(--surf); color: var(--ink); outline: none;
-  transition: border-color .15s, box-shadow .15s;
-}
-.search-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-l); }
-.filter-select {
-  font-size: 13px; font-family: inherit;
-  padding: 0 11px; height: 32px;
-  border: 1px solid var(--border); border-radius: 8px;
-  background: var(--surf); color: var(--ink); outline: none; cursor: pointer;
-}
-.filter-select:focus { border-color: var(--blue); }
+/* ═══════════════════════════════════════
+   TABS
+═══════════════════════════════════════ */
+.tabs-wrap{background:rgba(3,4,15,0.7);backdrop-filter:blur(20px);border-bottom:2px solid rgba(68,136,255,0.5);padding:0 28px;display:flex;overflow-x:auto;scrollbar-width:none;position:relative;z-index:2;}
+.tabs-wrap::-webkit-scrollbar{display:none}
+.tab{font-size:12px;font-weight:600;font-family:inherit;padding:14px 18px;border:none;border-bottom:2px solid transparent;background:transparent;color:#9ABBD8;cursor:pointer;white-space:nowrap;transition:all .18s;}
+.tab:hover{color:var(--ink2)}
+.tab.active{color:#fff;font-weight:800;border-bottom-color:var(--pink);text-shadow:0 0 20px rgba(255,45,120,0.6),0 0 40px rgba(255,45,120,0.3);}
+.tab-cnt{display:inline-flex;align-items:center;justify-content:center;min-width:19px;height:17px;font-size:10px;font-weight:800;padding:0 5px;border-radius:20px;margin-left:7px;vertical-align:middle;background:rgba(255,255,255,0.07);color:var(--ink3);transition:all .18s;}
+.tab.active .tab-cnt{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;box-shadow:0 0 12px rgba(255,45,120,0.6),0 0 24px rgba(180,79,255,0.3);}
 
-/* ── Table ── */
-.table-wrap { padding: 16px 24px 80px; }
-.table-card {
-  background: var(--white);
-  border: 1px solid var(--border-l);
-  border-radius: 12px; overflow: hidden;
-}
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-thead { border-bottom: 1px solid var(--border-l); }
-th {
-  font-size: 11px; font-weight: 500; color: var(--ink-3);
-  text-align: left; padding: 10px 14px;
-  cursor: pointer; white-space: nowrap;
-  background: var(--white); user-select: none;
-}
-th:hover { color: var(--ink-2); }
-td { padding: 11px 14px; border-bottom: 1px solid var(--surf); vertical-align: middle; }
-tr:last-child td { border-bottom: none; }
-tr:hover td { background: var(--surf); }
-.co-name { font-weight: 600; color: var(--ink); letter-spacing: -0.1px; }
-.co-addr { font-size: 11px; color: var(--ink-3); margin-top: 2px; }
-.badge {
-  display: inline-flex; align-items: center;
-  font-size: 11px; font-weight: 500;
-  padding: 3px 9px; border-radius: 20px; white-space: nowrap;
-}
-.area-chip {
-  display: inline-block; font-size: 11px; font-weight: 500;
-  padding: 3px 9px; border-radius: 20px;
-  background: var(--ink-5); color: var(--ink-2);
-}
-.muted { color: var(--ink-4); }
+/* ═══════════════════════════════════════
+   TOOLBAR
+═══════════════════════════════════════ */
+.toolbar{display:flex;gap:10px;padding:14px 28px;align-items:center;flex-wrap:wrap;background:rgba(3,4,15,0.6);backdrop-filter:blur(20px);border-bottom:1px solid var(--b);position:relative;z-index:2;}
+.search-wrap{flex:1;min-width:200px;position:relative}
+.search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--ink3);font-size:16px;pointer-events:none}
+.search-input{width:100%;font-size:13px;font-family:inherit;font-weight:500;padding:0 14px 0 38px;height:40px;border:1px solid var(--bm);border-radius:11px;background:rgba(255,255,255,0.05);color:var(--ink);outline:none;transition:all .2s;}
+.search-input::placeholder{color:#8AAACE}
+.search-input:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,45,120,0.15),0 0 30px rgba(255,45,120,0.08);background:rgba(255,255,255,0.08);}
+.filter-select{font-size:13px;font-family:inherit;font-weight:500;padding:0 14px;height:40px;border:1px solid var(--bm);border-radius:11px;background:rgba(255,255,255,0.05);color:var(--ink);outline:none;cursor:pointer;transition:all .2s;}
+.filter-select option{background:#060814}
+.filter-select:focus{border-color:var(--pink)}
 
-/* ── Empty ── */
-.empty { text-align: center; padding: 56px 20px; }
-.empty-icon { font-size: 32px; margin-bottom: 12px; opacity: .25; }
-.empty-title { font-size: 15px; font-weight: 600; color: var(--ink-2); letter-spacing: -0.2px; }
-.empty-sub { font-size: 13px; color: var(--ink-3); margin-top: 5px; }
+/* ═══════════════════════════════════════
+   TABLE
+═══════════════════════════════════════ */
+.table-wrap{padding:22px 28px 80px;position:relative;z-index:2}
+.table-card{background:rgba(8,10,24,0.85);backdrop-filter:blur(24px);border:1px solid var(--bm);border-radius:20px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,0.04),0 0 120px rgba(255,45,120,0.05),0 0 80px rgba(180,79,255,0.04);}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead{border-bottom:1px solid var(--b)}
+th{font-size:10px;font-weight:800;letter-spacing:.13em;color:#9ABBD8;text-align:left;padding:15px 18px;cursor:pointer;white-space:nowrap;background:rgba(255,255,255,0.02);text-transform:uppercase;user-select:none;transition:color .15s;}
+th:hover{color:var(--ink2)}
+td{padding:15px 18px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr{transition:background .12s}
+tr:hover td{background:rgba(255,255,255,0.03)}
+.co-name{font-weight:700;color:var(--ink);font-size:13px}
+.co-addr{font-size:11px;color:#8AAACE;margin-top:2px}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:800;letter-spacing:.07em;padding:5px 12px;border-radius:20px;white-space:nowrap;text-transform:uppercase;position:relative;overflow:hidden;}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;box-shadow:0 0 6px currentColor;animation:dot-pulse 2s ease-in-out infinite;}
+@keyframes dot-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.6)}}
+.area-chip{display:inline-block;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;background:rgba(255,255,255,0.07);color:var(--ink2);border:1px solid rgba(255,255,255,0.12);transition:all .15s;}
+tr:hover .area-chip{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.18)}
+.muted{color:var(--ink4)}
 
-/* ── Overlay / Modal ── */
-.overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,.3);
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  z-index: 100; align-items: center; justify-content: center; padding: 16px;
-}
-.overlay.open { display: flex; }
-.modal {
-  background: var(--white); border-radius: 16px;
-  padding: 24px; width: 100%; max-width: 520px;
-  max-height: 92vh; overflow-y: auto;
-  border: 1px solid var(--border-l);
-  box-shadow: 0 24px 64px rgba(0,0,0,.18);
-}
-.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
-.modal-title { font-size: 17px; font-weight: 700; color: var(--ink); letter-spacing: -0.4px; }
-.modal-close {
-  background: var(--ink-5); border: none;
-  width: 28px; height: 28px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 17px; color: var(--ink-3); cursor: pointer; line-height: 1;
-  transition: background .12s;
-}
-.modal-close:hover { background: var(--border); color: var(--ink); }
-.modal-sub { font-size: 13px; color: var(--ink-3); margin-bottom: 20px; line-height: 1.5; margin-top: 4px; }
-.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-l); }
+/* ═══════════════════════════════════════
+   EMPTY
+═══════════════════════════════════════ */
+.empty{text-align:center;padding:90px 20px}
+.empty-icon{font-size:56px;margin-bottom:20px;display:block;filter:drop-shadow(0 0 20px rgba(255,45,120,0.5)) drop-shadow(0 0 40px rgba(180,79,255,0.3));animation:empty-bounce 3s ease-in-out infinite;}
+@keyframes empty-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.empty-title{font-size:20px;font-weight:900;letter-spacing:-.4px;background:linear-gradient(90deg,#fff,var(--pink3),var(--purple3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.empty-sub{font-size:14px;color:var(--ink3);margin-top:8px}
 
-/* ── Form fields ── */
-.field { margin-bottom: 14px; }
-.field label { display: block; font-size: 12px; font-weight: 500; color: var(--ink-2); margin-bottom: 5px; letter-spacing: -0.1px; }
-.field input, .field select, .field textarea {
-  width: 100%; font-size: 14px; font-family: inherit; font-weight: 400;
-  padding: 9px 12px;
-  border: 1px solid var(--border); border-radius: 10px;
-  background: var(--surf); color: var(--ink); outline: none;
-  -webkit-appearance: none; appearance: none;
-  transition: border-color .15s, box-shadow .15s;
-}
-.field input:focus, .field select:focus, .field textarea:focus {
-  border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-l); background: var(--white);
-}
-.field textarea { resize: vertical; min-height: 72px; }
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+/* ═══════════════════════════════════════
+   OVERLAY / MODAL
+═══════════════════════════════════════ */
+.overlay{display:none;position:fixed;inset:0;background:rgba(1,2,12,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:100;align-items:center;justify-content:center;padding:16px;}
+.overlay.open{display:flex}
+.modal{background:rgba(8,10,26,0.97);backdrop-filter:blur(30px);border-radius:22px;padding:32px;width:100%;max-width:535px;max-height:92vh;overflow-y:auto;border:1px solid rgba(255,255,255,0.1);box-shadow:0 50px 120px rgba(0,0,0,.9),0 0 0 1px rgba(255,45,120,0.25),0 0 80px rgba(255,45,120,0.1),0 0 160px rgba(180,79,255,0.07);position:relative;overflow:hidden;}
+.modal::before{content:'';position:absolute;top:-80px;right:-80px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(180,79,255,0.3),transparent 70%);pointer-events:none;}
+.modal::after{content:'';position:absolute;bottom:-60px;left:-60px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(255,45,120,0.25),transparent 70%);pointer-events:none;}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;position:relative;z-index:1}
+.modal-title{font-size:22px;font-weight:900;letter-spacing:-.6px;background:linear-gradient(90deg,#fff 0%,var(--pink3) 40%,var(--purple3) 80%,var(--cyan3) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.modal-close{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.07);border:1px solid var(--bm);display:flex;align-items:center;justify-content:center;font-size:19px;color:var(--ink3);cursor:pointer;transition:all .18s;position:relative;z-index:1;}
+.modal-close:hover{background:rgba(255,45,120,0.18);border-color:rgba(255,45,120,0.5);color:var(--pink);box-shadow:0 0 16px rgba(255,45,120,0.3);transform:rotate(90deg);}
+.modal-sub{font-size:13px;color:var(--ink3);margin-bottom:26px;line-height:1.65;margin-top:6px;position:relative;z-index:1}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:26px;padding-top:22px;border-top:1px solid var(--b);position:relative;z-index:1;}
 
-/* ── Autofill box ── */
-.autofill-box {
-  background: var(--blue-l); border: 1px solid var(--blue-m);
-  border-radius: 12px; padding: 14px 16px; margin-bottom: 20px;
-}
-.autofill-label { font-size: 11px; font-weight: 600; color: var(--blue); margin-bottom: 3px; }
-.autofill-desc { font-size: 12px; color: var(--ink-2); margin-bottom: 10px; line-height: 1.5; }
-.autofill-row { display: flex; gap: 8px; align-items: center; }
-.autofill-row input {
-  flex: 1; font-size: 13px; font-family: inherit;
-  padding: 0 12px; height: 32px;
-  border: 1px solid var(--blue-m); border-radius: 8px;
-  background: var(--white); color: var(--ink); outline: none;
-  transition: border-color .15s, box-shadow .15s;
-}
-.autofill-row input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-l); }
-.autofill-status { margin-top: 10px; font-size: 12px; min-height: 18px; }
+/* ═══════════════════════════════════════
+   FORM FIELDS
+═══════════════════════════════════════ */
+.field{margin-bottom:16px;position:relative;z-index:1}
+.field label{display:block;font-size:10px;font-weight:800;letter-spacing:.13em;color:var(--ink3);margin-bottom:7px;text-transform:uppercase;}
+.field input,.field select,.field textarea{width:100%;font-size:14px;font-family:inherit;font-weight:500;padding:12px 14px;border:1px solid var(--bm);border-radius:11px;background:rgba(255,255,255,0.05);color:var(--ink);outline:none;-webkit-appearance:none;appearance:none;transition:all .2s;}
+.field input::placeholder,.field textarea::placeholder{color:#8AAACE}
+.field select option{background:#08081A}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,45,120,0.15),0 0 30px rgba(255,45,120,0.08);background:rgba(255,255,255,0.08);}
+.field textarea{resize:vertical;min-height:88px;line-height:1.6}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 
-/* ── Manage Areas ── */
-.area-row {
-  display: flex; align-items: center; gap: 8px;
-  padding: 9px 12px; border-radius: 10px;
-  border: 1px solid var(--border-l);
-  background: var(--surf); margin-bottom: 6px;
-  cursor: grab; user-select: none;
-  transition: background .12s, border-color .12s, opacity .12s;
-}
-.area-row:active { cursor: grabbing; }
-.area-row.dragging { opacity: .35; }
-.area-row.drag-over { border-color: var(--blue); background: var(--blue-l); }
-.drag-handle { color: var(--ink-4); font-size: 14px; cursor: grab; flex-shrink: 0; letter-spacing: -1px; }
-.count-chip { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; background: var(--ink-5); color: var(--ink-3); }
-.area-name-input {
-  flex: 1; font-size: 13px; font-family: inherit;
-  padding: 5px 9px; border: 1px solid var(--blue);
-  border-radius: 8px; background: var(--white); color: var(--ink); outline: none;
-}
+/* ═══════════════════════════════════════
+   AUTOFILL BOX
+═══════════════════════════════════════ */
+.autofill-box{position:relative;overflow:hidden;border-radius:16px;padding:22px;margin-bottom:26px;border:1px solid rgba(255,45,120,0.4);background:linear-gradient(135deg,rgba(255,45,120,0.12) 0%,rgba(180,79,255,0.1) 33%,rgba(0,212,255,0.08) 66%,rgba(0,245,160,0.06) 100%);}
+.autofill-box::before{content:'';position:absolute;top:-80px;right:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(180,79,255,0.5),transparent 70%);opacity:.25;animation:float 18s ease-in-out infinite alternate;pointer-events:none;}
+.autofill-box::after{content:'';position:absolute;bottom:-60px;left:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(255,45,120,0.5),transparent 70%);opacity:.2;animation:float 22s ease-in-out infinite alternate-reverse;pointer-events:none;}
+.autofill-shimmer{position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,0.07) 50%,transparent 65%);background-size:200% 100%;animation:shimmer 4s ease-in-out infinite;pointer-events:none;}
+.autofill-label{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:900;letter-spacing:.15em;margin-bottom:6px;text-transform:uppercase;position:relative;z-index:1;}
+.autofill-label-text{background:linear-gradient(90deg,var(--pink),var(--purple),var(--cyan),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.autofill-desc{font-size:13px;color:var(--ink2);margin-bottom:16px;line-height:1.65;position:relative;z-index:1}
+.autofill-row{display:flex;gap:10px;align-items:center;position:relative;z-index:1}
+.autofill-row input{flex:1;font-size:14px;font-family:inherit;font-weight:500;padding:0 15px;height:46px;border:1px solid rgba(255,45,120,0.4);border-radius:12px;background:rgba(255,255,255,0.08);color:var(--ink);outline:none;transition:all .2s;}
+.autofill-row input::placeholder{color:#8AAACE}
+.autofill-row input:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,45,120,0.2),0 0 30px rgba(255,45,120,0.12);background:rgba(255,255,255,0.1);}
+.autofill-status{margin-top:14px;font-size:13px;min-height:20px;position:relative;z-index:1;font-weight:700}
 
-@media (max-width: 640px) {
-  .stats-bar { grid-template-columns: repeat(2,1fr); }
-  .topbar, .stats-bar, .tabs-wrap, .toolbar, .table-wrap { padding-left: 16px; padding-right: 16px; }
-  .hide-mob { display: none; }
-  .stat-val { font-size: 22px; }
+/* ═══════════════════════════════════════
+   MANAGE AREAS
+═══════════════════════════════════════ */
+.area-row{display:flex;align-items:center;gap:10px;padding:13px 15px;border-radius:11px;border:1px solid var(--b);background:rgba(255,255,255,0.03);margin-bottom:8px;cursor:grab;user-select:none;transition:all .18s;}
+.area-row:active{cursor:grabbing}
+.area-row.dragging{opacity:.2;transform:scale(0.97)}
+.area-row.drag-over{border-color:var(--pink);background:rgba(255,45,120,0.1);box-shadow:0 0 24px rgba(255,45,120,0.2),0 0 48px rgba(255,45,120,0.08);}
+.drag-handle{color:var(--ink4);font-size:15px;cursor:grab;flex-shrink:0;letter-spacing:-1px;transition:color .15s}
+.area-row:hover .drag-handle{color:#8AAACE}
+.count-chip{font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.07);color:var(--ink3);text-transform:uppercase;letter-spacing:.07em;}
+.area-name-input{flex:1;font-size:13px;font-family:inherit;font-weight:600;padding:8px 13px;border:1px solid var(--pink);border-radius:9px;background:rgba(255,45,120,0.1);color:var(--ink);outline:none;box-shadow:0 0 0 3px rgba(255,45,120,0.15),0 0 20px rgba(255,45,120,0.08);}
+
+/* ═══════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════ */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--pink),var(--purple),var(--cyan));border-radius:4px;box-shadow:0 0 8px rgba(255,45,120,0.5);}
+
+@media(max-width:640px){
+  .stats-bar{grid-template-columns:repeat(2,1fr)}
+  .topbar,.stats-bar,.tabs-wrap,.toolbar,.table-wrap{padding-left:16px;padding-right:16px}
+  .hide-mob{display:none}
+  .stat-val{font-size:32px}
+  .brand-tag{display:none}
+  .stat{padding:20px 16px}
+  .live-dot{display:none}
 }
 </style>
 </head>
 <body>
 
-<!-- Topbar -->
+<div id="bg">
+  <div id="stars"></div>
+  <div id="grid"></div>
+  <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+  <div class="orb o4"></div><div class="orb o5"></div><div class="orb o6"></div>
+  <div id="scan"></div><div id="vig"></div>
+</div>
+
+<!-- TOPBAR -->
 <div class="topbar">
   <div class="brand">
     <div class="brand-icon">
@@ -295,43 +322,53 @@ tr:hover td { background: var(--surf); }
         <polyline points="9 22 9 12 15 12 15 22"/>
       </svg>
     </div>
-    <span class="brand-name">Central Ohio PM Leads</span>
+    <span class="brand-name">PM Leads</span>
+    <span class="brand-tag">Central Ohio · Flooring Turns</span>
   </div>
-  <div class="top-actions">
-    <button class="btn btn-ghost" onclick="openAreas()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-      Manage areas
-    </button>
-    <button class="btn btn-primary" onclick="openAdd()">+ Add lead</button>
+  <div class="top-right">
+    <div class="live-dot">Live</div>
+    <div class="top-actions">
+      <button class="btn btn-ghost-top" onclick="openAreas()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Areas
+      </button>
+      <button class="btn btn-glow" onclick="openAdd()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add lead
+      </button>
+    </div>
   </div>
 </div>
 
-<!-- Stats -->
+<!-- STATS -->
 <div class="stats-bar">
-  <div class="stat"><div class="stat-label">Total leads</div><div class="stat-val" id="s-total">0</div></div>
-  <div class="stat"><div class="stat-label">Contacted</div><div class="stat-val" id="s-contacted">0</div></div>
-  <div class="stat"><div class="stat-label">Qualified</div><div class="stat-val" id="s-qualified">0</div></div>
-  <div class="stat"><div class="stat-label">Total units</div><div class="stat-val" id="s-units">0</div></div>
+  <div class="stat"><div class="stat-bg"></div><div class="stat-label">Total leads</div><div class="stat-val" id="s-total">0</div></div>
+  <div class="stat"><div class="stat-bg"></div><div class="stat-label">Contacted</div><div class="stat-val" id="s-contacted">0</div></div>
+  <div class="stat"><div class="stat-bg"></div><div class="stat-label">Qualified</div><div class="stat-val" id="s-qualified">0</div></div>
+  <div class="stat"><div class="stat-bg"></div><div class="stat-label">Total units</div><div class="stat-val" id="s-units">0</div></div>
 </div>
 
-<!-- Tabs -->
+<!-- TABS -->
 <div class="tabs-wrap" id="tabs"></div>
 
-<!-- Toolbar -->
+<!-- TOOLBAR -->
 <div class="toolbar">
   <div class="search-wrap">
     <span class="search-icon">⌕</span>
-    <input class="search-input" id="search" placeholder="Search company or contact…" oninput="render()">
+    <input class="search-input" id="search" placeholder="Search company, contact, or notes…" oninput="render()">
   </div>
   <select class="filter-select" id="filter-status" onchange="render()">
     <option value="">All statuses</option>
     <option>New</option><option>Contacted</option><option>Qualified</option>
     <option>Proposal sent</option><option>Closed won</option><option>Dead</option>
   </select>
-  <button class="btn btn-ghost" onclick="exportCSV()">↓ Export CSV</button>
+  <button class="btn btn-ghost" onclick="exportCSV()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Export CSV
+  </button>
 </div>
 
-<!-- Table -->
+<!-- TABLE -->
 <div class="table-wrap">
   <div class="table-card">
     <table>
@@ -352,25 +389,24 @@ tr:hover td { background: var(--surf); }
   </div>
 </div>
 
-<!-- Add/Edit Lead Modal -->
+<!-- ADD/EDIT MODAL -->
 <div class="overlay" id="lead-modal" onclick="bgClose(event,'lead-modal')">
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title" id="modal-title">Add lead</span>
       <button class="modal-close" onclick="closeModal('lead-modal')">×</button>
     </div>
-    <p class="modal-sub">Type a property name and hit Autofill — Claude will search and populate the fields automatically.</p>
-
+    <p class="modal-sub">Type a property name and hit Lookup — Claude opens in a new tab with the search ready to go.</p>
     <div class="autofill-box">
-      <div class="autofill-label">✦ AI Autofill</div>
-      <div class="autofill-desc">Type the property name and click Autofill — Claude searches for the address, phone, and key details and fills the form for you.</div>
+      <div class="autofill-shimmer"></div>
+      <div class="autofill-label"><span>✦</span><span class="autofill-label-text">AI Lookup</span></div>
+      <div class="autofill-desc">Type the property name and hit Lookup — Claude searches for the address, phone, contact, and key details. Copy the results back into the fields below.</div>
       <div class="autofill-row">
         <input id="lookup-input" placeholder="e.g. Emerson Park Apartments" oninput="onLookupInput()" onkeydown="if(event.key==='Enter')doAutofill()">
-        <button class="btn-ai" id="autofill-btn" onclick="doAutofill()" disabled>Autofill ✦</button>
+        <button class="btn-ai" id="autofill-btn" onclick="doAutofill()" disabled>Lookup ↗</button>
       </div>
       <div class="autofill-status" id="autofill-status"></div>
     </div>
-
     <div class="field"><label>Property / company name *</label><input id="f-company" placeholder="e.g. Worthington Arms Apartments"></div>
     <div class="field-row">
       <div class="field"><label>Contact name</label><input id="f-contact" placeholder="Jane Smith"></div>
@@ -394,12 +430,12 @@ tr:hover td { background: var(--surf); }
     <div class="field"><label>Notes / next steps</label><textarea id="f-notes" placeholder="e.g. Call back Thursday, ask about summer turns"></textarea></div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('lead-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveLead()">Save lead</button>
+      <button class="btn btn-glow" onclick="saveLead()">Save lead</button>
     </div>
   </div>
 </div>
 
-<!-- Manage Areas Modal -->
+<!-- MANAGE AREAS MODAL -->
 <div class="overlay" id="areas-modal" onclick="bgClose(event,'areas-modal')">
   <div class="modal">
     <div class="modal-header">
@@ -407,376 +443,169 @@ tr:hover td { background: var(--surf); }
       <button class="modal-close" onclick="closeModal('areas-modal')">×</button>
     </div>
     <p class="modal-sub">Add, rename, or remove territories. Drag ⠿ to reorder. Removing an area moves its leads to "Other".</p>
-    <div style="display:flex;gap:8px;margin-bottom:16px">
+    <div style="display:flex;gap:10px;margin-bottom:18px">
       <input id="new-area-input" placeholder="New area or town name…"
-        style="flex:1;font-size:13px;font-family:inherit;padding:0 12px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--surf);color:var(--ink);outline:none"
+        style="flex:1;font-size:13px;font-family:inherit;font-weight:500;padding:0 14px;height:42px;border:1px solid var(--bm);border-radius:11px;background:rgba(255,255,255,0.05);color:var(--ink);outline:none;transition:all .2s;position:relative;z-index:1"
         onkeydown="if(event.key==='Enter')addArea()"
-        onfocus="this.style.borderColor='var(--blue)';this.style.boxShadow='0 0 0 3px var(--blue-l)'"
-        onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
-      <button class="btn btn-primary" onclick="addArea()">Add</button>
+        onfocus="this.style.borderColor='var(--pink)';this.style.boxShadow='0 0 0 3px rgba(255,45,120,0.15),0 0 30px rgba(255,45,120,0.08)'"
+        onblur="this.style.borderColor='var(--bm)';this.style.boxShadow='none'">
+      <button class="btn btn-glow" onclick="addArea()">Add</button>
     </div>
-    <div id="areas-list"></div>
+    <div id="areas-list" style="position:relative;z-index:1"></div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('areas-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveAreas()">Save changes</button>
+      <button class="btn btn-glow" onclick="saveAreas()">Save changes</button>
     </div>
   </div>
 </div>
 
 <script>
-// ── State ──────────────────────────────────────────────────────────────────
-const STATUS_CFG = {
-  "New":           { bg:"#E5E5EA", color:"#3A3A3C" },
-  "Contacted":     { bg:"#EAF3FF", color:"#007AFF" },
-  "Qualified":     { bg:"#EDFBF1", color:"#248A3D" },
-  "Proposal sent": { bg:"#FFF4E0", color:"#C93400" },
-  "Closed won":    { bg:"#34C759", color:"#FFFFFF" },
-  "Dead":          { bg:"#F2F2F7", color:"#8E8E93" },
+(function(){
+  const c=document.getElementById('stars');
+  for(let i=0;i<200;i++){
+    const s=document.createElement('div');s.className='star';
+    const sz=Math.random()*2.5+0.5;
+    s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*5}s;--o:${0.3+Math.random()*0.7};animation-delay:${Math.random()*5}s`;
+    c.appendChild(s);
+  }
+})();
+
+const STATUS_CFG={
+  "New":          {bg:"rgba(255,255,255,0.07)",  color:"#6A80A8", glow:false},
+  "Contacted":    {bg:"rgba(0,212,255,0.13)",    color:"#00D4FF", glow:"rgba(0,212,255,0.4)"},
+  "Qualified":    {bg:"rgba(0,245,160,0.13)",    color:"#00F5A0", glow:"rgba(0,245,160,0.4)"},
+  "Proposal sent":{bg:"rgba(255,184,0,0.13)",    color:"#FFB800", glow:"rgba(255,184,0,0.4)"},
+  "Closed won":   {bg:"linear-gradient(135deg,rgba(255,45,120,0.75),rgba(180,79,255,0.75))",color:"#fff",glow:"rgba(255,45,120,0.55)"},
+  "Dead":         {bg:"rgba(255,255,255,0.04)",  color:"#3A4A62", glow:false},
 };
 
-let leads = JSON.parse(localStorage.getItem('pm_leads') || '[]');
-let areas = (() => {
-  const s = localStorage.getItem('pm_areas');
-  if (s) return JSON.parse(s);
-  return ["Bexley","Clintonville","Dublin","Grove City","Hilliard","Marysville","New Albany","Plain City","Upper Arlington","Westerville","West Jefferson","Worthington","Other"];
-})();
-let draftAreas = [];
-let activeArea = "All Areas";
-let editId = null;
-let sortCol = "company", sortDir = 1;
-let dragSrcIdx = null;
+let leads=JSON.parse(localStorage.getItem('pm_leads')||'[]');
+let areas=(()=>{const s=localStorage.getItem('pm_areas');if(s)return JSON.parse(s);return["Bexley","Clintonville","Dublin","Grove City","Hilliard","Marysville","New Albany","Plain City","Upper Arlington","Westerville","West Jefferson","Worthington","Other"];})();
+let draftAreas=[],activeArea="All Areas",editId=null,sortCol="company",sortDir=1,dragSrcIdx=null;
 
-function save() {
-  localStorage.setItem('pm_leads', JSON.stringify(leads));
-  localStorage.setItem('pm_areas', JSON.stringify(areas));
+function save(){localStorage.setItem('pm_leads',JSON.stringify(leads));localStorage.setItem('pm_areas',JSON.stringify(areas));}
+function onLookupInput(){document.getElementById('autofill-btn').disabled=!document.getElementById('lookup-input').value.trim();}
+async function doAutofill(){
+  const name=document.getElementById('lookup-input').value.trim();if(!name)return;
+  document.getElementById('f-company').value=name;
+  const areaList=areas.filter(a=>a!=='Other').join(', ');
+  const prompt=`Please look up this apartment complex or property management company in Central Ohio and give me the following details in a simple labeled list:\n\n- Company name\n- Physical address (full, including city, state, zip)\n- Main phone number\n- Leasing manager or contact name (if available)\n- Email (if available)\n- Total unit count (if available)\n- Property style (e.g. garden-style, mid-rise, townhome)\n- Area — pick the best match from this list: ${areaList}\n\nProperty: "${name}"\nLocation: Central Ohio / Columbus metro area\n\nIf any detail isn't publicly available just write "Not found" for that field.`;
+  window.open('https://claude.ai/new?q='+encodeURIComponent(prompt),'_blank','noopener');
+  document.getElementById('autofill-status').innerHTML='<span style="background:linear-gradient(90deg,var(--pink),var(--purple),var(--cyan),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">↗ Claude opened in a new tab — copy the results back into the fields below.</span>';
 }
-
-// ── Autofill ───────────────────────────────────────────────────────────────
-function onLookupInput() {
-  document.getElementById('autofill-btn').disabled = !document.getElementById('lookup-input').value.trim();
-}
-
-async function doAutofill() {
-  const name = document.getElementById('lookup-input').value.trim();
-  if (!name) return;
-
-  const btn = document.getElementById('autofill-btn');
-  const status = document.getElementById('autofill-status');
-  btn.disabled = true;
-  btn.textContent = 'Searching…';
-  status.innerHTML = '<span style="color:var(--ink-3)">⟳ Looking up ' + esc(name) + '…</span>';
-
-  const areaList = areas.filter(a => a !== 'Other').join(', ');
-  const prompt = `You are a research assistant. Search the web for this apartment complex or property management company in Central Ohio and return ONLY a valid JSON object with these exact keys:
-{"company":"full property name","address":"full street address including city, state, zip","phone":"main phone number as (XXX) XXX-XXXX","contact":"leasing manager or primary contact name or empty string","email":"leasing or main email or empty string","units":unit count as number or 0,"style":"property style e.g. garden-style mid-rise townhome or empty string","area":"best match from this list: ${areaList} — or Other if none match"}
-Property: "${name}"
-Location: Central Ohio / Columbus metro area
-Return ONLY the JSON object. No markdown, no explanation, no extra text.`;
-
-  try {
-    const res = await fetch("/api/autofill", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        tools: [{ type: "web_search_20250305", name: "web_search" }],
-        messages: [{ role: "user", content: prompt }]
-      })
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      const errMsg = data?.error?.message || ("HTTP " + res.status);
-      throw new Error(errMsg);
-    }
-    const tb = (data.content || []).filter(b => b.type === "text").pop();
-    if (!tb) throw new Error("No text in response — try again.");
-
-    let d;
-    try {
-      d = JSON.parse(tb.text.replace(/```json|```/g, "").trim());
-    } catch(parseErr) {
-      throw new Error("Could not parse response — try again.");
-    }
-
-    document.getElementById('f-company').value = d.company || name;
-    document.getElementById('f-address').value = d.address || '';
-    document.getElementById('f-phone').value   = d.phone   || '';
-    document.getElementById('f-contact').value = d.contact || '';
-    document.getElementById('f-email').value   = d.email   || '';
-    document.getElementById('f-style').value   = d.style   || '';
-    if (d.units) document.getElementById('f-units').value = d.units;
-    const matchedArea = areas.includes(d.area) ? d.area : 'Other';
-    document.getElementById('f-area').value = matchedArea;
-
-    status.innerHTML = '<span style="color:var(--green-d)">✓ Fields filled in — review and adjust as needed.</span>';
-  } catch(e) {
-    console.error(e);
-    document.getElementById('f-company').value = name;
-    status.innerHTML = '<span style="color:var(--red)">⚠ ' + (e.message || 'Autofill failed') + '</span>';
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Autofill ✦';
-  }
-}
-
-// ── Tabs & Stats ───────────────────────────────────────────────────────────
-function renderTabs() {
-  const counts = {};
-  leads.forEach(l => counts[l.area] = (counts[l.area] || 0) + 1);
-  const all = ["All Areas", ...areas];
-  document.getElementById('tabs').innerHTML = all.map(a => {
-    const cnt = a === "All Areas" ? leads.length : (counts[a] || 0);
-    const active = activeArea === a ? ' active' : '';
-    const badge = cnt > 0 ? `<span class="tab-cnt">${cnt}</span>` : '';
-    return `<button class="tab${active}" onclick="setArea('${a.replace(/'/g,"\\'")}'">${esc(a)}${badge}</button>`;
+function renderTabs(){
+  const counts={};leads.forEach(l=>counts[l.area]=(counts[l.area]||0)+1);
+  document.getElementById('tabs').innerHTML=["All Areas",...areas].map(a=>{
+    const cnt=a==="All Areas"?leads.length:(counts[a]||0);
+    const act=activeArea===a?' active':'';
+    const badge=cnt>0?`<span class="tab-cnt">${cnt}</span>`:'';
+    return`<button class="tab${act}" onclick="setArea('${a.replace(/'/g,"\\'")}'">${esc(a)}${badge}</button>`;
   }).join('');
 }
-
-function setArea(a) { activeArea = a; render(); }
-
-function renderStats() {
-  const s = activeArea === "All Areas" ? leads : leads.filter(l => l.area === activeArea);
-  document.getElementById('s-total').textContent = s.length;
-  document.getElementById('s-contacted').textContent = s.filter(l => ["Contacted","Qualified","Proposal sent","Closed won"].includes(l.status)).length;
-  document.getElementById('s-qualified').textContent = s.filter(l => ["Qualified","Proposal sent","Closed won"].includes(l.status)).length;
-  document.getElementById('s-units').textContent = s.reduce((t, l) => t + (parseInt(l.units) || 0), 0).toLocaleString();
+function setArea(a){activeArea=a;render();}
+function renderStats(){
+  const s=activeArea==="All Areas"?leads:leads.filter(l=>l.area===activeArea);
+  document.getElementById('s-total').textContent=s.length;
+  document.getElementById('s-contacted').textContent=s.filter(l=>["Contacted","Qualified","Proposal sent","Closed won"].includes(l.status)).length;
+  document.getElementById('s-qualified').textContent=s.filter(l=>["Qualified","Proposal sent","Closed won"].includes(l.status)).length;
+  document.getElementById('s-units').textContent=s.reduce((t,l)=>t+(parseInt(l.units)||0),0).toLocaleString();
 }
-
-// ── Sort & Render ──────────────────────────────────────────────────────────
-function sortBy(col) {
-  if (sortCol === col) sortDir *= -1; else { sortCol = col; sortDir = 1; }
-  render();
-}
-
-function render() {
-  renderTabs(); renderStats();
-  const q = document.getElementById('search').value.toLowerCase();
-  const fs = document.getElementById('filter-status').value;
-
-  let rows = leads.filter(l => {
-    if (activeArea !== "All Areas" && l.area !== activeArea) return false;
-    if (fs && l.status !== fs) return false;
-    if (q && !(l.company + l.contact + (l.notes || '')).toLowerCase().includes(q)) return false;
+function sortBy(col){if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=1;}render();}
+function render(){
+  renderTabs();renderStats();
+  const q=document.getElementById('search').value.toLowerCase();
+  const fs=document.getElementById('filter-status').value;
+  let rows=leads.filter(l=>{
+    if(activeArea!=="All Areas"&&l.area!==activeArea)return false;
+    if(fs&&l.status!==fs)return false;
+    if(q&&!(l.company+l.contact+(l.notes||'')).toLowerCase().includes(q))return false;
     return true;
-  }).sort((a, b) => {
-    if (sortCol === 'units') return ((a.units || 0) - (b.units || 0)) * sortDir;
-    return (a[sortCol] || '').toString().localeCompare((b[sortCol] || '').toString()) * sortDir;
+  }).sort((a,b)=>{
+    if(sortCol==='units')return((a.units||0)-(b.units||0))*sortDir;
+    return(a[sortCol]||'').toString().localeCompare((b[sortCol]||'').toString())*sortDir;
   });
-
-  ['company','contact','units','area','status'].forEach(c => {
-    const el = document.getElementById('arr-' + c);
-    if (el) el.textContent = sortCol === c ? (sortDir === 1 ? ' ↑' : ' ↓') : '';
-  });
-
-  const tb = document.getElementById('tbody');
-  if (!rows.length) {
-    tb.innerHTML = `<tr><td colspan="8"><div class="empty">
-      <div class="empty-icon">📋</div>
-      <div class="empty-title">${leads.length ? 'No leads match your filter' : 'No leads yet'}</div>
-      <div class="empty-sub">${leads.length ? 'Try adjusting your search or filter.' : 'Click "+ Add lead" to get started.'}</div>
-    </div></td></tr>`;
+  ['company','contact','units','area','status'].forEach(c=>{const el=document.getElementById('arr-'+c);if(el)el.textContent=sortCol===c?(sortDir===1?' ↑':' ↓'):'';});
+  const tb=document.getElementById('tbody');
+  if(!rows.length){
+    tb.innerHTML=`<tr><td colspan="8"><div class="empty"><span class="empty-icon">🏢</span><div class="empty-title">${leads.length?'No leads match your filter':'No leads yet'}</div><div class="empty-sub">${leads.length?'Try adjusting your search or filter.':'Hit "Add lead" to start building your pipeline.'}</div></div></td></tr>`;
     return;
   }
-
-  tb.innerHTML = rows.map(l => {
-    const sc = STATUS_CFG[l.status] || STATUS_CFG["New"];
-    const note = (l.style ? '[' + l.style + '] ' : '') + (l.notes || '');
-    return `<tr>
-      <td><div class="co-name">${esc(l.company)}</div>${l.address ? '<div class="co-addr">' + esc(l.address) + '</div>' : ''}</td>
-      <td class="hide-mob" style="color:var(--ink-2)">${esc(l.contact) || '<span class="muted">—</span>'}</td>
-      <td class="hide-mob" style="color:var(--ink-2)">${esc(l.phone) || '<span class="muted">—</span>'}</td>
-      <td style="text-align:right;font-weight:700">${l.units || '<span class="muted" style="font-weight:400">—</span>'}</td>
+  tb.innerHTML=rows.map(l=>{
+    const sc=STATUS_CFG[l.status]||STATUS_CFG["New"];
+    const note=(l.style?'['+l.style+'] ':'')+(l.notes||'');
+    const glow=sc.glow?`box-shadow:0 0 16px ${sc.glow},0 0 32px ${sc.glow.replace('0.4','0.15').replace('0.55','0.2')}`:'';
+    return`<tr>
+      <td><div class="co-name">${esc(l.company)}</div>${l.address?'<div class="co-addr">'+esc(l.address)+'</div>':''}</td>
+      <td class="hide-mob" style="color:var(--ink2)">${esc(l.contact)||'<span class="muted">—</span>'}</td>
+      <td class="hide-mob" style="color:var(--ink2)">${esc(l.phone)||'<span class="muted">—</span>'}</td>
+      <td style="text-align:right;font-weight:800;color:var(--ink)">${l.units||'<span class="muted" style="font-weight:400">—</span>'}</td>
       <td><span class="area-chip">${esc(l.area)}</span></td>
-      <td><span class="badge" style="background:${sc.bg};color:${sc.color}">${esc(l.status)}</span></td>
-      <td class="hide-mob" style="font-size:12px;color:var(--ink-3);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(note)}">${esc(note) || '<span class="muted">—</span>'}</td>
+      <td><span class="badge" style="background:${sc.bg};color:${sc.color};${glow}">${esc(l.status)}</span></td>
+      <td class="hide-mob" style="font-size:12px;color:var(--ink3);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(note)}">${esc(note)||'<span class="muted">—</span>'}</td>
       <td><button class="btn btn-ghost btn-sm" onclick="openEdit('${l.id}')">Edit</button></td>
     </tr>`;
   }).join('');
 }
-
-function esc(s) {
-  return (s || '').toString()
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-// ── Lead Modal ─────────────────────────────────────────────────────────────
-function populateAreaSelect() {
-  document.getElementById('f-area').innerHTML = areas.map(a => `<option value="${esc(a)}">${esc(a)}</option>`).join('');
-}
-
-function openAdd() {
-  editId = null;
-  document.getElementById('modal-title').textContent = 'Add lead';
+function esc(s){return(s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function populateAreaSelect(){document.getElementById('f-area').innerHTML=areas.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('');}
+function openAdd(){
+  editId=null;document.getElementById('modal-title').textContent='Add lead';
   populateAreaSelect();
-  ['company','contact','phone','email','address','units','style','notes'].forEach(k => document.getElementById('f-' + k).value = '');
-  document.getElementById('f-status').value = 'New';
-  document.getElementById('f-area').value = activeArea !== 'All Areas' ? activeArea : areas[0];
-  document.getElementById('lookup-input').value = '';
-  document.getElementById('autofill-btn').disabled = true;
-  document.getElementById('autofill-status').innerHTML = '';
+  ['company','contact','phone','email','address','units','style','notes'].forEach(k=>document.getElementById('f-'+k).value='');
+  document.getElementById('f-status').value='New';
+  document.getElementById('f-area').value=activeArea!=='All Areas'?activeArea:areas[0];
+  document.getElementById('lookup-input').value='';
+  document.getElementById('autofill-btn').disabled=true;
+  document.getElementById('autofill-status').innerHTML='';
   document.getElementById('lead-modal').classList.add('open');
-  setTimeout(() => document.getElementById('lookup-input').focus(), 60);
+  setTimeout(()=>document.getElementById('lookup-input').focus(),60);
 }
-
-function openEdit(id) {
-  const l = leads.find(x => x.id === id); if (!l) return;
-  editId = id;
-  document.getElementById('modal-title').textContent = 'Edit lead';
+function openEdit(id){
+  const l=leads.find(x=>x.id===id);if(!l)return;
+  editId=id;document.getElementById('modal-title').textContent='Edit lead';
   populateAreaSelect();
-  document.getElementById('f-company').value = l.company || '';
-  document.getElementById('f-contact').value = l.contact || '';
-  document.getElementById('f-phone').value   = l.phone   || '';
-  document.getElementById('f-email').value   = l.email   || '';
-  document.getElementById('f-address').value = l.address || '';
-  document.getElementById('f-units').value   = l.units   || '';
-  document.getElementById('f-style').value   = l.style   || '';
-  document.getElementById('f-status').value  = l.status  || 'New';
-  document.getElementById('f-area').value    = l.area    || areas[0];
-  document.getElementById('f-notes').value   = l.notes   || '';
-  document.getElementById('lookup-input').value = l.company || '';
-  document.getElementById('autofill-btn').disabled = !l.company;
-  document.getElementById('autofill-status').innerHTML = '';
+  ['company','contact','phone','email','address','style','notes'].forEach(k=>document.getElementById('f-'+k).value=l[k]||'');
+  document.getElementById('f-units').value=l.units||'';
+  document.getElementById('f-status').value=l.status||'New';
+  document.getElementById('f-area').value=l.area||areas[0];
+  document.getElementById('lookup-input').value=l.company||'';
+  document.getElementById('autofill-btn').disabled=!l.company;
+  document.getElementById('autofill-status').innerHTML='';
   document.getElementById('lead-modal').classList.add('open');
 }
-
-function saveLead() {
-  const co = document.getElementById('f-company').value.trim();
-  if (!co) { document.getElementById('f-company').focus(); return; }
-  const obj = {
-    id: editId || Date.now() + '',
-    company: co,
-    contact: document.getElementById('f-contact').value.trim(),
-    phone:   document.getElementById('f-phone').value.trim(),
-    email:   document.getElementById('f-email').value.trim(),
-    address: document.getElementById('f-address').value.trim(),
-    units:   parseInt(document.getElementById('f-units').value) || 0,
-    style:   document.getElementById('f-style').value.trim(),
-    area:    document.getElementById('f-area').value,
-    status:  document.getElementById('f-status').value,
-    notes:   document.getElementById('f-notes').value.trim(),
-  };
-  if (editId) { const i = leads.findIndex(x => x.id === editId); if (i > -1) leads[i] = obj; }
-  else leads.unshift(obj);
-  save(); closeModal('lead-modal'); render();
+function saveLead(){
+  const co=document.getElementById('f-company').value.trim();if(!co){document.getElementById('f-company').focus();return;}
+  const obj={id:editId||Date.now()+'',company:co,contact:document.getElementById('f-contact').value.trim(),phone:document.getElementById('f-phone').value.trim(),email:document.getElementById('f-email').value.trim(),address:document.getElementById('f-address').value.trim(),units:parseInt(document.getElementById('f-units').value)||0,style:document.getElementById('f-style').value.trim(),area:document.getElementById('f-area').value,status:document.getElementById('f-status').value,notes:document.getElementById('f-notes').value.trim()};
+  if(editId){const i=leads.findIndex(x=>x.id===editId);if(i>-1)leads[i]=obj;}else leads.unshift(obj);
+  save();closeModal('lead-modal');render();
 }
-
-// ── Manage Areas ───────────────────────────────────────────────────────────
-function openAreas() {
-  draftAreas = [...areas];
-  renderAreasList();
-  document.getElementById('new-area-input').value = '';
-  document.getElementById('areas-modal').classList.add('open');
-}
-
-function renderAreasList() {
-  const counts = {};
-  leads.forEach(l => counts[l.area] = (counts[l.area] || 0) + 1);
-  document.getElementById('areas-list').innerHTML = draftAreas.map((a, i) => `
-    <div class="area-row" id="arow-${i}" draggable="true" data-idx="${i}"
-      ondragstart="onDragStart(event,${i})"
-      ondragover="onDragOver(event,${i})"
-      ondragleave="onDragLeave(event,${i})"
-      ondrop="onDrop(event,${i})"
-      ondragend="onDragEnd()">
+function openAreas(){draftAreas=[...areas];renderAreasList();document.getElementById('new-area-input').value='';document.getElementById('areas-modal').classList.add('open');}
+function renderAreasList(){
+  const counts={};leads.forEach(l=>counts[l.area]=(counts[l.area]||0)+1);
+  document.getElementById('areas-list').innerHTML=draftAreas.map((a,i)=>`
+    <div class="area-row" id="arow-${i}" draggable="true"
+      ondragstart="onDragStart(event,${i})" ondragover="onDragOver(event,${i})"
+      ondragleave="onDragLeave(event,${i})" ondrop="onDrop(event,${i})" ondragend="onDragEnd()">
       <span class="drag-handle">⠿</span>
-      <span style="flex:1;font-size:13px;font-weight:500;color:var(--ink)">${esc(a)}</span>
-      ${counts[a] ? `<span class="count-chip">${counts[a]} lead${counts[a] !== 1 ? 's' : ''}</span>` : ''}
+      <span style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">${esc(a)}</span>
+      ${counts[a]?`<span class="count-chip">${counts[a]} lead${counts[a]!==1?'s':''}</span>`:''}
       <button class="btn btn-ghost btn-sm" onclick="startRename(${i})">Rename</button>
-      ${a !== 'Other' ? `<button class="btn-danger-sm" onclick="removeArea(${i})">✕</button>` : ''}
+      ${a!=='Other'?`<button class="btn-danger-sm" onclick="removeArea(${i})">✕</button>`:''}
     </div>`).join('');
 }
-
-function onDragStart(e, i) {
-  dragSrcIdx = i;
-  e.dataTransfer.effectAllowed = 'move';
-  setTimeout(() => { const el = document.getElementById('arow-'+i); if(el) el.classList.add('dragging'); }, 0);
-}
-function onDragOver(e, i) {
-  e.preventDefault();
-  if (i === dragSrcIdx) return;
-  document.querySelectorAll('.area-row').forEach(r => r.classList.remove('drag-over'));
-  const el = document.getElementById('arow-'+i); if(el) el.classList.add('drag-over');
-}
-function onDragLeave(e, i) { const el = document.getElementById('arow-'+i); if(el) el.classList.remove('drag-over'); }
-function onDrop(e, i) {
-  e.preventDefault();
-  if (dragSrcIdx === null || dragSrcIdx === i) return;
-  const moved = draftAreas.splice(dragSrcIdx, 1)[0];
-  draftAreas.splice(i, 0, moved);
-  dragSrcIdx = null; renderAreasList();
-}
-function onDragEnd() {
-  dragSrcIdx = null;
-  document.querySelectorAll('.area-row').forEach(r => r.classList.remove('dragging','drag-over'));
-}
-
-function startRename(i) {
-  const row = document.getElementById('arow-' + i);
-  row.draggable = false;
-  row.innerHTML = `
-    <span class="drag-handle" style="opacity:.2">⠿</span>
-    <input class="area-name-input" value="${esc(draftAreas[i])}" id="ri-${i}"
-      onkeydown="if(event.key==='Enter')confirmRename(${i});if(event.key==='Escape')renderAreasList()">
-    <button class="btn btn-primary btn-sm" onclick="confirmRename(${i})">Save</button>
-    <button class="btn btn-ghost btn-sm" onclick="renderAreasList()">Cancel</button>`;
-  document.getElementById('ri-' + i).focus();
-}
-
-function confirmRename(i) {
-  const v = document.getElementById('ri-' + i).value.trim();
-  if (!v || (draftAreas.includes(v) && draftAreas[i] !== v)) { renderAreasList(); return; }
-  draftAreas[i] = v; renderAreasList();
-}
-
-function addArea() {
-  const v = document.getElementById('new-area-input').value.trim();
-  if (!v || draftAreas.includes(v)) return;
-  const oi = draftAreas.indexOf('Other');
-  const end = oi > -1 ? oi : draftAreas.length;
-  let pos = draftAreas.slice(0, end).findIndex(a => a.localeCompare(v) > 0);
-  if (pos === -1) pos = end;
-  draftAreas.splice(pos, 0, v);
-  document.getElementById('new-area-input').value = '';
-  renderAreasList();
-}
-
-function removeArea(i) {
-  const name = draftAreas[i];
-  const cnt = leads.filter(l => l.area === name).length;
-  if (cnt > 0 && !confirm(`"${name}" has ${cnt} lead(s). They will be moved to "Other". Continue?`)) return;
-  draftAreas.splice(i, 1);
-  if (!draftAreas.includes('Other')) draftAreas.push('Other');
-  renderAreasList();
-}
-
-function saveAreas() {
-  const ns = new Set(draftAreas);
-  leads = leads.map(l => ns.has(l.area) ? l : { ...l, area: 'Other' });
-  areas = [...draftAreas];
-  if (!areas.includes('Other')) areas.push('Other');
-  if (activeArea !== 'All Areas' && !ns.has(activeArea)) activeArea = 'All Areas';
-  save(); closeModal('areas-modal'); render();
-}
-
-// ── Modals ─────────────────────────────────────────────────────────────────
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-function bgClose(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
-
-// ── CSV Export ─────────────────────────────────────────────────────────────
-function exportCSV() {
-  const hdr = 'Company,Contact,Phone,Email,Address,Units,Style,Area,Status,Notes';
-  const rows = leads.map(l =>
-    [l.company,l.contact,l.phone,l.email,l.address,l.units,l.style,l.area,l.status,l.notes]
-      .map(v => `"${(v||'').toString().replace(/"/g,'""')}"`)
-      .join(',')
-  );
-  const blob = new Blob([[hdr,...rows].join('\n')], { type:'text/csv' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'central_ohio_pm_leads.csv';
-  a.click();
-}
+function onDragStart(e,i){dragSrcIdx=i;e.dataTransfer.effectAllowed='move';setTimeout(()=>{const el=document.getElementById('arow-'+i);if(el)el.classList.add('dragging');},0);}
+function onDragOver(e,i){e.preventDefault();if(i===dragSrcIdx)return;document.querySelectorAll('.area-row').forEach(r=>r.classList.remove('drag-over'));const el=document.getElementById('arow-'+i);if(el)el.classList.add('drag-over');}
+function onDragLeave(e,i){const el=document.getElementById('arow-'+i);if(el)el.classList.remove('drag-over');}
+function onDrop(e,i){e.preventDefault();if(dragSrcIdx===null||dragSrcIdx===i)return;const moved=draftAreas.splice(dragSrcIdx,1)[0];draftAreas.splice(i,0,moved);dragSrcIdx=null;renderAreasList();}
+function onDragEnd(){dragSrcIdx=null;document.querySelectorAll('.area-row').forEach(r=>r.classList.remove('dragging','drag-over'));}
+function startRename(i){const row=document.getElementById('arow-'+i);row.draggable=false;row.innerHTML=`<span class="drag-handle" style="opacity:.2">⠿</span><input class="area-name-input" value="${esc(draftAreas[i])}" id="ri-${i}" onkeydown="if(event.key==='Enter')confirmRename(${i});if(event.key==='Escape')renderAreasList()"><button class="btn btn-glow btn-sm" onclick="confirmRename(${i})">Save</button><button class="btn btn-ghost btn-sm" onclick="renderAreasList()">Cancel</button>`;document.getElementById('ri-'+i).focus();}
+function confirmRename(i){const v=document.getElementById('ri-'+i).value.trim();if(!v||(draftAreas.includes(v)&&draftAreas[i]!==v)){renderAreasList();return;}draftAreas[i]=v;renderAreasList();}
+function addArea(){const v=document.getElementById('new-area-input').value.trim();if(!v||draftAreas.includes(v))return;const oi=draftAreas.indexOf('Other');const end=oi>-1?oi:draftAreas.length;let pos=draftAreas.slice(0,end).findIndex(a=>a.localeCompare(v)>0);if(pos===-1)pos=end;draftAreas.splice(pos,0,v);document.getElementById('new-area-input').value='';renderAreasList();}
+function removeArea(i){const name=draftAreas[i];const cnt=leads.filter(l=>l.area===name).length;if(cnt>0&&!confirm(`"${name}" has ${cnt} lead(s). Move to Other?`))return;draftAreas.splice(i,1);if(!draftAreas.includes('Other'))draftAreas.push('Other');renderAreasList();}
+function saveAreas(){const ns=new Set(draftAreas);leads=leads.map(l=>ns.has(l.area)?l:{...l,area:'Other'});areas=[...draftAreas];if(!areas.includes('Other'))areas.push('Other');if(activeArea!=='All Areas'&&!ns.has(activeArea))activeArea='All Areas';save();closeModal('areas-modal');render();}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function bgClose(e,id){if(e.target===document.getElementById(id))closeModal(id);}
+function exportCSV(){const hdr='Company,Contact,Phone,Email,Address,Units,Style,Area,Status,Notes';const rows=leads.map(l=>[l.company,l.contact,l.phone,l.email,l.address,l.units,l.style,l.area,l.status,l.notes].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(','));const blob=new Blob([[hdr,...rows].join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='central_ohio_pm_leads.csv';a.click();}
 
 render();
 </script>
