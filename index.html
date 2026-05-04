@@ -259,6 +259,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
 .section-toggle-mob{display:none;gap:0;width:100%;margin:0}
 .section-toggle-mob .section-btn{flex:1;height:38px;border-radius:0;font-size:13px;}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -585,32 +586,37 @@ function openWinModal(id){
   document.getElementById('win-modal').classList.add('open');
 }
 
-function confirmMoveToWins(){
+async function confirmMoveToWins(){
   const l=leads.find(x=>x.id===winTargetId);if(!l)return;
   const win={...l,wonDate:document.getElementById('win-date').value,winNotes:document.getElementById('win-notes').value.trim(),id:l.id};
   wins.unshift(win);
   leads=leads.filter(x=>x.id!==winTargetId);
+  const wid=winTargetId;
   winTargetId=null;
-  save();
   closeModal('win-modal');
   render();
   updateWinsBadge();
+  await saveWin_db(win);
+  await deleteLead_db(wid);
 }
 
-function removeWin(id){
+async function removeWin(id){
   if(!confirm('Remove this win permanently?'))return;
   wins=wins.filter(x=>x.id!==id);
-  save();renderWins();updateWinsBadge();
+  renderWins();updateWinsBadge();
+  await deleteWin_db(id);
 }
 
-function moveWinBackToLeads(id){
+async function moveWinBackToLeads(id){
   const w=wins.find(x=>x.id===id);if(!w)return;
   if(!confirm(`Move "${w.company}" back to pipeline?`))return;
   const lead={...w,status:'New'};
   delete lead.wonDate;delete lead.winNotes;
   leads.unshift(lead);
   wins=wins.filter(x=>x.id!==id);
-  save();renderWins();updateWinsBadge();render();
+  renderWins();updateWinsBadge();render();
+  await saveLead_db(lead);
+  await deleteWin_db(id);
 }
 
 // ── Lookup / autofill ──
@@ -791,11 +797,12 @@ function openEdit(id){
   document.getElementById('autofill-status').innerHTML='';
   document.getElementById('lead-modal').classList.add('open');
 }
-function saveLead(){
+async function saveLead(){
   const co=document.getElementById('f-company').value.trim();if(!co){document.getElementById('f-company').focus();return;}
   const obj={id:editId||Date.now()+'',company:co,contact:document.getElementById('f-contact').value.trim(),phone:document.getElementById('f-phone').value.trim(),email:document.getElementById('f-email').value.trim(),address:document.getElementById('f-address').value.trim(),units:parseInt(document.getElementById('f-units').value)||0,style:document.getElementById('f-style').value.trim(),area:document.getElementById('f-area').value,status:document.getElementById('f-status').value,notes:document.getElementById('f-notes').value.trim()};
   if(editId){const i=leads.findIndex(x=>x.id===editId);if(i>-1)leads[i]=obj;}else leads.unshift(obj);
-  save();closeModal('lead-modal');render();
+  closeModal('lead-modal');render();
+  await saveLead_db(obj);
 }
 
 // ── Areas ──
@@ -827,7 +834,21 @@ function startRename(i){const row=document.getElementById('arow-'+i);row.draggab
 function confirmRename(i){const v=document.getElementById('ri-'+i).value.trim();if(!v||(draftAreas.includes(v)&&draftAreas[i]!==v)){renderAreasList();return;}draftAreas[i]=v;renderAreasList();}
 function addArea(){const v=document.getElementById('new-area-input').value.trim();if(!v||draftAreas.includes(v))return;const oi=draftAreas.indexOf('Other');const end=oi>-1?oi:draftAreas.length;let pos=draftAreas.slice(0,end).findIndex(a=>a.localeCompare(v)>0);if(pos===-1)pos=end;draftAreas.splice(pos,0,v);document.getElementById('new-area-input').value='';renderAreasList();}
 function removeArea(i){const name=draftAreas[i];const cnt=leads.filter(l=>l.area===name).length;if(cnt>0&&!confirm(`"${name}" has ${cnt} lead(s). Move to Other?`))return;draftAreas.splice(i,1);if(!draftAreas.includes('Other'))draftAreas.push('Other');renderAreasList();}
-function saveAreas(){const ns=new Set(draftAreas);leads=leads.map(l=>ns.has(l.area)?l:{...l,area:'Other'});wins=wins.map(w=>ns.has(w.area)?w:{...w,area:'Other'});areas=[...draftAreas];if(!areas.includes('Other'))areas.push('Other');if(activeArea!=='All Areas'&&!ns.has(activeArea))activeArea='All Areas';if(activeWinArea!=='All Areas'&&!ns.has(activeWinArea))activeWinArea='All Areas';save();closeModal('areas-modal');render();}
+async function saveAreas(){
+  const ns=new Set(draftAreas);
+  const movedLeads=leads.filter(l=>!ns.has(l.area));
+  const movedWins=wins.filter(w=>!ns.has(w.area));
+  leads=leads.map(l=>ns.has(l.area)?l:{...l,area:'Other'});
+  wins=wins.map(w=>ns.has(w.area)?w:{...w,area:'Other'});
+  areas=[...draftAreas];
+  if(!areas.includes('Other'))areas.push('Other');
+  if(activeArea!=='All Areas'&&!ns.has(activeArea))activeArea='All Areas';
+  if(activeWinArea!=='All Areas'&&!ns.has(activeWinArea))activeWinArea='All Areas';
+  closeModal('areas-modal');render();
+  await saveAreas_db(areas);
+  for(const l of movedLeads) await saveLead_db({...l,area:'Other'});
+  for(const w of movedWins) await saveWin_db({...w,area:'Other'});
+}
 
 function sortAreasAlpha(){
   const hasOther = draftAreas.includes('Other');
@@ -842,8 +863,13 @@ function bgClose(e,id){if(e.target===document.getElementById(id))closeModal(id);
 function exportCSV(){const hdr='Company,Contact,Phone,Email,Address,Units,Style,Area,Status,Notes';const rows=leads.map(l=>[l.company,l.contact,l.phone,l.email,l.address,l.units,l.style,l.area,l.status,l.notes].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(','));const blob=new Blob([[hdr,...rows].join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pm_leads.csv';a.click();}
 function exportWinsCSV(){const hdr='Company,Contact,Phone,Email,Address,Units,Style,Area,Won Date,Win Notes';const rows=wins.map(w=>[w.company,w.contact,w.phone,w.email,w.address,w.units,w.style,w.area,w.wonDate,w.winNotes].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(','));const blob=new Blob([[hdr,...rows].join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pm_wins.csv';a.click();}
 
-render();
-updateWinsBadge();
+loadAll();
 </script>
+<!-- Loading overlay -->
+<div id="loading-overlay" style="display:none;position:fixed;inset:0;background:rgba(1,2,12,0.85);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:16px;backdrop-filter:blur(8px)">
+  <div style="width:48px;height:48px;border:3px solid rgba(255,0,110,0.3);border-top-color:#FF006E;border-radius:50%;animation:spin 0.8s linear infinite"></div>
+  <div style="font-size:14px;font-weight:600;color:#C8D8F0;letter-spacing:0.05em">Loading your leads...</div>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 </body>
 </html>
