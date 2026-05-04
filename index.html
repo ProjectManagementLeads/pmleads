@@ -19,28 +19,15 @@
   --b:rgba(255,255,255,0.07);--bm:rgba(255,255,255,0.13);
 }
 html{font-size:14px}
-body{
-  font-family:'Inter',sans-serif;
-  background:#03040F;
-  color:var(--ink);
-  -webkit-font-smoothing:antialiased;
-  min-height:100vh;overflow-x:hidden;
-}
+body{font-family:'Inter',sans-serif;background:#03040F;color:var(--ink);-webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;}
 
-/* ═══════════════════════════════════════
-   BACKGROUND
-═══════════════════════════════════════ */
+/* ── BACKGROUND ── */
 #bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
 #stars{position:absolute;inset:0}
 .star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d,3s) ease-in-out infinite alternate}
 @keyframes twinkle{0%{opacity:0.1;transform:scale(0.8)}100%{opacity:var(--o,0.8);transform:scale(1.2)}}
 .orb{position:absolute;border-radius:50%;filter:blur(90px);animation:float var(--t,20s) ease-in-out infinite alternate}
-@keyframes float{
-  0%{transform:translate(0,0) scale(1) rotate(0deg)}
-  33%{transform:translate(var(--x1,40px),var(--y1,-30px)) scale(1.1) rotate(5deg)}
-  66%{transform:translate(var(--x2,-20px),var(--y2,20px)) scale(0.93) rotate(-3deg)}
-  100%{transform:translate(var(--x3,30px),var(--y3,15px)) scale(1.07) rotate(2deg)}
-}
+@keyframes float{0%{transform:translate(0,0) scale(1)}33%{transform:translate(var(--x1,40px),var(--y1,-30px)) scale(1.1)}66%{transform:translate(var(--x2,-20px),var(--y2,20px)) scale(0.93)}100%{transform:translate(var(--x3,30px),var(--y3,15px)) scale(1.07)}}
 .o1{width:700px;height:700px;background:radial-gradient(circle,rgba(255,45,120,0.55),transparent 65%);top:-250px;left:-150px;--t:22s;--x1:60px;--y1:-40px;--x2:-30px;--y2:30px;--x3:50px;--y3:20px}
 .o2{width:600px;height:600px;background:radial-gradient(circle,rgba(180,79,255,0.5),transparent 65%);top:0;right:-150px;--t:28s;--x1:-50px;--y1:50px;--x2:30px;--y2:-20px;--x3:-40px;--y3:30px}
 .o3{width:500px;height:500px;background:radial-gradient(circle,rgba(0,212,255,0.4),transparent 65%);bottom:-100px;left:20%;--t:32s;--x1:40px;--y1:-50px;--x2:-40px;--y2:30px;--x3:20px;--y3:-20px}
@@ -51,43 +38,14 @@ body{
 #scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px);pointer-events:none}
 #vig{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,transparent 40%,rgba(0,0,0,0.7) 100%)}
 
-/* ═══════════════════════════════════════
-   TOPBAR
-═══════════════════════════════════════ */
-.topbar{
-  position:sticky;top:0;z-index:30;
-  background:rgba(3,4,15,0.75);
-  backdrop-filter:saturate(200%) blur(28px);
-  -webkit-backdrop-filter:saturate(200%) blur(28px);
-  border-bottom:1px solid var(--b);
-  padding:0 28px;height:62px;
-  display:flex;align-items:center;justify-content:space-between;
-  overflow:hidden;
-}
-
-/* Shimmer sweep */
-.topbar::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,0.04) 50%,transparent 60%);
-  background-size:200% 100%;
-  animation:shimmer 6s ease-in-out infinite;
-}
+/* ── TOPBAR ── */
+.topbar{position:sticky;top:0;z-index:30;background:rgba(3,4,15,0.75);backdrop-filter:saturate(200%) blur(28px);-webkit-backdrop-filter:saturate(200%) blur(28px);border-bottom:1px solid var(--b);padding:0 28px;height:62px;display:flex;align-items:center;justify-content:space-between;overflow:hidden;}
+.topbar::before{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,0.04) 50%,transparent 60%);background-size:200% 100%;animation:shimmer 6s ease-in-out infinite;}
 @keyframes shimmer{0%,100%{background-position:200% 0}50%{background-position:-200% 0}}
-
 .brand{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
-.brand-icon{
-  width:38px;height:38px;border-radius:11px;flex-shrink:0;
-  background:linear-gradient(135deg,var(--pink),var(--purple),var(--cyan));
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 28px rgba(255,45,120,0.7),0 0 56px rgba(180,79,255,0.4),0 0 84px rgba(0,212,255,0.2),inset 0 1px 0 rgba(255,255,255,0.3);
-  animation:icon-pulse 2.5s ease-in-out infinite;
-  position:relative;overflow:hidden;
-}
+.brand-icon{width:38px;height:38px;border-radius:11px;flex-shrink:0;background:linear-gradient(135deg,var(--pink),var(--purple),var(--cyan));display:flex;align-items:center;justify-content:center;box-shadow:0 0 28px rgba(255,45,120,0.7),0 0 56px rgba(180,79,255,0.4),inset 0 1px 0 rgba(255,255,255,0.3);animation:icon-pulse 2.5s ease-in-out infinite;position:relative;overflow:hidden;}
 .brand-icon::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.25),transparent);animation:icon-sweep 3s ease-in-out infinite;}
-@keyframes icon-pulse{
-  0%,100%{box-shadow:0 0 28px rgba(255,45,120,0.7),0 0 56px rgba(180,79,255,0.4),0 0 84px rgba(0,212,255,0.2)}
-  50%{box-shadow:0 0 40px rgba(255,45,120,0.9),0 0 80px rgba(180,79,255,0.6),0 0 120px rgba(0,212,255,0.3)}
-}
+@keyframes icon-pulse{0%,100%{box-shadow:0 0 28px rgba(255,45,120,0.7),0 0 56px rgba(180,79,255,0.4)}50%{box-shadow:0 0 40px rgba(255,45,120,0.9),0 0 80px rgba(180,79,255,0.6)}}
 @keyframes icon-sweep{0%,100%{opacity:0}40%,60%{opacity:1}}
 .brand-icon svg{width:18px;height:18px;position:relative;z-index:1}
 .brand-name{font-size:20px;font-weight:900;letter-spacing:-0.5px;color:#FFFFFF;text-shadow:0 0 30px rgba(255,255,255,0.3);}
@@ -98,59 +56,41 @@ body{
 @keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.7)}}
 .top-actions{display:flex;gap:10px}
 
-/* ═══════════════════════════════════════
-   BUTTONS
-═══════════════════════════════════════ */
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:7px;
-  font-size:12px;font-weight:800;font-family:inherit;letter-spacing:0.05em;
-  padding:0 20px;height:38px;border:none;border-radius:10px;
-  cursor:pointer;white-space:nowrap;transition:all .2s;
-  text-transform:uppercase;position:relative;overflow:hidden;
-}
+/* ── SECTION TOGGLE ── */
+.section-toggle{display:flex;background:rgba(255,255,255,0.07);border:1px solid var(--bm);border-radius:10px;padding:3px;gap:3px;position:relative;z-index:1;}
+.section-btn{font-size:12px;font-weight:700;font-family:inherit;padding:0 16px;height:30px;border:none;border-radius:7px;cursor:pointer;white-space:nowrap;transition:all .2s;letter-spacing:0.03em;background:transparent;color:var(--ink3);}
+.section-btn.active-leads{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;box-shadow:0 0 16px rgba(255,45,120,0.4);}
+.section-btn.active-wins{background:linear-gradient(135deg,var(--green2),var(--green));color:#03040F;box-shadow:0 0 16px rgba(0,245,160,0.4);}
+.section-btn:hover:not(.active-leads):not(.active-wins){color:var(--ink2);background:rgba(255,255,255,0.08);}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-size:12px;font-weight:800;font-family:inherit;letter-spacing:0.05em;padding:0 20px;height:38px;border:none;border-radius:10px;cursor:pointer;white-space:nowrap;transition:all .2s;text-transform:uppercase;position:relative;overflow:hidden;}
 .btn:disabled{opacity:.4;cursor:not-allowed}
 .btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.18),transparent);opacity:0;transition:opacity .2s;}
 .btn:hover:not(:disabled)::after{opacity:1}
 .btn-glow{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;box-shadow:0 0 24px rgba(255,45,120,0.5),0 0 48px rgba(180,79,255,0.25),inset 0 1px 0 rgba(255,255,255,0.2);}
 .btn-glow:hover:not(:disabled){transform:translateY(-3px) scale(1.02);box-shadow:0 6px 36px rgba(255,45,120,0.7),0 12px 72px rgba(180,79,255,0.4);}
 .btn-glow:active:not(:disabled){transform:translateY(-1px) scale(1)}
+.btn-green{background:linear-gradient(135deg,var(--green2),var(--green));color:#03040F;font-weight:900;box-shadow:0 0 20px rgba(0,245,160,0.4);}
+.btn-green:hover:not(:disabled){transform:translateY(-3px) scale(1.02);box-shadow:0 6px 30px rgba(0,245,160,0.6);}
 .btn-ghost-top{background:rgba(255,255,255,0.07);color:var(--ink2);border:1px solid var(--bm);backdrop-filter:blur(10px);text-transform:none;}
 .btn-ghost-top:hover:not(:disabled){background:rgba(255,255,255,0.13);color:var(--ink);border-color:rgba(255,255,255,0.22)}
 .btn-ghost{background:rgba(255,255,255,0.05);color:var(--ink2);border:1px solid var(--b);text-transform:none;font-weight:600;}
 .btn-ghost:hover:not(:disabled){background:rgba(255,255,255,0.09);color:var(--ink)}
+.btn-win-sm{font-size:11px;padding:0 10px;height:28px;border-radius:7px;background:rgba(0,245,160,0.12);color:var(--green);border:1px solid rgba(0,245,160,0.3);cursor:pointer;font-family:inherit;font-weight:700;transition:all .15s;white-space:nowrap;text-transform:none;letter-spacing:0;}
+.btn-win-sm:hover{background:rgba(0,245,160,0.22);border-color:var(--green);box-shadow:0 0 12px rgba(0,245,160,0.3);}
 .btn-sm{font-size:11px;padding:0 12px;height:28px;border-radius:7px}
 .btn-danger-sm{font-size:11px;padding:0 12px;height:28px;border-radius:7px;background:rgba(255,68,102,0.1);color:var(--pink);border:1px solid rgba(255,68,102,0.3);cursor:pointer;font-family:inherit;font-weight:700;transition:all .15s;text-transform:none;letter-spacing:0;}
 .btn-danger-sm:hover{background:rgba(255,68,102,0.2);border-color:var(--pink)}
-.btn-ai{
-  display:inline-flex;align-items:center;gap:8px;
-  font-size:13px;font-weight:900;font-family:inherit;letter-spacing:0.06em;
-  padding:0 22px;height:44px;border-radius:12px;
-  background:linear-gradient(135deg,var(--pink),var(--purple),var(--cyan));
-  color:#fff;border:none;cursor:pointer;text-transform:uppercase;
-  box-shadow:0 0 28px rgba(255,45,120,0.55),0 0 56px rgba(180,79,255,0.3),0 0 84px rgba(0,212,255,0.15),inset 0 1px 0 rgba(255,255,255,0.25);
-  transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;
-}
+.btn-ai{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:900;font-family:inherit;letter-spacing:0.06em;padding:0 22px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--pink),var(--purple),var(--cyan));color:#fff;border:none;cursor:pointer;text-transform:uppercase;box-shadow:0 0 28px rgba(255,45,120,0.55),0 0 56px rgba(180,79,255,0.3),inset 0 1px 0 rgba(255,255,255,0.25);transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;}
 .btn-ai::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.2),transparent);opacity:0;transition:opacity .2s;}
 .btn-ai:hover:not(:disabled){transform:translateY(-3px) scale(1.03);box-shadow:0 8px 40px rgba(255,45,120,0.75),0 16px 80px rgba(180,79,255,0.5);}
 .btn-ai:hover::before{opacity:1}
 .btn-ai:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;transform:none;}
 
-/* ═══════════════════════════════════════
-   STATS BAR
-═══════════════════════════════════════ */
-.stats-bar{
-  background:rgba(3,4,15,0.6);
-  backdrop-filter:blur(24px);
-  border-bottom:none;
-  display:grid;grid-template-columns:repeat(4,1fr);
-  position:relative;z-index:2;
-}
-/* Rainbow gradient divider line */
-.stats-bar::after{
-  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,var(--pink),var(--purple),var(--cyan),var(--green),var(--amber),var(--orange),var(--blue),var(--pink));
-  opacity:0.75;
-}
+/* ── STATS BAR ── */
+.stats-bar{background:rgba(3,4,15,0.6);backdrop-filter:blur(24px);border-bottom:none;display:grid;grid-template-columns:repeat(4,1fr);position:relative;z-index:2;}
+.stats-bar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--pink),var(--purple),var(--cyan),var(--green),var(--amber),var(--orange),var(--blue),var(--pink));opacity:0.75;}
 .stat{padding:28px 28px;border-right:1px solid var(--b);position:relative;overflow:hidden;cursor:default;transition:background .3s;}
 .stat:last-child{border-right:none}
 .stat:hover{background:rgba(255,255,255,0.03)}
@@ -160,7 +100,7 @@ body{
 .stat:nth-child(3)::before{background:linear-gradient(90deg,transparent,var(--green),var(--green3),transparent);box-shadow:0 2px 20px rgba(0,245,160,0.8)}
 .stat:nth-child(4)::before{background:linear-gradient(90deg,transparent,var(--amber),var(--amber3),transparent);box-shadow:0 2px 20px rgba(255,184,0,0.8)}
 @keyframes line-glow{0%{opacity:0.6;transform:scaleX(0.7)}100%{opacity:1;transform:scaleX(1)}}
-.stat::after{content:'✦';position:absolute;top:10px;right:14px;font-size:10px;opacity:0;transition:opacity .3s;animation:sparkle-spin 4s linear infinite;}
+.stat::after{content:'★';position:absolute;top:10px;right:14px;font-size:9px;opacity:0;transition:opacity .3s;animation:sparkle-spin 4s linear infinite;font-family:sans-serif;}
 .stat:nth-child(1)::after{color:var(--pink)}.stat:nth-child(2)::after{color:var(--cyan)}.stat:nth-child(3)::after{color:var(--green)}.stat:nth-child(4)::after{color:var(--amber)}
 .stat:hover::after{opacity:0.7}
 @keyframes sparkle-spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
@@ -175,9 +115,14 @@ body{
 .stat:nth-child(4) .stat-val{background-image:linear-gradient(135deg,var(--amber),var(--amber3),#FFF0A0)}
 @keyframes val-glow{0%{filter:drop-shadow(0 0 0px transparent)}100%{filter:drop-shadow(0 0 12px currentColor)}}
 
-/* ═══════════════════════════════════════
-   TABS
-═══════════════════════════════════════ */
+/* Wins stats override — green theme */
+.wins-stats-bar::after{background:linear-gradient(90deg,var(--green),var(--cyan),var(--green));opacity:0.75;}
+.wins-stats-bar .stat:nth-child(1)::before,.wins-stats-bar .stat:nth-child(2)::before,
+.wins-stats-bar .stat:nth-child(3)::before,.wins-stats-bar .stat:nth-child(4)::before{background:linear-gradient(90deg,transparent,var(--green),var(--green3),transparent);box-shadow:0 2px 20px rgba(0,245,160,0.8)}
+.wins-stats-bar .stat-bg{background:var(--green)!important}
+.wins-stats-bar .stat-val{background-image:linear-gradient(135deg,var(--green),var(--green3),#C0FFE8)!important}
+
+/* ── TABS ── */
 .tabs-wrap{background:rgba(3,4,15,0.7);backdrop-filter:blur(20px);border-bottom:2px solid rgba(68,136,255,0.5);padding:0 28px;display:flex;overflow-x:auto;scrollbar-width:none;position:relative;z-index:2;}
 .tabs-wrap::-webkit-scrollbar{display:none}
 .tab{font-size:12px;font-weight:600;font-family:inherit;padding:14px 18px;border:none;border-bottom:2px solid transparent;background:transparent;color:#9ABBD8;cursor:pointer;white-space:nowrap;transition:all .18s;}
@@ -186,24 +131,26 @@ body{
 .tab-cnt{display:inline-flex;align-items:center;justify-content:center;min-width:19px;height:17px;font-size:10px;font-weight:800;padding:0 5px;border-radius:20px;margin-left:7px;vertical-align:middle;background:rgba(255,255,255,0.07);color:var(--ink3);transition:all .18s;}
 .tab.active .tab-cnt{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;box-shadow:0 0 12px rgba(255,45,120,0.6),0 0 24px rgba(180,79,255,0.3);}
 
-/* ═══════════════════════════════════════
-   TOOLBAR
-═══════════════════════════════════════ */
+/* Wins tabs — green active */
+.wins-tabs .tab.active{color:var(--green);border-bottom-color:var(--green);text-shadow:0 0 20px rgba(0,245,160,0.6);}
+.wins-tabs .tab.active .tab-cnt{background:linear-gradient(135deg,var(--green2),var(--green));color:#03040F;box-shadow:0 0 12px rgba(0,245,160,0.5);}
+.wins-tabs{border-bottom:2px solid rgba(0,245,160,0.4);}
+
+/* ── TOOLBAR ── */
 .toolbar{display:flex;gap:10px;padding:14px 28px;align-items:center;flex-wrap:wrap;background:rgba(3,4,15,0.6);backdrop-filter:blur(20px);border-bottom:1px solid var(--b);position:relative;z-index:2;}
 .search-wrap{flex:1;min-width:200px;position:relative}
-.search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--ink3);font-size:16px;pointer-events:none}
+.search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#8AAACE;display:flex;align-items:center;pointer-events:none}
 .search-input{width:100%;font-size:13px;font-family:inherit;font-weight:500;padding:0 14px 0 38px;height:40px;border:1px solid var(--bm);border-radius:11px;background:rgba(255,255,255,0.05);color:var(--ink);outline:none;transition:all .2s;}
 .search-input::placeholder{color:#8AAACE}
 .search-input:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,45,120,0.15),0 0 30px rgba(255,45,120,0.08);background:rgba(255,255,255,0.08);}
+.search-input.wins-search:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(0,245,160,0.15);}
 .filter-select{font-size:13px;font-family:inherit;font-weight:500;padding:0 14px;height:40px;border:1px solid var(--bm);border-radius:11px;background:rgba(255,255,255,0.05);color:var(--ink);outline:none;cursor:pointer;transition:all .2s;}
 .filter-select option{background:#060814}
 .filter-select:focus{border-color:var(--pink)}
 
-/* ═══════════════════════════════════════
-   TABLE
-═══════════════════════════════════════ */
+/* ── TABLE ── */
 .table-wrap{padding:22px 28px 80px;position:relative;z-index:2}
-.table-card{background:rgba(8,10,24,0.85);backdrop-filter:blur(24px);border:1px solid var(--bm);border-radius:20px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,0.04),0 0 120px rgba(255,45,120,0.05),0 0 80px rgba(180,79,255,0.04);}
+.table-card{background:rgba(8,10,24,0.85);backdrop-filter:blur(24px);border:1px solid var(--bm);border-radius:20px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,0.04);}
 table{width:100%;border-collapse:collapse;font-size:13px}
 thead{border-bottom:1px solid var(--b)}
 th{font-size:10px;font-weight:800;letter-spacing:.13em;color:#9ABBD8;text-align:left;padding:15px 18px;cursor:pointer;white-space:nowrap;background:rgba(255,255,255,0.02);text-transform:uppercase;user-select:none;transition:color .15s;}
@@ -213,29 +160,44 @@ tr:last-child td{border-bottom:none}
 tr{transition:background .12s}
 tr:hover td{background:rgba(255,255,255,0.03)}
 .co-name{font-weight:700;color:var(--ink);font-size:13px}
-.co-addr{font-size:11px;color:#8AAACE;margin-top:2px}
-.badge{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:800;letter-spacing:.07em;padding:5px 12px;border-radius:20px;white-space:nowrap;text-transform:uppercase;position:relative;overflow:hidden;}
+.co-addr{font-size:11px;color:var(--ink3);margin-top:2px}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:800;letter-spacing:.07em;padding:5px 12px;border-radius:20px;white-space:nowrap;text-transform:uppercase;}
 .badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;box-shadow:0 0 6px currentColor;animation:dot-pulse 2s ease-in-out infinite;}
 @keyframes dot-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.6)}}
 .area-chip{display:inline-block;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;background:rgba(255,255,255,0.07);color:var(--ink2);border:1px solid rgba(255,255,255,0.12);transition:all .15s;}
-tr:hover .area-chip{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.18)}
+tr:hover .area-chip{background:rgba(255,255,255,0.1)}
 .muted{color:var(--ink4)}
 
-/* ═══════════════════════════════════════
-   EMPTY
-═══════════════════════════════════════ */
+/* Win badge — special trophy style */
+.win-badge{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:800;letter-spacing:.07em;padding:5px 12px;border-radius:20px;white-space:nowrap;text-transform:uppercase;background:linear-gradient(135deg,rgba(0,245,160,0.2),rgba(0,212,255,0.15));color:var(--green);border:1px solid rgba(0,245,160,0.3);box-shadow:0 0 12px rgba(0,245,160,0.2);}
+.win-date{font-size:11px;color:var(--ink3)}
+
+/* ── WINS HERO BANNER ── */
+.wins-banner{
+  position:relative;z-index:2;
+  background:linear-gradient(135deg,rgba(0,245,160,0.1),rgba(0,212,255,0.07),rgba(180,79,255,0.08));
+  border-bottom:1px solid rgba(0,245,160,0.2);
+  padding:22px 28px;
+  display:flex;align-items:center;gap:20px;
+  overflow:hidden;
+}
+.wins-banner::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(0,245,160,0.2),transparent 70%);pointer-events:none;}
+.wins-trophy{font-size:36px;filter:drop-shadow(0 0 16px rgba(0,245,160,0.6));animation:trophy-pulse 2s ease-in-out infinite alternate;}
+@keyframes trophy-pulse{0%{filter:drop-shadow(0 0 8px rgba(0,245,160,0.4))}100%{filter:drop-shadow(0 0 24px rgba(0,245,160,0.8))}}
+.wins-banner-text h2{font-size:18px;font-weight:900;letter-spacing:-.4px;background:linear-gradient(90deg,var(--green),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.wins-banner-text p{font-size:13px;color:var(--ink3);margin-top:3px;}
+
+/* ── EMPTY ── */
 .empty{text-align:center;padding:90px 20px}
-.empty-icon{font-size:56px;margin-bottom:20px;display:block;filter:drop-shadow(0 0 20px rgba(255,45,120,0.5)) drop-shadow(0 0 40px rgba(180,79,255,0.3));animation:empty-bounce 3s ease-in-out infinite;}
-@keyframes empty-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 .empty-title{font-size:20px;font-weight:900;letter-spacing:-.4px;background:linear-gradient(90deg,#fff,var(--pink3),var(--purple3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .empty-sub{font-size:14px;color:var(--ink3);margin-top:8px}
+.empty-icon-wrap{font-size:52px;margin-bottom:18px;display:block;animation:empty-bounce 3s ease-in-out infinite;}
+@keyframes empty-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 
-/* ═══════════════════════════════════════
-   OVERLAY / MODAL
-═══════════════════════════════════════ */
+/* ── OVERLAY / MODAL ── */
 .overlay{display:none;position:fixed;inset:0;background:rgba(1,2,12,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:100;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .overlay.open{display:flex}
-.modal{background:rgba(8,10,26,0.97);backdrop-filter:blur(30px);border-radius:22px;padding:32px;width:100%;max-width:535px;margin:auto;border:1px solid rgba(255,255,255,0.1);box-shadow:0 50px 120px rgba(0,0,0,.9),0 0 0 1px rgba(255,45,120,0.25),0 0 80px rgba(255,45,120,0.1),0 0 160px rgba(180,79,255,0.07);position:relative;}
+.modal{background:rgba(8,10,26,0.97);backdrop-filter:blur(30px);border-radius:22px;padding:32px;width:100%;max-width:535px;margin:auto;border:1px solid rgba(255,255,255,0.1);box-shadow:0 50px 120px rgba(0,0,0,.9),0 0 0 1px rgba(255,45,120,0.25),0 0 80px rgba(255,45,120,0.1);position:relative;}
 .modal::before{content:'';position:absolute;top:-80px;right:-80px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(180,79,255,0.3),transparent 70%);pointer-events:none;}
 .modal::after{content:'';position:absolute;bottom:-60px;left:-60px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(255,45,120,0.25),transparent 70%);pointer-events:none;}
 .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;position:relative;z-index:1}
@@ -245,9 +207,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1);border-color:rgba(255,255,2
 .modal-sub{font-size:13px;color:var(--ink3);margin-bottom:26px;line-height:1.65;margin-top:6px;position:relative;z-index:1}
 .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:26px;padding-top:22px;border-top:1px solid var(--b);position:relative;z-index:1;}
 
-/* ═══════════════════════════════════════
-   FORM FIELDS
-═══════════════════════════════════════ */
+/* ── FORM FIELDS ── */
 .field{margin-bottom:16px;position:relative;z-index:1}
 .field label{display:block;font-size:10px;font-weight:800;letter-spacing:.13em;color:var(--ink3);margin-bottom:7px;text-transform:uppercase;}
 .field input,.field select,.field textarea{width:100%;font-size:14px;font-family:inherit;font-weight:500;padding:12px 14px;border:1px solid var(--bm);border-radius:11px;background:rgba(255,255,255,0.05);color:var(--ink);outline:none;-webkit-appearance:none;appearance:none;transition:all .2s;}
@@ -257,9 +217,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1);border-color:rgba(255,255,2
 .field textarea{resize:vertical;min-height:88px;line-height:1.6}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 
-/* ═══════════════════════════════════════
-   AUTOFILL BOX
-═══════════════════════════════════════ */
+/* ── AUTOFILL BOX ── */
 .autofill-box{position:relative;overflow:hidden;border-radius:16px;padding:22px;margin-bottom:26px;border:1px solid rgba(255,45,120,0.4);background:linear-gradient(135deg,rgba(255,45,120,0.12) 0%,rgba(180,79,255,0.1) 33%,rgba(0,212,255,0.08) 66%,rgba(0,245,160,0.06) 100%);}
 .autofill-box::before{content:'';position:absolute;top:-80px;right:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(180,79,255,0.5),transparent 70%);opacity:.25;animation:float 18s ease-in-out infinite alternate;pointer-events:none;}
 .autofill-box::after{content:'';position:absolute;bottom:-60px;left:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(255,45,120,0.5),transparent 70%);opacity:.2;animation:float 22s ease-in-out infinite alternate-reverse;pointer-events:none;}
@@ -273,21 +231,17 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1);border-color:rgba(255,255,2
 .autofill-row input:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,45,120,0.2),0 0 30px rgba(255,45,120,0.12);background:rgba(255,255,255,0.1);}
 .autofill-status{margin-top:14px;font-size:13px;min-height:20px;position:relative;z-index:1;font-weight:700}
 
-/* ═══════════════════════════════════════
-   MANAGE AREAS
-═══════════════════════════════════════ */
+/* ── MANAGE AREAS ── */
 .area-row{display:flex;align-items:center;gap:10px;padding:13px 15px;border-radius:11px;border:1px solid var(--b);background:rgba(255,255,255,0.03);margin-bottom:8px;cursor:grab;user-select:none;transition:all .18s;}
 .area-row:active{cursor:grabbing}
 .area-row.dragging{opacity:.2;transform:scale(0.97)}
-.area-row.drag-over{border-color:var(--pink);background:rgba(255,45,120,0.1);box-shadow:0 0 24px rgba(255,45,120,0.2),0 0 48px rgba(255,45,120,0.08);}
-.drag-handle{color:var(--ink4);font-size:15px;cursor:grab;flex-shrink:0;letter-spacing:-1px;transition:color .15s}
-.area-row:hover .drag-handle{color:#8AAACE}
+.area-row.drag-over{border-color:var(--pink);background:rgba(255,45,120,0.1);box-shadow:0 0 24px rgba(255,45,120,0.2);}
+.drag-handle{color:#8AAACE;cursor:grab;flex-shrink:0;transition:color .15s;display:flex;align-items:center}
+.area-row:hover .drag-handle{color:#C8D8F0}
 .count-chip{font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.07);color:var(--ink3);text-transform:uppercase;letter-spacing:.07em;}
-.area-name-input{flex:1;font-size:13px;font-family:inherit;font-weight:600;padding:8px 13px;border:1px solid var(--pink);border-radius:9px;background:rgba(255,45,120,0.1);color:var(--ink);outline:none;box-shadow:0 0 0 3px rgba(255,45,120,0.15),0 0 20px rgba(255,45,120,0.08);}
+.area-name-input{flex:1;font-size:13px;font-family:inherit;font-weight:600;padding:8px 13px;border:1px solid var(--pink);border-radius:9px;background:rgba(255,45,120,0.1);color:var(--ink);outline:none;box-shadow:0 0 0 3px rgba(255,45,120,0.15);}
 
-/* ═══════════════════════════════════════
-   SCROLLBAR
-═══════════════════════════════════════ */
+/* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--pink),var(--purple),var(--cyan));border-radius:4px;box-shadow:0 0 8px rgba(255,45,120,0.5);}
@@ -297,17 +251,19 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1);border-color:rgba(255,255,2
   .topbar,.stats-bar,.tabs-wrap,.toolbar,.table-wrap{padding-left:16px;padding-right:16px}
   .hide-mob{display:none}
   .stat-val{font-size:32px}
-  .brand-tag{display:none}
+  .brand-tag,.live-dot{display:none}
   .stat{padding:20px 16px}
-  .live-dot{display:none}
+  .section-toggle{display:none}
+  .section-toggle-mob{display:flex!important}
 }
+.section-toggle-mob{display:none;gap:0;width:100%;margin:0}
+.section-toggle-mob .section-btn{flex:1;height:38px;border-radius:0;font-size:13px;}
 </style>
 </head>
 <body>
 
 <div id="bg">
-  <div id="stars"></div>
-  <div id="grid"></div>
+  <div id="stars"></div><div id="grid"></div>
   <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
   <div class="orb o4"></div><div class="orb o5"></div><div class="orb o6"></div>
   <div id="scan"></div><div id="vig"></div>
@@ -317,79 +273,146 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1);border-color:rgba(255,255,2
 <div class="topbar">
   <div class="brand">
     <div class="brand-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-        <polyline points="9 22 9 12 15 12 15 22"/>
-      </svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="position:relative;z-index:1"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     </div>
     <span class="brand-name">PM Leads</span>
     <span class="brand-tag">Central Ohio · Flooring Turns</span>
   </div>
   <div class="top-right">
     <div class="live-dot">Live</div>
-    <div class="top-actions">
+    <!-- Section toggle desktop -->
+    <div class="section-toggle">
+      <button class="section-btn active-leads" id="toggle-leads" onclick="setSection('leads')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Pipeline
+      </button>
+      <button class="section-btn" id="toggle-wins" onclick="setSection('wins')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/></svg>
+        Wins
+        <span id="wins-badge" style="display:none;background:linear-gradient(135deg,var(--green2),var(--green));color:#03040F;font-size:10px;font-weight:800;padding:1px 6px;border-radius:20px;margin-left:4px"></span>
+      </button>
+    </div>
+    <div class="top-actions" id="top-actions">
       <button class="btn btn-ghost-top" onclick="openAreas()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
         Areas
       </button>
       <button class="btn btn-glow" onclick="openAdd()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Add lead
       </button>
     </div>
   </div>
 </div>
 
-<!-- STATS -->
-<div class="stats-bar">
-  <div class="stat"><div class="stat-bg"></div><div class="stat-label">Total leads</div><div class="stat-val" id="s-total">0</div></div>
-  <div class="stat"><div class="stat-bg"></div><div class="stat-label">Contacted</div><div class="stat-val" id="s-contacted">0</div></div>
-  <div class="stat"><div class="stat-bg"></div><div class="stat-label">Qualified</div><div class="stat-val" id="s-qualified">0</div></div>
-  <div class="stat"><div class="stat-bg"></div><div class="stat-label">Total units</div><div class="stat-val" id="s-units">0</div></div>
+<!-- Mobile section toggle -->
+<div class="section-toggle-mob" style="position:relative;z-index:2;background:rgba(3,4,15,0.8);border-bottom:1px solid var(--b);">
+  <button class="section-btn active-leads" id="toggle-leads-mob" onclick="setSection('leads')" style="flex:1;height:42px;border-radius:0;font-size:13px;">Pipeline</button>
+  <button class="section-btn" id="toggle-wins-mob" onclick="setSection('wins')" style="flex:1;height:42px;border-radius:0;font-size:13px;">Wins</button>
 </div>
 
-<!-- TABS -->
-<div class="tabs-wrap" id="tabs"></div>
-
-<!-- TOOLBAR -->
-<div class="toolbar">
-  <div class="search-wrap">
-    <span class="search-icon">⌕</span>
-    <input class="search-input" id="search" placeholder="Search company, contact, or notes…" oninput="render()">
+<!-- ═══════════ LEADS SECTION ═══════════ -->
+<div id="leads-section">
+  <!-- Stats -->
+  <div class="stats-bar" id="lead-stats-bar">
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label">Total leads</div><div class="stat-val" id="s-total">0</div></div>
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label">Contacted</div><div class="stat-val" id="s-contacted">0</div></div>
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label">Qualified</div><div class="stat-val" id="s-qualified">0</div></div>
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label">Total units</div><div class="stat-val" id="s-units">0</div></div>
   </div>
-  <select class="filter-select" id="filter-status" onchange="render()">
-    <option value="">All statuses</option>
-    <option>New</option><option>Contacted</option><option>Qualified</option>
-    <option>Proposal sent</option><option>Closed won</option><option>Dead</option>
-  </select>
-  <button class="btn btn-ghost" onclick="exportCSV()">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    Export CSV
-  </button>
-</div>
-
-<!-- TABLE -->
-<div class="table-wrap">
-  <div class="table-card">
-    <table>
-      <thead>
-        <tr>
-          <th onclick="sortBy('company')">Company <span id="arr-company"></span></th>
-          <th onclick="sortBy('contact')" class="hide-mob">Contact <span id="arr-contact"></span></th>
-          <th class="hide-mob">Phone</th>
-          <th onclick="sortBy('units')" style="text-align:right">Units <span id="arr-units"></span></th>
-          <th onclick="sortBy('area')">Area <span id="arr-area"></span></th>
-          <th onclick="sortBy('status')">Status <span id="arr-status"></span></th>
-          <th class="hide-mob">Notes</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
+  <!-- Tabs -->
+  <div class="tabs-wrap" id="tabs"></div>
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="search-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+      <input class="search-input" id="search" placeholder="Search company, contact, or notes…" oninput="render()">
+    </div>
+    <select class="filter-select" id="filter-status" onchange="render()">
+      <option value="">All statuses</option>
+      <option>New</option><option>Contacted</option><option>Qualified</option>
+      <option>Proposal sent</option><option>Dead</option>
+    </select>
+    <button class="btn btn-ghost" onclick="exportCSV()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export
+    </button>
+  </div>
+  <!-- Table -->
+  <div class="table-wrap">
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortBy('company')">Company <span id="arr-company"></span></th>
+            <th onclick="sortBy('contact')" class="hide-mob">Contact <span id="arr-contact"></span></th>
+            <th class="hide-mob">Phone</th>
+            <th onclick="sortBy('units')" style="text-align:right">Units <span id="arr-units"></span></th>
+            <th onclick="sortBy('area')">Area <span id="arr-area"></span></th>
+            <th onclick="sortBy('status')">Status <span id="arr-status"></span></th>
+            <th class="hide-mob">Notes</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
-<!-- ADD/EDIT MODAL -->
+<!-- ═══════════ WINS SECTION ═══════════ -->
+<div id="wins-section" style="display:none">
+  <!-- Wins hero banner -->
+  <div class="wins-banner">
+    <div class="wins-trophy">🏆</div>
+    <div class="wins-banner-text">
+      <h2>Closed Wins</h2>
+      <p>Leads you've converted — transferred from your pipeline.</p>
+    </div>
+  </div>
+  <!-- Wins stats -->
+  <div class="stats-bar wins-stats-bar" id="wins-stats-bar">
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label">Total wins</div><div class="stat-val" id="sw-total">0</div></div>
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label">Total units</div><div class="stat-val" id="sw-units">0</div></div>
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label">This month</div><div class="stat-val" id="sw-month">0</div></div>
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label">This year</div><div class="stat-val" id="sw-year">0</div></div>
+  </div>
+  <!-- Wins tabs -->
+  <div class="tabs-wrap wins-tabs" id="wins-tabs"></div>
+  <!-- Wins toolbar -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="search-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+      <input class="search-input wins-search" id="wins-search" placeholder="Search wins…" oninput="renderWins()">
+    </div>
+    <button class="btn btn-ghost" onclick="exportWinsCSV()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export
+    </button>
+  </div>
+  <!-- Wins table -->
+  <div class="table-wrap">
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortWinsBy('company')">Company <span id="warr-company"></span></th>
+            <th onclick="sortWinsBy('contact')" class="hide-mob">Contact <span id="warr-contact"></span></th>
+            <th class="hide-mob">Phone</th>
+            <th onclick="sortWinsBy('units')" style="text-align:right">Units <span id="warr-units"></span></th>
+            <th onclick="sortWinsBy('area')">Area <span id="warr-area"></span></th>
+            <th onclick="sortWinsBy('wonDate')">Won date <span id="warr-wonDate"></span></th>
+            <th class="hide-mob">Notes</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="wins-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT LEAD MODAL -->
 <div class="overlay" id="lead-modal" onclick="bgClose(event,'lead-modal')">
   <div class="modal">
     <div class="modal-header">
@@ -399,7 +422,9 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1);border-color:rgba(255,255,2
     <p class="modal-sub">Type a property name and hit Lookup — Claude opens in a new tab with the search ready to go.</p>
     <div class="autofill-box">
       <div class="autofill-shimmer"></div>
-      <div class="autofill-label"><span>✦</span><span class="autofill-label-text">AI Lookup</span></div>
+      <div class="autofill-label"><span class="autofill-label-text" style="display:flex;align-items:center;gap:6px">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-1.2 5.4-6 6-6 6s4.8.6 6 6c1.2-5.4 6-6 6-6s-4.8-.6-6-6z"/><path d="M5 17c-.7 2-2 3-2 3s1.3-1 3-2"/></svg>
+        AI Lookup</span></div>
       <div class="autofill-desc">Type the property name and hit Lookup — Claude searches for the address, phone, contact, and key details. Copy the results back into the fields below.</div>
       <div class="autofill-row">
         <input id="lookup-input" placeholder="e.g. Emerson Park Apartments" oninput="onLookupInput()" onkeydown="if(event.key==='Enter')doAutofill()">
@@ -423,7 +448,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1);border-color:rgba(255,255,2
       <div class="field"><label>Status</label>
         <select id="f-status">
           <option>New</option><option>Contacted</option><option>Qualified</option>
-          <option>Proposal sent</option><option>Closed won</option><option>Dead</option>
+          <option>Proposal sent</option><option>Dead</option>
         </select>
       </div>
     </div>
@@ -442,12 +467,12 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1);border-color:rgba(255,255,2
       <span class="modal-title">Manage areas</span>
       <button class="modal-close" onclick="closeModal('areas-modal')">×</button>
     </div>
-    <p class="modal-sub">Add, rename, or remove territories. Drag ⠿ to reorder. Removing an area moves its leads to "Other".</p>
+    <p class="modal-sub">Add, rename, or remove territories. Drag to reorder. Removing an area moves its leads to "Other".</p>
     <div style="display:flex;gap:10px;margin-bottom:18px">
       <input id="new-area-input" placeholder="New area or town name…"
         style="flex:1;font-size:13px;font-family:inherit;font-weight:500;padding:0 14px;height:42px;border:1px solid var(--bm);border-radius:11px;background:rgba(255,255,255,0.05);color:var(--ink);outline:none;transition:all .2s;position:relative;z-index:1"
         onkeydown="if(event.key==='Enter')addArea()"
-        onfocus="this.style.borderColor='var(--pink)';this.style.boxShadow='0 0 0 3px rgba(255,45,120,0.15),0 0 30px rgba(255,45,120,0.08)'"
+        onfocus="this.style.borderColor='var(--pink)';this.style.boxShadow='0 0 0 3px rgba(255,45,120,0.15)'"
         onblur="this.style.borderColor='var(--bm)';this.style.boxShadow='none'">
       <button class="btn btn-glow" onclick="addArea()">Add</button>
     </div>
@@ -459,7 +484,32 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1);border-color:rgba(255,255,2
   </div>
 </div>
 
+<!-- MOVE TO WINS CONFIRM MODAL -->
+<div class="overlay" id="win-modal" onclick="bgClose(event,'win-modal')">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <span class="modal-title" style="background:linear-gradient(90deg,var(--green),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Move to Wins 🏆</span>
+      <button class="modal-close" onclick="closeModal('win-modal')">×</button>
+    </div>
+    <p class="modal-sub">This lead will be transferred to your Wins section and removed from the pipeline.</p>
+    <div style="background:rgba(0,245,160,0.08);border:1px solid rgba(0,245,160,0.25);border-radius:12px;padding:16px;margin-bottom:20px;position:relative;z-index:1">
+      <div style="font-size:16px;font-weight:800;color:var(--ink)" id="win-modal-name"></div>
+      <div style="font-size:12px;color:var(--ink3);margin-top:4px" id="win-modal-detail"></div>
+    </div>
+    <div class="field" style="position:relative;z-index:1"><label>Win date</label><input type="date" id="win-date"></div>
+    <div class="field" style="position:relative;z-index:1"><label>Win notes (optional)</label><textarea id="win-notes" placeholder="e.g. Signed 2-year contract, 120 units…" style="min-height:72px"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('win-modal')">Cancel</button>
+      <button class="btn btn-green" onclick="confirmMoveToWins()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/></svg>
+        Confirm Win!
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
+// ── Stars ──
 (function(){
   const c=document.getElementById('stars');
   for(let i=0;i<200;i++){
@@ -475,15 +525,91 @@ const STATUS_CFG={
   "Contacted":    {bg:"rgba(0,212,255,0.13)",    color:"#00D4FF", glow:"rgba(0,212,255,0.4)"},
   "Qualified":    {bg:"rgba(0,245,160,0.13)",    color:"#00F5A0", glow:"rgba(0,245,160,0.4)"},
   "Proposal sent":{bg:"rgba(255,184,0,0.13)",    color:"#FFB800", glow:"rgba(255,184,0,0.4)"},
-  "Closed won":   {bg:"linear-gradient(135deg,rgba(255,45,120,0.75),rgba(180,79,255,0.75))",color:"#fff",glow:"rgba(255,45,120,0.55)"},
   "Dead":         {bg:"rgba(255,255,255,0.04)",  color:"#3A4A62", glow:false},
 };
 
 let leads=JSON.parse(localStorage.getItem('pm_leads')||'[]');
-let areas=(()=>{const s=localStorage.getItem('pm_areas');if(s)return JSON.parse(s);return["Bexley","Clintonville","Dublin","Grove City","Hilliard","Marysville","New Albany","Plain City","Upper Arlington","Westerville","West Jefferson","Worthington","Other"];})();
-let draftAreas=[],activeArea="All Areas",editId=null,sortCol="company",sortDir=1,dragSrcIdx=null;
+// Migrate any old "Closed won" leads out of pipeline
+leads=leads.filter(l=>l.status!=='Closed won');
 
-function save(){localStorage.setItem('pm_leads',JSON.stringify(leads));localStorage.setItem('pm_areas',JSON.stringify(areas));}
+let wins=JSON.parse(localStorage.getItem('pm_wins')||'[]');
+let areas=(()=>{const s=localStorage.getItem('pm_areas');if(s)return JSON.parse(s);return["Bexley","Clintonville","Dublin","Grove City","Hilliard","Marysville","New Albany","Plain City","Upper Arlington","Westerville","West Jefferson","Worthington","Other"];})();
+let draftAreas=[],activeArea="All Areas",activeWinArea="All Areas";
+let editId=null,winTargetId=null;
+let sortCol="company",sortDir=1;
+let wSortCol="wonDate",wSortDir=-1;
+let dragSrcIdx=null;
+let currentSection="leads";
+
+function save(){
+  localStorage.setItem('pm_leads',JSON.stringify(leads));
+  localStorage.setItem('pm_wins',JSON.stringify(wins));
+  localStorage.setItem('pm_areas',JSON.stringify(areas));
+}
+
+// ── Section toggle ──
+function setSection(s){
+  currentSection=s;
+  document.getElementById('leads-section').style.display=s==='leads'?'':'none';
+  document.getElementById('wins-section').style.display=s==='wins'?'':'none';
+  // Desktop toggle
+  document.getElementById('toggle-leads').className='section-btn'+(s==='leads'?' active-leads':'');
+  document.getElementById('toggle-wins').className='section-btn'+(s==='wins'?' active-wins':'');
+  // Mobile toggle
+  document.getElementById('toggle-leads-mob').className='section-btn'+(s==='leads'?' active-leads':'');
+  document.getElementById('toggle-wins-mob').className='section-btn'+(s==='wins'?' active-wins':'');
+  // Top actions — hide Areas/Add when in wins
+  document.getElementById('top-actions').style.display=s==='leads'?'flex':'none';
+  if(s==='wins') renderWins(); else render();
+}
+
+// ── Wins badge count ──
+function updateWinsBadge(){
+  const badge=document.getElementById('wins-badge');
+  if(wins.length>0){badge.style.display='inline';badge.textContent=wins.length;}
+  else badge.style.display='none';
+}
+
+// ── Move to wins ──
+function openWinModal(id){
+  const l=leads.find(x=>x.id===id);if(!l)return;
+  winTargetId=id;
+  document.getElementById('win-modal-name').textContent=l.company;
+  document.getElementById('win-modal-detail').textContent=[l.area,l.units?l.units+' units':'',l.style].filter(Boolean).join(' · ');
+  document.getElementById('win-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('win-notes').value=l.notes||'';
+  document.getElementById('win-modal').classList.add('open');
+}
+
+function confirmMoveToWins(){
+  const l=leads.find(x=>x.id===winTargetId);if(!l)return;
+  const win={...l,wonDate:document.getElementById('win-date').value,winNotes:document.getElementById('win-notes').value.trim(),id:l.id};
+  wins.unshift(win);
+  leads=leads.filter(x=>x.id!==winTargetId);
+  winTargetId=null;
+  save();
+  closeModal('win-modal');
+  render();
+  updateWinsBadge();
+}
+
+function removeWin(id){
+  if(!confirm('Remove this win permanently?'))return;
+  wins=wins.filter(x=>x.id!==id);
+  save();renderWins();updateWinsBadge();
+}
+
+function moveWinBackToLeads(id){
+  const w=wins.find(x=>x.id===id);if(!w)return;
+  if(!confirm(`Move "${w.company}" back to pipeline?`))return;
+  const lead={...w,status:'New'};
+  delete lead.wonDate;delete lead.winNotes;
+  leads.unshift(lead);
+  wins=wins.filter(x=>x.id!==id);
+  save();renderWins();updateWinsBadge();render();
+}
+
+// ── Lookup / autofill ──
 function onLookupInput(){document.getElementById('autofill-btn').disabled=!document.getElementById('lookup-input').value.trim();}
 async function doAutofill(){
   const name=document.getElementById('lookup-input').value.trim();if(!name)return;
@@ -493,6 +619,8 @@ async function doAutofill(){
   window.open('https://claude.ai/new?q='+encodeURIComponent(prompt),'_blank','noopener');
   document.getElementById('autofill-status').innerHTML='<span style="background:linear-gradient(90deg,var(--pink),var(--purple),var(--cyan),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">↗ Claude opened in a new tab — copy the results back into the fields below.</span>';
 }
+
+// ── Leads render ──
 function renderTabs(){
   const counts={};leads.forEach(l=>counts[l.area]=(counts[l.area]||0)+1);
   document.getElementById('tabs').innerHTML=["All Areas",...areas].map(a=>{
@@ -503,14 +631,17 @@ function renderTabs(){
   }).join('');
 }
 function setArea(a){activeArea=a;render();}
+
 function renderStats(){
   const s=activeArea==="All Areas"?leads:leads.filter(l=>l.area===activeArea);
   document.getElementById('s-total').textContent=s.length;
-  document.getElementById('s-contacted').textContent=s.filter(l=>["Contacted","Qualified","Proposal sent","Closed won"].includes(l.status)).length;
-  document.getElementById('s-qualified').textContent=s.filter(l=>["Qualified","Proposal sent","Closed won"].includes(l.status)).length;
+  document.getElementById('s-contacted').textContent=s.filter(l=>["Contacted","Qualified","Proposal sent"].includes(l.status)).length;
+  document.getElementById('s-qualified').textContent=s.filter(l=>["Qualified","Proposal sent"].includes(l.status)).length;
   document.getElementById('s-units').textContent=s.reduce((t,l)=>t+(parseInt(l.units)||0),0).toLocaleString();
 }
+
 function sortBy(col){if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=1;}render();}
+
 function render(){
   renderTabs();renderStats();
   const q=document.getElementById('search').value.toLowerCase();
@@ -527,13 +658,17 @@ function render(){
   ['company','contact','units','area','status'].forEach(c=>{const el=document.getElementById('arr-'+c);if(el)el.textContent=sortCol===c?(sortDir===1?' ↑':' ↓'):'';});
   const tb=document.getElementById('tbody');
   if(!rows.length){
-    tb.innerHTML=`<tr><td colspan="8"><div class="empty"><span class="empty-icon">🏢</span><div class="empty-title">${leads.length?'No leads match your filter':'No leads yet'}</div><div class="empty-sub">${leads.length?'Try adjusting your search or filter.':'Hit "Add lead" to start building your pipeline.'}</div></div></td></tr>`;
+    tb.innerHTML=`<tr><td colspan="8"><div class="empty">
+      <span class="empty-icon-wrap"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="var(--pink)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+      <div class="empty-title">${leads.length?'No leads match your filter':'No leads yet'}</div>
+      <div class="empty-sub">${leads.length?'Try adjusting your search or filter.':'Hit "Add lead" to start building your pipeline.'}</div>
+    </div></td></tr>`;
     return;
   }
   tb.innerHTML=rows.map(l=>{
     const sc=STATUS_CFG[l.status]||STATUS_CFG["New"];
     const note=(l.style?'['+l.style+'] ':'')+(l.notes||'');
-    const glow=sc.glow?`box-shadow:0 0 16px ${sc.glow},0 0 32px ${sc.glow.replace('0.4','0.15').replace('0.55','0.2')}`:'';
+    const glow=sc.glow?`box-shadow:0 0 16px ${sc.glow}`:'';
     return`<tr>
       <td><div class="co-name">${esc(l.company)}</div>${l.address?'<div class="co-addr">'+esc(l.address)+'</div>':''}</td>
       <td class="hide-mob" style="color:var(--ink2)">${esc(l.contact)||'<span class="muted">—</span>'}</td>
@@ -541,11 +676,90 @@ function render(){
       <td style="text-align:right;font-weight:800;color:var(--ink)">${l.units||'<span class="muted" style="font-weight:400">—</span>'}</td>
       <td><span class="area-chip">${esc(l.area)}</span></td>
       <td><span class="badge" style="background:${sc.bg};color:${sc.color};${glow}">${esc(l.status)}</span></td>
-      <td class="hide-mob" style="font-size:12px;color:var(--ink3);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(note)}">${esc(note)||'<span class="muted">—</span>'}</td>
-      <td><button class="btn btn-ghost btn-sm" onclick="openEdit('${l.id}')">Edit</button></td>
+      <td class="hide-mob" style="font-size:12px;color:var(--ink3);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(note)}">${esc(note)||'<span class="muted">—</span>'}</td>
+      <td style="white-space:nowrap">
+        <button class="btn-win-sm" onclick="openWinModal('${l.id}')" style="margin-right:4px">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:3px"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/><path d="M4 22h16"/></svg>Win
+        </button>
+        <button class="btn btn-ghost btn-sm" onclick="openEdit('${l.id}')">Edit</button>
+      </td>
     </tr>`;
   }).join('');
 }
+
+// ── Wins render ──
+function renderWinsTabs(){
+  const counts={};wins.forEach(w=>counts[w.area]=(counts[w.area]||0)+1);
+  document.getElementById('wins-tabs').innerHTML=["All Areas",...areas].map(a=>{
+    const cnt=a==="All Areas"?wins.length:(counts[a]||0);
+    const act=activeWinArea===a?' active':'';
+    const badge=cnt>0?`<span class="tab-cnt">${cnt}</span>`:'';
+    return`<button class="tab${act}" onclick="setWinArea('${a.replace(/'/g,"\\'")}'">${esc(a)}${badge}</button>`;
+  }).join('');
+}
+function setWinArea(a){activeWinArea=a;renderWins();}
+
+function renderWinsStats(){
+  const now=new Date();
+  const s=activeWinArea==="All Areas"?wins:wins.filter(w=>w.area===activeWinArea);
+  document.getElementById('sw-total').textContent=s.length;
+  document.getElementById('sw-units').textContent=s.reduce((t,w)=>t+(parseInt(w.units)||0),0).toLocaleString();
+  document.getElementById('sw-month').textContent=s.filter(w=>{
+    if(!w.wonDate)return false;
+    const d=new Date(w.wonDate);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+  }).length;
+  document.getElementById('sw-year').textContent=s.filter(w=>{
+    if(!w.wonDate)return false;
+    return new Date(w.wonDate).getFullYear()===now.getFullYear();
+  }).length;
+}
+
+function sortWinsBy(col){if(wSortCol===col)wSortDir*=-1;else{wSortCol=col;wSortDir=1;}renderWins();}
+
+function renderWins(){
+  renderWinsTabs();renderWinsStats();updateWinsBadge();
+  const q=document.getElementById('wins-search').value.toLowerCase();
+  let rows=wins.filter(w=>{
+    if(activeWinArea!=="All Areas"&&w.area!==activeWinArea)return false;
+    if(q&&!(w.company+w.contact+(w.winNotes||'')).toLowerCase().includes(q))return false;
+    return true;
+  }).sort((a,b)=>{
+    if(wSortCol==='units')return((a.units||0)-(b.units||0))*wSortDir;
+    if(wSortCol==='wonDate')return((a.wonDate||'').localeCompare(b.wonDate||''))*wSortDir;
+    return(a[wSortCol]||'').toString().localeCompare((b[wSortCol]||'').toString())*wSortDir;
+  });
+  ['company','contact','units','area','wonDate'].forEach(c=>{const el=document.getElementById('warr-'+c);if(el)el.textContent=wSortCol===c?(wSortDir===1?' ↑':' ↓'):'';});
+  const tb=document.getElementById('wins-tbody');
+  if(!rows.length){
+    tb.innerHTML=`<tr><td colspan="8"><div class="empty">
+      <span class="empty-icon-wrap" style="font-size:52px;display:block;margin-bottom:18px;animation:empty-bounce 3s ease-in-out infinite">🏆</span>
+      <div class="empty-title" style="background:linear-gradient(90deg,var(--green),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent">${wins.length?'No wins match your filter':'No wins yet'}</div>
+      <div class="empty-sub">${wins.length?'Try adjusting your search.':'Hit the "Win" button on a lead to record a closed deal.'}</div>
+    </div></td></tr>`;
+    return;
+  }
+  tb.innerHTML=rows.map(w=>{
+    const note=w.winNotes||'';
+    const dateStr=w.wonDate?new Date(w.wonDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
+    return`<tr>
+      <td><div class="co-name">${esc(w.company)}</div>${w.address?'<div class="co-addr">'+esc(w.address)+'</div>':''}</td>
+      <td class="hide-mob" style="color:var(--ink2)">${esc(w.contact)||'<span class="muted">—</span>'}</td>
+      <td class="hide-mob" style="color:var(--ink2)">${esc(w.phone)||'<span class="muted">—</span>'}</td>
+      <td style="text-align:right;font-weight:800;color:var(--ink)">${w.units||'<span class="muted" style="font-weight:400">—</span>'}</td>
+      <td><span class="area-chip">${esc(w.area)}</span></td>
+      <td><span class="win-badge">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/><path d="M4 22h16"/></svg>
+        ${dateStr}</span></td>
+      <td class="hide-mob" style="font-size:12px;color:var(--ink3);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(note)}">${esc(note)||'<span class="muted">—</span>'}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-ghost btn-sm" onclick="moveWinBackToLeads('${w.id}')" style="margin-right:4px">↩ Pipeline</button>
+        <button class="btn-danger-sm" onclick="removeWin('${w.id}')">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Lead modal ──
 function esc(s){return(s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function populateAreaSelect(){document.getElementById('f-area').innerHTML=areas.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('');}
 function openAdd(){
@@ -579,6 +793,8 @@ function saveLead(){
   if(editId){const i=leads.findIndex(x=>x.id===editId);if(i>-1)leads[i]=obj;}else leads.unshift(obj);
   save();closeModal('lead-modal');render();
 }
+
+// ── Areas ──
 function openAreas(){draftAreas=[...areas];renderAreasList();document.getElementById('new-area-input').value='';document.getElementById('areas-modal').classList.add('open');}
 function renderAreasList(){
   const counts={};leads.forEach(l=>counts[l.area]=(counts[l.area]||0)+1);
@@ -587,7 +803,7 @@ function renderAreasList(){
       ondragstart="onDragStart(event,${i})" ondragover="onDragOver(event,${i})"
       ondragleave="onDragLeave(event,${i})" ondrop="onDrop(event,${i})" ondragend="onDragEnd()"
       ontouchstart="onTouchStart(event,${i})" ontouchmove="onTouchMove(event)" ontouchend="onTouchEnd(event)">
-      <span class="drag-handle">⠿</span>
+      <span class="drag-handle"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="5" r="1.2" fill="currentColor" stroke="none"/><circle cx="9" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="9" cy="19" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="5" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="19" r="1.2" fill="currentColor" stroke="none"/></svg></span>
       <span style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">${esc(a)}</span>
       ${counts[a]?`<span class="count-chip">${counts[a]} lead${counts[a]!==1?'s':''}</span>`:''}
       <button class="btn btn-ghost btn-sm" onclick="startRename(${i})">Rename</button>
@@ -599,69 +815,24 @@ function onDragOver(e,i){e.preventDefault();if(i===dragSrcIdx)return;document.qu
 function onDragLeave(e,i){const el=document.getElementById('arow-'+i);if(el)el.classList.remove('drag-over');}
 function onDrop(e,i){e.preventDefault();if(dragSrcIdx===null||dragSrcIdx===i)return;const moved=draftAreas.splice(dragSrcIdx,1)[0];draftAreas.splice(i,0,moved);dragSrcIdx=null;renderAreasList();}
 function onDragEnd(){dragSrcIdx=null;document.querySelectorAll('.area-row').forEach(r=>r.classList.remove('dragging','drag-over'));}
-
-// ── Touch drag-and-drop for iPad/tablet ──
-let touchDragIdx=null, touchClone=null, touchOffsetY=0;
-
-function onTouchStart(e,i){
-  touchDragIdx=i;
-  const row=document.getElementById('arow-'+i);
-  const rect=row.getBoundingClientRect();
-  touchOffsetY=e.touches[0].clientY-rect.top;
-  // Create a floating clone
-  touchClone=row.cloneNode(true);
-  touchClone.style.cssText=`position:fixed;z-index:9999;width:${rect.width}px;left:${rect.left}px;top:${rect.top}px;opacity:0.9;pointer-events:none;border-radius:11px;box-shadow:0 8px 32px rgba(255,45,120,0.4);transform:scale(1.03);transition:none`;
-  document.body.appendChild(touchClone);
-  row.classList.add('dragging');
-}
-
-function onTouchMove(e){
-  e.preventDefault();
-  if(touchDragIdx===null||!touchClone)return;
-  const y=e.touches[0].clientY;
-  touchClone.style.top=(y-touchOffsetY)+'px';
-  // Find which row we're hovering over
-  document.querySelectorAll('.area-row').forEach(r=>r.classList.remove('drag-over'));
-  const els=document.getElementById('areas-list').querySelectorAll('.area-row');
-  els.forEach((row,idx)=>{
-    const rect=row.getBoundingClientRect();
-    if(y>=rect.top&&y<=rect.bottom&&idx!==touchDragIdx){
-      row.classList.add('drag-over');
-    }
-  });
-}
-
-function onTouchEnd(e){
-  if(touchDragIdx===null)return;
-  // Find drop target
-  const y=e.changedTouches[0].clientY;
-  let dropIdx=null;
-  const els=document.getElementById('areas-list').querySelectorAll('.area-row');
-  els.forEach((row,idx)=>{
-    const rect=row.getBoundingClientRect();
-    if(y>=rect.top&&y<=rect.bottom&&idx!==touchDragIdx) dropIdx=idx;
-  });
-  // Clean up clone and styles
-  if(touchClone){touchClone.remove();touchClone=null;}
-  document.querySelectorAll('.area-row').forEach(r=>r.classList.remove('dragging','drag-over'));
-  // Perform reorder
-  if(dropIdx!==null&&dropIdx!==touchDragIdx){
-    const moved=draftAreas.splice(touchDragIdx,1)[0];
-    draftAreas.splice(dropIdx,0,moved);
-    renderAreasList();
-  }
-  touchDragIdx=null;
-}
-function startRename(i){const row=document.getElementById('arow-'+i);row.draggable=false;row.innerHTML=`<span class="drag-handle" style="opacity:.2">⠿</span><input class="area-name-input" value="${esc(draftAreas[i])}" id="ri-${i}" onkeydown="if(event.key==='Enter')confirmRename(${i});if(event.key==='Escape')renderAreasList()"><button class="btn btn-glow btn-sm" onclick="confirmRename(${i})">Save</button><button class="btn btn-ghost btn-sm" onclick="renderAreasList()">Cancel</button>`;document.getElementById('ri-'+i).focus();}
+let touchDragIdx=null,touchClone=null,touchOffsetY=0;
+function onTouchStart(e,i){touchDragIdx=i;const row=document.getElementById('arow-'+i);const rect=row.getBoundingClientRect();touchOffsetY=e.touches[0].clientY-rect.top;touchClone=row.cloneNode(true);touchClone.style.cssText=`position:fixed;z-index:9999;width:${rect.width}px;left:${rect.left}px;top:${rect.top}px;opacity:0.9;pointer-events:none;border-radius:11px;box-shadow:0 8px 32px rgba(255,45,120,0.4);transform:scale(1.03);transition:none`;document.body.appendChild(touchClone);row.classList.add('dragging');}
+function onTouchMove(e){e.preventDefault();if(touchDragIdx===null||!touchClone)return;const y=e.touches[0].clientY;touchClone.style.top=(y-touchOffsetY)+'px';document.querySelectorAll('.area-row').forEach(r=>r.classList.remove('drag-over'));const els=document.getElementById('areas-list').querySelectorAll('.area-row');els.forEach((row,idx)=>{const rect=row.getBoundingClientRect();if(y>=rect.top&&y<=rect.bottom&&idx!==touchDragIdx)row.classList.add('drag-over');});}
+function onTouchEnd(e){if(touchDragIdx===null)return;const y=e.changedTouches[0].clientY;let dropIdx=null;const els=document.getElementById('areas-list').querySelectorAll('.area-row');els.forEach((row,idx)=>{const rect=row.getBoundingClientRect();if(y>=rect.top&&y<=rect.bottom&&idx!==touchDragIdx)dropIdx=idx;});if(touchClone){touchClone.remove();touchClone=null;}document.querySelectorAll('.area-row').forEach(r=>r.classList.remove('dragging','drag-over'));if(dropIdx!==null&&dropIdx!==touchDragIdx){const moved=draftAreas.splice(touchDragIdx,1)[0];draftAreas.splice(dropIdx,0,moved);renderAreasList();}touchDragIdx=null;}
+function startRename(i){const row=document.getElementById('arow-'+i);row.draggable=false;row.innerHTML=`<span class="drag-handle" style="opacity:.2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1.2" fill="currentColor" stroke="none"/><circle cx="9" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="9" cy="19" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="5" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="19" r="1.2" fill="currentColor" stroke="none"/></svg></span><input class="area-name-input" value="${esc(draftAreas[i])}" id="ri-${i}" onkeydown="if(event.key==='Enter')confirmRename(${i});if(event.key==='Escape')renderAreasList()"><button class="btn btn-glow btn-sm" onclick="confirmRename(${i})">Save</button><button class="btn btn-ghost btn-sm" onclick="renderAreasList()">Cancel</button>`;document.getElementById('ri-'+i).focus();}
 function confirmRename(i){const v=document.getElementById('ri-'+i).value.trim();if(!v||(draftAreas.includes(v)&&draftAreas[i]!==v)){renderAreasList();return;}draftAreas[i]=v;renderAreasList();}
 function addArea(){const v=document.getElementById('new-area-input').value.trim();if(!v||draftAreas.includes(v))return;const oi=draftAreas.indexOf('Other');const end=oi>-1?oi:draftAreas.length;let pos=draftAreas.slice(0,end).findIndex(a=>a.localeCompare(v)>0);if(pos===-1)pos=end;draftAreas.splice(pos,0,v);document.getElementById('new-area-input').value='';renderAreasList();}
 function removeArea(i){const name=draftAreas[i];const cnt=leads.filter(l=>l.area===name).length;if(cnt>0&&!confirm(`"${name}" has ${cnt} lead(s). Move to Other?`))return;draftAreas.splice(i,1);if(!draftAreas.includes('Other'))draftAreas.push('Other');renderAreasList();}
-function saveAreas(){const ns=new Set(draftAreas);leads=leads.map(l=>ns.has(l.area)?l:{...l,area:'Other'});areas=[...draftAreas];if(!areas.includes('Other'))areas.push('Other');if(activeArea!=='All Areas'&&!ns.has(activeArea))activeArea='All Areas';save();closeModal('areas-modal');render();}
+function saveAreas(){const ns=new Set(draftAreas);leads=leads.map(l=>ns.has(l.area)?l:{...l,area:'Other'});wins=wins.map(w=>ns.has(w.area)?w:{...w,area:'Other'});areas=[...draftAreas];if(!areas.includes('Other'))areas.push('Other');if(activeArea!=='All Areas'&&!ns.has(activeArea))activeArea='All Areas';if(activeWinArea!=='All Areas'&&!ns.has(activeWinArea))activeWinArea='All Areas';save();closeModal('areas-modal');render();}
+
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function bgClose(e,id){if(e.target===document.getElementById(id))closeModal(id);}
-function exportCSV(){const hdr='Company,Contact,Phone,Email,Address,Units,Style,Area,Status,Notes';const rows=leads.map(l=>[l.company,l.contact,l.phone,l.email,l.address,l.units,l.style,l.area,l.status,l.notes].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(','));const blob=new Blob([[hdr,...rows].join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='central_ohio_pm_leads.csv';a.click();}
+
+function exportCSV(){const hdr='Company,Contact,Phone,Email,Address,Units,Style,Area,Status,Notes';const rows=leads.map(l=>[l.company,l.contact,l.phone,l.email,l.address,l.units,l.style,l.area,l.status,l.notes].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(','));const blob=new Blob([[hdr,...rows].join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pm_leads.csv';a.click();}
+function exportWinsCSV(){const hdr='Company,Contact,Phone,Email,Address,Units,Style,Area,Won Date,Win Notes';const rows=wins.map(w=>[w.company,w.contact,w.phone,w.email,w.address,w.units,w.style,w.area,w.wonDate,w.winNotes].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(','));const blob=new Blob([[hdr,...rows].join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pm_wins.csv';a.click();}
 
 render();
+updateWinsBadge();
 </script>
 </body>
 </html>
