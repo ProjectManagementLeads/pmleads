@@ -527,7 +527,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
 
 // ── Supabase ──
 const SUPA_URL = 'https://syakuvxmqqwougouudnw.supabase.co';
-const SUPA_KEY = 'sb_publishable_K4cdFHSTah6eTuxMltRdIA_3XFjEa-w';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5YWt1dnhtcXF3b3Vnb3V1ZG53Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MDI2NTYsImV4cCI6MjA5MzQ3ODY1Nn0.JdevRGo00E24jb4Df5Fj5Qc6_laOuEkmMoPgA36DOhc';
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 
 const DEFAULT_AREAS = ["Bexley","Clintonville","Dublin","Grove City","Hilliard","Marysville","New Albany","Plain City","Upper Arlington","Westerville","West Jefferson","Worthington","Other"];
@@ -570,38 +570,52 @@ async function saveAreas_db(list){try{await sb.from('areas').upsert({id:1,list:l
 async function loadAll(){
   showLoading();
   try{
-    const [leadsRes,winsRes,areasRes] = await Promise.all([
-      sb.from('leads').select('*').order('created_at',{ascending:false}),
-      sb.from('wins').select('*').order('created_at',{ascending:false}),
-      sb.from('areas').select('*').eq('id',1).maybeSingle()
-    ]);
-    if(leadsRes.data) leads=leadsRes.data.map(dbToLead);
-    if(winsRes.data) wins=winsRes.data.map(dbToWin);
-    if(areasRes.data && areasRes.data.list && areasRes.data.list.length>0){
-      areas=areasRes.data.list;
+    // Load leads
+    const leadsRes = await sb.from('leads').select('*').order('created_at',{ascending:false});
+    if(leadsRes.data) leads = leadsRes.data.map(dbToLead);
+
+    // Load wins
+    const winsRes = await sb.from('wins').select('*').order('created_at',{ascending:false});
+    if(winsRes.data) wins = winsRes.data.map(dbToWin);
+
+    // Load areas — always fetch fresh
+    const areasRes = await sb.from('areas').select('list').eq('id',1).maybeSingle();
+    if(areasRes.data && Array.isArray(areasRes.data.list) && areasRes.data.list.length > 0){
+      areas = areasRes.data.list;
     } else {
-      // First time — seed default areas into DB
-      areas=[...DEFAULT_AREAS];
+      // First ever load — seed defaults
+      areas = [...DEFAULT_AREAS];
       await saveAreas_db(areas);
     }
-  }catch(e){console.error('loadAll error',e);}
+  } catch(e){
+    console.error('loadAll error', e);
+    // Keep defaults on error so UI still works
+    if(!areas.length) areas = [...DEFAULT_AREAS];
+  }
   hideLoading();
   render();
+  if(currentSection==='wins') renderWins();
   updateWinsBadge();
 }
 
-// ── Realtime — debounced so saves don't trigger mid-operation ──
+// ── Realtime — unique channel per session, debounced ──
 let realtimeTimer=null;
 function scheduleReload(){
-  if(isSaving)return;
+  if(isSaving) return;
   clearTimeout(realtimeTimer);
-  realtimeTimer=setTimeout(()=>{if(!isSaving)loadAll();},1200);
+  realtimeTimer = setTimeout(()=>{ if(!isSaving) loadAll(); }, 1000);
 }
-sb.channel('db-changes')
-  .on('postgres_changes',{event:'*',schema:'public',table:'leads'},scheduleReload)
-  .on('postgres_changes',{event:'*',schema:'public',table:'wins'},scheduleReload)
-  .on('postgres_changes',{event:'*',schema:'public',table:'areas'},scheduleReload)
-  .subscribe();
+const channelId = 'db-' + Math.random().toString(36).slice(2,8);
+sb.channel(channelId)
+  .on('postgres_changes',{event:'INSERT',schema:'public',table:'leads'},scheduleReload)
+  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'leads'},scheduleReload)
+  .on('postgres_changes',{event:'DELETE',schema:'public',table:'leads'},scheduleReload)
+  .on('postgres_changes',{event:'INSERT',schema:'public',table:'wins'},scheduleReload)
+  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'wins'},scheduleReload)
+  .on('postgres_changes',{event:'DELETE',schema:'public',table:'wins'},scheduleReload)
+  .on('postgres_changes',{event:'INSERT',schema:'public',table:'areas'},scheduleReload)
+  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'areas'},scheduleReload)
+  .subscribe((status)=>{ console.log('Realtime status:', status); });
 
 function save(){} // no-op — all saves go direct to Supabase now
 
@@ -913,6 +927,16 @@ function sortAreasAlpha(){
   if(hasOther) sorted.push('Other');
   draftAreas = sorted;
   renderAreasList();
+}
+async function deleteLead(id){
+  const l = leads.find(x=>x.id===id);
+  if(!l) return;
+  if(!confirm(`Delete "${l.company}" permanently? This cannot be undone.`)) return;
+  leads = leads.filter(x=>x.id!==id);
+  render();
+  isSaving=true;
+  await deleteLead_db(id);
+  isSaving=false;
 }
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function bgClose(e,id){if(e.target===document.getElementById(id))closeModal(id);}
