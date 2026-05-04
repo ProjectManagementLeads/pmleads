@@ -525,6 +525,13 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
   }
 })();
 
+// ── Supabase ──
+const SUPA_URL = 'https://syakuvxmqqwougouudnw.supabase.co';
+const SUPA_KEY = 'sb_publishable_K4cdFHSTah6eTuxMltRdIA_3XFjEa-w';
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+const DEFAULT_AREAS = ["Bexley","Clintonville","Dublin","Grove City","Hilliard","Marysville","New Albany","Plain City","Upper Arlington","Westerville","West Jefferson","Worthington","Other"];
+
 const STATUS_CFG={
   "New":          {bg:"rgba(255,255,255,0.07)",  color:"#6A80A8", glow:false},
   "Contacted":    {bg:"rgba(0,255,255,0.13)",    color:"#00D4FF", glow:"rgba(0,255,255,0.6)"},
@@ -533,24 +540,70 @@ const STATUS_CFG={
   "Dead":         {bg:"rgba(255,255,255,0.04)",  color:"#3A4A62", glow:false},
 };
 
-let leads=JSON.parse(localStorage.getItem('pm_leads')||'[]');
-// Migrate any old "Closed won" leads out of pipeline
-leads=leads.filter(l=>l.status!=='Closed won');
-
-let wins=JSON.parse(localStorage.getItem('pm_wins')||'[]');
-let areas=(()=>{const s=localStorage.getItem('pm_areas');if(s)return JSON.parse(s);return["Bexley","Clintonville","Dublin","Grove City","Hilliard","Marysville","New Albany","Plain City","Upper Arlington","Westerville","West Jefferson","Worthington","Other"];})();
+let leads=[], wins=[], areas=[...DEFAULT_AREAS];
 let draftAreas=[],activeArea="All Areas",activeWinArea="All Areas";
 let editId=null,winTargetId=null;
 let sortCol="company",sortDir=1;
 let wSortCol="wonDate",wSortDir=-1;
 let dragSrcIdx=null;
 let currentSection="leads";
+let isSaving=false;
 
-function save(){
-  localStorage.setItem('pm_leads',JSON.stringify(leads));
-  localStorage.setItem('pm_wins',JSON.stringify(wins));
-  localStorage.setItem('pm_areas',JSON.stringify(areas));
+// ── Loading overlay ──
+function showLoading(){document.getElementById('loading-overlay').style.display='flex';}
+function hideLoading(){document.getElementById('loading-overlay').style.display='none';}
+
+// ── DB mappers ──
+function dbToLead(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,style:r.style||'',area:r.area||'Other',status:r.status||'New',notes:r.notes||''};}
+function leadToDB(l){return{id:l.id,company:l.company,contact:l.contact,phone:l.phone,email:l.email,address:l.address,units:l.units||0,style:l.style,area:l.area,status:l.status,notes:l.notes};}
+function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||''};}
+function winToDB(w){return{id:w.id,company:w.company,contact:w.contact,phone:w.phone,email:w.email,address:w.address,units:w.units||0,style:w.style,area:w.area,won_date:w.wonDate,win_notes:w.winNotes};}
+
+// ── Supabase CRUD ──
+async function saveLead_db(obj){try{await sb.from('leads').upsert(leadToDB(obj));}catch(e){console.error('saveLead_db',e);}}
+async function deleteLead_db(id){try{await sb.from('leads').delete().eq('id',id);}catch(e){console.error('deleteLead_db',e);}}
+async function saveWin_db(obj){try{await sb.from('wins').upsert(winToDB(obj));}catch(e){console.error('saveWin_db',e);}}
+async function deleteWin_db(id){try{await sb.from('wins').delete().eq('id',id);}catch(e){console.error('deleteWin_db',e);}}
+async function saveAreas_db(list){try{await sb.from('areas').upsert({id:1,list:list});}catch(e){console.error('saveAreas_db',e);}}
+
+// ── Load all data ──
+async function loadAll(){
+  showLoading();
+  try{
+    const [leadsRes,winsRes,areasRes] = await Promise.all([
+      sb.from('leads').select('*').order('created_at',{ascending:false}),
+      sb.from('wins').select('*').order('created_at',{ascending:false}),
+      sb.from('areas').select('*').eq('id',1).maybeSingle()
+    ]);
+    if(leadsRes.data) leads=leadsRes.data.map(dbToLead);
+    if(winsRes.data) wins=winsRes.data.map(dbToWin);
+    if(areasRes.data && areasRes.data.list && areasRes.data.list.length>0){
+      areas=areasRes.data.list;
+    } else {
+      // First time — seed default areas into DB
+      areas=[...DEFAULT_AREAS];
+      await saveAreas_db(areas);
+    }
+  }catch(e){console.error('loadAll error',e);}
+  hideLoading();
+  render();
+  updateWinsBadge();
 }
+
+// ── Realtime — debounced so saves don't trigger mid-operation ──
+let realtimeTimer=null;
+function scheduleReload(){
+  if(isSaving)return;
+  clearTimeout(realtimeTimer);
+  realtimeTimer=setTimeout(()=>{if(!isSaving)loadAll();},1200);
+}
+sb.channel('db-changes')
+  .on('postgres_changes',{event:'*',schema:'public',table:'leads'},scheduleReload)
+  .on('postgres_changes',{event:'*',schema:'public',table:'wins'},scheduleReload)
+  .on('postgres_changes',{event:'*',schema:'public',table:'areas'},scheduleReload)
+  .subscribe();
+
+function save(){} // no-op — all saves go direct to Supabase now
 
 // ── Section toggle ──
 function setSection(s){
