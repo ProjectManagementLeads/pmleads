@@ -802,7 +802,9 @@ async function saveLead(){
   const obj={id:editId||Date.now()+'',company:co,contact:document.getElementById('f-contact').value.trim(),phone:document.getElementById('f-phone').value.trim(),email:document.getElementById('f-email').value.trim(),address:document.getElementById('f-address').value.trim(),units:parseInt(document.getElementById('f-units').value)||0,style:document.getElementById('f-style').value.trim(),area:document.getElementById('f-area').value,status:document.getElementById('f-status').value,notes:document.getElementById('f-notes').value.trim()};
   if(editId){const i=leads.findIndex(x=>x.id===editId);if(i>-1)leads[i]=obj;}else leads.unshift(obj);
   closeModal('lead-modal');render();
+  isSaving=true;
   await saveLead_db(obj);
+  isSaving=false;
 }
 
 // ── Areas ──
@@ -845,9 +847,11 @@ async function saveAreas(){
   if(activeArea!=='All Areas'&&!ns.has(activeArea))activeArea='All Areas';
   if(activeWinArea!=='All Areas'&&!ns.has(activeWinArea))activeWinArea='All Areas';
   closeModal('areas-modal');render();
+  isSaving=true;
   await saveAreas_db(areas);
   for(const l of movedLeads) await saveLead_db({...l,area:'Other'});
   for(const w of movedWins) await saveWin_db({...w,area:'Other'});
+  isSaving=false;
 }
 
 function sortAreasAlpha(){
