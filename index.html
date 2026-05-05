@@ -739,13 +739,18 @@ async function confirmMoveToWins(){
   winTargetId=null;
   closeModal('win-modal');
   render();
+  renderWins();
   updateWinsBadge();
-  await saveWin_db(win);
-  await deleteLead_db(wid);
+  isSaving=true;
+  try{
+    await saveWin_db(win);
+    await deleteLead_db(wid);
+  }catch(e){console.error('moveToWins error',e);}
+  isSaving=false;
 }
 
 async function removeWin(id){
-  if(!confirm('Remove this win permanently?'))return;
+  if(!confirm('Remove this win? This cannot be undone.'))return;
   wins=wins.filter(x=>x.id!==id);
   renderWins();updateWinsBadge();
   await deleteWin_db(id);
@@ -753,14 +758,17 @@ async function removeWin(id){
 
 async function moveWinBackToLeads(id){
   const w=wins.find(x=>x.id===id);if(!w)return;
-  if(!confirm(`Move "${w.company}" back to pipeline?`))return;
-  const lead={...w,status:'New'};
+  const lead={...w,status:'Qualified'};
   delete lead.wonDate;delete lead.winNotes;
   leads.unshift(lead);
   wins=wins.filter(x=>x.id!==id);
   renderWins();updateWinsBadge();render();
-  await saveLead_db(lead);
-  await deleteWin_db(id);
+  isSaving=true;
+  try{
+    await saveLead_db(lead);
+    await deleteWin_db(id);
+  }catch(e){console.error('moveBackToLeads error',e);}
+  isSaving=false;
 }
 
 // ── Lookup / autofill ──
@@ -960,7 +968,7 @@ function renderWins(){
       </td>
       <td style="white-space:nowrap">
         <div style="display:flex;gap:6px;align-items:center">
-          <button class="btn btn-ghost btn-sm" onclick="moveWinBackToLeads('${w.id}')" style="min-height:34px;touch-action:manipulation">↩ Pipeline</button>
+          <button class="btn btn-ghost btn-sm" onclick="moveWinBackToLeads('${w.id}')" style="min-height:34px;touch-action:manipulation;background:rgba(0,255,179,0.08);border-color:rgba(0,255,179,0.3);color:var(--green)">↩ Pipeline</button>
           <button class="btn-danger-sm" onclick="removeWin('${w.id}')" style="min-height:34px;min-width:34px;touch-action:manipulation">✕</button>
         </div>
       </td>
