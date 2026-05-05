@@ -46,7 +46,6 @@ body{font-family:'Inter',sans-serif;background:#010209;color:var(--ink);-webkit-
 .brand-icon{width:38px;height:38px;border-radius:11px;flex-shrink:0;background:linear-gradient(135deg,var(--pink),var(--purple),var(--cyan));display:flex;align-items:center;justify-content:center;box-shadow:0 0 32px rgba(255,0,110,0.9),0 0 64px rgba(153,0,255,0.6),0 0 96px rgba(0,255,255,0.3),inset 0 1px 0 rgba(255,255,255,0.3);animation:icon-pulse 2.5s ease-in-out infinite;position:relative;overflow:hidden;}
 .brand-icon::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.2),transparent);}
 @keyframes icon-pulse{0%,100%{box-shadow:0 0 32px rgba(255,0,110,0.9),0 0 64px rgba(153,0,255,0.6),0 0 96px rgba(0,255,255,0.3)}50%{box-shadow:0 0 48px rgba(255,0,110,1.0),0 0 96px rgba(153,0,255,0.8),0 0 128px rgba(0,255,255,0.5)}}
-40%,60%{opacity:1}}
 .brand-icon svg{width:18px;height:18px;position:relative;z-index:1}
 .brand-name{font-size:18px;font-weight:900;letter-spacing:-0.4px;color:#FFFFFF;text-shadow:0 0 30px rgba(255,255,255,0.3);white-space:nowrap;}
 
@@ -242,6 +241,29 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
 .area-name-input{flex:1;font-size:13px;font-family:inherit;font-weight:600;padding:8px 13px;border:1px solid var(--pink);border-radius:9px;background:rgba(255,0,110,0.1);color:var(--ink);outline:none;box-shadow:0 0 0 3px rgba(255,0,110,0.15);}
 
 /* ── SCROLLBAR ── */
+.quick-note-popup{
+  position:fixed;z-index:200;
+  background:rgba(8,10,26,0.98);
+  border:1px solid rgba(255,0,110,0.5);
+  border-radius:16px;
+  padding:16px;
+  width:320px;
+  box-shadow:0 20px 60px rgba(0,0,0,.8),0 0 40px rgba(255,0,110,0.15);
+  backdrop-filter:blur(20px);
+}
+.quick-note-popup textarea{
+  width:100%;font-size:13px;font-family:inherit;
+  padding:10px 12px;border:1px solid var(--bm);border-radius:9px;
+  background:rgba(255,255,255,0.06);color:var(--ink);outline:none;
+  resize:none;height:90px;line-height:1.5;
+  transition:border-color .15s;
+}
+.quick-note-popup textarea:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,0,110,0.15);}
+.quick-note-header{font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--pink);text-transform:uppercase;margin-bottom:8px;}
+.quick-note-company{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.quick-note-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px;}
+.notes-cell{cursor:pointer;transition:background .15s;}
+.notes-cell:hover{background:rgba(255,0,110,0.08)!important;border-radius:6px;}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--pink),var(--purple),var(--cyan));border-radius:4px;box-shadow:0 0 8px rgba(255,0,110,0.5);}
@@ -273,6 +295,22 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
 </div>
 <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 
+<!-- Quick note popup -->
+<div id="quick-note-popup" class="quick-note-popup" style="display:none">
+  <div class="quick-note-header">✦ Quick note</div>
+  <div class="quick-note-company" id="qn-company"></div>
+  <textarea id="qn-text" placeholder="Type your note here…"></textarea>
+  <div id="qn-history" style="display:none;margin-top:8px;max-height:100px;overflow-y:auto;font-size:11px;color:var(--ink3);background:rgba(255,255,255,0.03);border:1px solid var(--b);border-radius:8px;padding:8px;white-space:pre-wrap;-webkit-overflow-scrolling:touch"></div>
+  <div class="quick-note-actions">
+    <button class="btn btn-ghost btn-sm" onclick="closeQuickNote()">Cancel</button>
+    <button class="btn btn-glow btn-sm" onclick="saveQuickNote()">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Save note
+    </button>
+  </div>
+</div>
+<div id="quick-note-backdrop" onclick="closeQuickNote()" style="display:none;position:fixed;inset:0;z-index:199;"></div>
+
 <div id="bg">
   <div id="stars"></div><div id="grid"></div>
   <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
@@ -282,11 +320,11 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
 
 <!-- TOPBAR -->
 <div class="topbar">
-  <div class="brand">
+  <div style="display:flex;flex-direction:row;align-items:center;gap:12px;position:relative;z-index:1;flex-shrink:0">
     <div class="brand-icon">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="position:relative;z-index:1"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     </div>
-    <span class="brand-name">PM Leads</span>
+    <span style="font-size:18px;font-weight:900;letter-spacing:-0.4px;color:#FFFFFF;text-shadow:0 0 30px rgba(255,255,255,0.3);white-space:nowrap;line-height:1">PM Leads</span>
   </div>
   <div class="top-right">
     <div class="live-dot">Live</div>
@@ -823,7 +861,12 @@ function render(){
       <td style="text-align:right;font-weight:800;color:var(--ink)">${l.units||'<span class="muted" style="font-weight:400">—</span>'}</td>
       <td><span class="area-chip">${esc(l.area)}</span></td>
       <td><span class="badge" style="background:${sc.bg};color:${sc.color};${glow}">${esc(l.status)}</span></td>
-      <td class="hide-mob" style="font-size:12px;color:var(--ink3);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(note)}">${esc(note)||'<span class="muted">—</span>'}</td>
+      <td class="hide-mob notes-cell" onclick="openQuickNote('${l.id}', event)" style="font-size:12px;color:var(--ink3);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:14px 18px" title="${note?note:'Tap to add note'}">
+        ${note
+          ? `<span style="display:flex;align-items:center;gap:5px">${esc(note.split('\n')[0])}<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;opacity:0.4"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>`
+          : '<span style="color:var(--ink4);display:flex;align-items:center;gap:5px">Add note <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>'
+        }
+      </td>
       <td style="white-space:nowrap">
         <button class="btn-win-sm" onclick="openWinModal('${l.id}')" style="margin-right:4px">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:3px"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/><path d="M4 22h16"/></svg>Win
@@ -907,7 +950,12 @@ function renderWins(){
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/><path d="M4 22h16"/></svg>
         ${dateStr}</span></td>
       <td class="hide-mob" style="font-size:12px;color:var(--ink2);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${w.mgmt?`<span style="background:rgba(180,79,255,0.15);color:var(--purple3);border:1px solid rgba(180,79,255,0.3);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">${esc(w.mgmt)}</span>`:'<span class="muted">—</span>'}</td>
-      <td class="hide-mob" style="font-size:12px;color:var(--ink3);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(note)}">${esc(note)||'<span class="muted">—</span>'}</td>
+      <td class="hide-mob notes-cell" onclick="openQuickNote('${l.id}', event)" style="font-size:12px;color:var(--ink3);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:14px 18px" title="${note?note:'Tap to add note'}">
+        ${note
+          ? `<span style="display:flex;align-items:center;gap:5px">${esc(note.split('\n')[0])}<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;opacity:0.4"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>`
+          : '<span style="color:var(--ink4);display:flex;align-items:center;gap:5px">Add note <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>'
+        }
+      </td>
       <td style="white-space:nowrap">
         <div style="display:flex;gap:6px;align-items:center">
           <button class="btn btn-ghost btn-sm" onclick="moveWinBackToLeads('${w.id}')" style="min-height:34px;touch-action:manipulation">↩ Pipeline</button>
@@ -1030,6 +1078,61 @@ function sortAreasAlpha(){
   draftAreas = sorted;
   renderAreasList();
 }
+// ── Quick note popup ──
+let quickNoteId = null;
+
+function openQuickNote(id, e){
+  e.stopPropagation();
+  const l = leads.find(x=>x.id===id);
+  if(!l) return;
+  quickNoteId = id;
+  document.getElementById('qn-company').textContent = l.company;
+  document.getElementById('qn-text').value = '';
+  // Show history
+  if(l.notes){
+    document.getElementById('qn-history').style.display='block';
+    document.getElementById('qn-history').textContent = l.notes;
+  } else {
+    document.getElementById('qn-history').style.display='none';
+  }
+  // Position popup near click/tap
+  const popup = document.getElementById('quick-note-popup');
+  popup.style.display='block';
+  document.getElementById('quick-note-backdrop').style.display='block';
+  // Position smartly
+  const vw = window.innerWidth, vh = window.innerHeight;
+  let x = e.clientX || vw/2, y = e.clientY || vh/2;
+  if(x + 340 > vw) x = vw - 340;
+  if(y + 280 > vh) y = vh - 280;
+  if(x < 10) x = 10;
+  if(y < 10) y = 10;
+  popup.style.left = x + 'px';
+  popup.style.top = y + 'px';
+  setTimeout(()=>document.getElementById('qn-text').focus(), 60);
+}
+
+function closeQuickNote(){
+  document.getElementById('quick-note-popup').style.display='none';
+  document.getElementById('quick-note-backdrop').style.display='none';
+  quickNoteId = null;
+}
+
+async function saveQuickNote(){
+  const newNote = document.getElementById('qn-text').value.trim();
+  if(!newNote){ closeQuickNote(); return; }
+  const l = leads.find(x=>x.id===quickNoteId);
+  if(!l) return;
+  const now = new Date();
+  const stamp = '[' + (now.getMonth()+1).toString().padStart(2,'0') + '/' + now.getDate().toString().padStart(2,'0') + '/' + now.getFullYear().toString().slice(2) + '] ';
+  const stamped = stamp + newNote;
+  l.notes = l.notes ? stamped + '\n' + l.notes : stamped;
+  closeQuickNote();
+  render();
+  isSaving=true;
+  await saveLead_db(l);
+  isSaving=false;
+}
+
 async function deleteLead(id){
   const l = leads.find(x=>x.id===id);
   if(!l) return;
