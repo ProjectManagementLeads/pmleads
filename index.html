@@ -246,24 +246,24 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
   background:rgba(8,10,26,0.98);
   border:1px solid rgba(255,0,110,0.5);
   border-radius:20px;
-  padding:22px;
-  width:min(480px,90vw);
+  padding:28px;
+  width:min(600px,92vw);
   box-shadow:0 20px 60px rgba(0,0,0,.8),0 0 60px rgba(255,0,110,0.2);
   backdrop-filter:blur(20px);
 }
 .quick-note-popup textarea{
-  width:100%;font-size:16px;font-family:inherit;
-  padding:14px;border:1px solid var(--bm);border-radius:11px;
+  width:100%;font-size:18px;font-family:inherit;
+  padding:16px;border:1px solid var(--bm);border-radius:11px;
   background:rgba(255,255,255,0.07);color:var(--ink);outline:none;
-  resize:none;height:130px;line-height:1.6;
+  resize:none;height:163px;line-height:1.6;
   transition:border-color .15s;
   -webkit-text-size-adjust:100%;
 }
 .quick-note-popup textarea:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,0,110,0.2);}
 .quick-note-header{font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--pink);text-transform:uppercase;margin-bottom:6px;}
-.quick-note-company{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.quick-note-company{font-size:20px;font-weight:700;color:var(--ink);margin-bottom:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .quick-note-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:14px;}
-.quick-note-actions .btn{height:42px;font-size:13px;min-width:90px;touch-action:manipulation;}
+.quick-note-actions .btn{height:52px;font-size:15px;min-width:112px;touch-action:manipulation;}
 .notes-cell{cursor:pointer;transition:background .15s;}
 .notes-cell:hover{background:rgba(255,0,110,0.08)!important;border-radius:6px;}
 ::-webkit-scrollbar{width:5px;height:5px}
@@ -302,7 +302,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
   <div class="quick-note-header">✦ Quick note</div>
   <div class="quick-note-company" id="qn-company"></div>
   <textarea id="qn-text" placeholder="Type your note here…"></textarea>
-  <div id="qn-history" style="display:none;margin-top:10px;max-height:140px;overflow-y:auto;font-size:13px;line-height:1.7;color:var(--ink3);background:rgba(255,255,255,0.03);border:1px solid var(--b);border-radius:10px;padding:12px;white-space:pre-wrap;-webkit-overflow-scrolling:touch"></div>
+  <div id="qn-history" style="display:none;margin-top:10px;max-height:175px;overflow-y:auto;font-size:16px;line-height:1.7;color:var(--ink3);background:rgba(255,255,255,0.03);border:1px solid var(--b);border-radius:10px;padding:12px;white-space:pre-wrap;-webkit-overflow-scrolling:touch"></div>
   <div class="quick-note-actions">
     <button class="btn btn-ghost btn-sm" onclick="closeQuickNote()">Cancel</button>
     <button class="btn btn-glow btn-sm" onclick="saveQuickNote()">
@@ -493,7 +493,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
     <div class="field"><label>Property / company name *</label><input id="f-company" placeholder="e.g. Worthington Arms Apartments"></div>
     <div class="field-row">
       <div class="field"><label>Contact name</label><input id="f-contact" placeholder="Jane Smith"></div>
-      <div class="field"><label>Phone</label><input id="f-phone" type="tel" placeholder="(614) 555-0100"></div>
+      <div class="field"><label>Phone</label><input id="f-phone" type="tel" placeholder="(614) 555-0100" oninput="this.value=formatPhone(this.value)"></div>
     </div>
     <div class="field"><label>Email</label><input id="f-email" type="email" placeholder="jane@company.com"></div>
     <div class="field"><label>Physical address</label><input id="f-address" placeholder="123 Main St, Westerville, OH 43081"></div>
@@ -969,6 +969,12 @@ function renderWins(){
 }
 
 // ── Lead modal ──
+function formatPhone(v){
+  const d=(v||'').replace(/\D/g,'');
+  if(d.length===10) return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;
+  if(d.length===11&&d[0]==='1') return `(${d.slice(1,4)}) ${d.slice(4,7)}-${d.slice(7)}`;
+  return v||'';
+}
 function esc(s){return(s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function populateAreaSelect(){document.getElementById('f-area').innerHTML=areas.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('');}
 function populateMgmtSuggestions(){
@@ -1018,7 +1024,7 @@ async function saveLead(){
     const stamped = stamp + newNote;
     finalNotes = existingNotes ? stamped + '\n' + existingNotes : stamped;
   }
-  const obj={id:editId||Date.now()+'',company:co,contact:document.getElementById('f-contact').value.trim(),phone:document.getElementById('f-phone').value.trim(),email:document.getElementById('f-email').value.trim(),address:document.getElementById('f-address').value.trim(),units:parseInt(document.getElementById('f-units').value)||0,style:document.getElementById('f-style').value.trim(),area:document.getElementById('f-area').value,status:document.getElementById('f-status').value,notes:finalNotes,mgmt:document.getElementById('f-mgmt').value.trim()};
+  const obj={id:editId||Date.now()+'',company:co,contact:document.getElementById('f-contact').value.trim(),phone:formatPhone(document.getElementById('f-phone').value.trim()),email:document.getElementById('f-email').value.trim(),address:document.getElementById('f-address').value.trim(),units:parseInt(document.getElementById('f-units').value)||0,style:document.getElementById('f-style').value.trim(),area:document.getElementById('f-area').value,status:document.getElementById('f-status').value,notes:finalNotes,mgmt:document.getElementById('f-mgmt').value.trim()};
   if(editId){const i=leads.findIndex(x=>x.id===editId);if(i>-1)leads[i]=obj;}else leads.unshift(obj);
   closeModal('lead-modal');render();
   isSaving=true;
