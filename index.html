@@ -339,6 +339,9 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
       <option>New</option><option>Contacted</option><option>Qualified</option>
       <option>Proposal sent</option><option>Dead</option>
     </select>
+    <select class="filter-select" id="filter-mgmt" onchange="render()" style="max-width:180px">
+      <option value="">All companies</option>
+    </select>
     <button class="btn btn-ghost" onclick="exportCSV()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Export
@@ -391,6 +394,9 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
       <span class="search-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
       <input class="search-input wins-search" id="wins-search" placeholder="Search wins…" oninput="renderWins()">
     </div>
+    <select class="filter-select" id="filter-wins-mgmt" onchange="renderWins()" style="max-width:180px">
+      <option value="">All companies</option>
+    </select>
     <button class="btn btn-ghost" onclick="exportWinsCSV()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Export
@@ -447,6 +453,11 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
     </div>
     <div class="field"><label>Email</label><input id="f-email" type="email" placeholder="jane@company.com"></div>
     <div class="field"><label>Physical address</label><input id="f-address" placeholder="123 Main St, Westerville, OH 43081"></div>
+    <div class="field">
+      <label>Management company</label>
+      <input id="f-mgmt" placeholder="e.g. Woda Cooper, NRP Group" list="mgmt-suggestions" autocomplete="off">
+      <datalist id="mgmt-suggestions"></datalist>
+    </div>
     <div class="field-row">
       <div class="field"><label>Unit count</label><input id="f-units" type="number" min="0" placeholder="120"></div>
       <div class="field"><label>Property style</label><input id="f-style" placeholder="e.g. Garden-style"></div>
@@ -561,10 +572,10 @@ function showLoading(){const el=document.getElementById('loading-overlay');if(el
 function hideLoading(){const el=document.getElementById('loading-overlay');if(el)el.style.display='none';}
 
 // ── DB mappers ──
-function dbToLead(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,style:r.style||'',area:r.area||'Other',status:r.status||'New',notes:r.notes||''};}
-function leadToDB(l){return{id:l.id,company:l.company,contact:l.contact,phone:l.phone,email:l.email,address:l.address,units:l.units||0,style:l.style,area:l.area,status:l.status,notes:l.notes};}
-function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||''};}
-function winToDB(w){return{id:w.id,company:w.company,contact:w.contact,phone:w.phone,email:w.email,address:w.address,units:w.units||0,style:w.style,area:w.area,won_date:w.wonDate,win_notes:w.winNotes};}
+function dbToLead(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,style:r.style||'',area:r.area||'Other',status:r.status||'New',notes:r.notes||'',mgmt:r.mgmt||''};}
+function leadToDB(l){return{id:l.id,company:l.company,contact:l.contact,phone:l.phone,email:l.email,address:l.address,units:l.units||0,style:l.style,area:l.area,status:l.status,notes:l.notes,mgmt:l.mgmt||''};}
+function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||'',mgmt:r.mgmt||''};}
+function winToDB(w){return{id:w.id,company:w.company,contact:w.contact,phone:w.phone,email:w.email,address:w.address,units:w.units||0,style:w.style,area:w.area,won_date:w.wonDate,win_notes:w.winNotes,mgmt:w.mgmt||''};}
 
 // ── Supabase CRUD ──
 async function saveLead_db(obj){try{await sb.from('leads').upsert(leadToDB(obj));}catch(e){console.error('saveLead_db',e);}}
@@ -735,16 +746,25 @@ function render(){
   renderTabs();renderStats();
   const q=document.getElementById('search').value.toLowerCase();
   const fs=document.getElementById('filter-status').value;
+  const fm=document.getElementById('filter-mgmt')?.value||'';
+  // Refresh mgmt dropdown
+  const mgmtSelect=document.getElementById('filter-mgmt');
+  if(mgmtSelect){
+    const cur=mgmtSelect.value;
+    const mgmtList=[...new Set(leads.map(l=>l.mgmt).filter(Boolean))].sort();
+    mgmtSelect.innerHTML='<option value="">All companies</option>'+mgmtList.map(m=>`<option value="${esc(m)}"${m===cur?' selected':''}>${esc(m)}</option>`).join('');
+  }
   let rows=leads.filter(l=>{
     if(activeArea!=="All Areas"&&l.area!==activeArea)return false;
     if(fs&&l.status!==fs)return false;
-    if(q&&!(l.company+l.contact+(l.notes||'')).toLowerCase().includes(q))return false;
+    if(fm&&l.mgmt!==fm)return false;
+    if(q&&!(l.company+l.contact+(l.notes||'')+(l.mgmt||'')).toLowerCase().includes(q))return false;
     return true;
   }).sort((a,b)=>{
     if(sortCol==='units')return((a.units||0)-(b.units||0))*sortDir;
     return(a[sortCol]||'').toString().localeCompare((b[sortCol]||'').toString())*sortDir;
   });
-  ['company','contact','units','area','status'].forEach(c=>{const el=document.getElementById('arr-'+c);if(el)el.textContent=sortCol===c?(sortDir===1?' ↑':' ↓'):'';});
+  ['company','contact','units','area','status','mgmt'].forEach(c=>{const el=document.getElementById('arr-'+c);if(el)el.textContent=sortCol===c?(sortDir===1?' ↑':' ↓'):'';});
   const tb=document.getElementById('tbody');
   if(!rows.length){
     tb.innerHTML=`<tr><td colspan="8"><div class="empty">
@@ -808,16 +828,24 @@ function sortWinsBy(col){if(wSortCol===col)wSortDir*=-1;else{wSortCol=col;wSortD
 function renderWins(){
   renderWinsTabs();renderWinsStats();updateWinsBadge();
   const q=document.getElementById('wins-search').value.toLowerCase();
+  const fwm=document.getElementById('filter-wins-mgmt')?.value||'';
+  const wMgmtSelect=document.getElementById('filter-wins-mgmt');
+  if(wMgmtSelect){
+    const cur=wMgmtSelect.value;
+    const mgmtList=[...new Set([...leads,...wins].map(x=>x.mgmt).filter(Boolean))].sort();
+    wMgmtSelect.innerHTML='<option value="">All companies</option>'+mgmtList.map(m=>`<option value="${esc(m)}"${m===cur?' selected':''}>${esc(m)}</option>`).join('');
+  }
   let rows=wins.filter(w=>{
     if(activeWinArea!=="All Areas"&&w.area!==activeWinArea)return false;
-    if(q&&!(w.company+w.contact+(w.winNotes||'')).toLowerCase().includes(q))return false;
+    if(fwm&&w.mgmt!==fwm)return false;
+    if(q&&!(w.company+w.contact+(w.winNotes||'')+(w.mgmt||'')).toLowerCase().includes(q))return false;
     return true;
   }).sort((a,b)=>{
     if(wSortCol==='units')return((a.units||0)-(b.units||0))*wSortDir;
     if(wSortCol==='wonDate')return((a.wonDate||'').localeCompare(b.wonDate||''))*wSortDir;
     return(a[wSortCol]||'').toString().localeCompare((b[wSortCol]||'').toString())*wSortDir;
   });
-  ['company','contact','units','area','wonDate'].forEach(c=>{const el=document.getElementById('warr-'+c);if(el)el.textContent=wSortCol===c?(wSortDir===1?' ↑':' ↓'):'';});
+  ['company','contact','units','area','wonDate','mgmt'].forEach(c=>{const el=document.getElementById('warr-'+c);if(el)el.textContent=wSortCol===c?(wSortDir===1?' ↑':' ↓'):'';});
   const tb=document.getElementById('wins-tbody');
   if(!rows.length){
     tb.innerHTML=`<tr><td colspan="8"><div class="empty">
@@ -839,6 +867,7 @@ function renderWins(){
       <td><span class="win-badge">
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/><path d="M4 22h16"/></svg>
         ${dateStr}</span></td>
+      <td class="hide-mob" style="font-size:12px;color:var(--ink2);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${w.mgmt?`<span style="background:rgba(180,79,255,0.15);color:var(--purple3);border:1px solid rgba(180,79,255,0.3);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">${esc(w.mgmt)}</span>`:'<span class="muted">—</span>'}</td>
       <td class="hide-mob" style="font-size:12px;color:var(--ink3);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(note)}">${esc(note)||'<span class="muted">—</span>'}</td>
       <td style="white-space:nowrap">
         <button class="btn btn-ghost btn-sm" onclick="moveWinBackToLeads('${w.id}')" style="margin-right:4px">↩ Pipeline</button>
@@ -851,15 +880,22 @@ function renderWins(){
 // ── Lead modal ──
 function esc(s){return(s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function populateAreaSelect(){document.getElementById('f-area').innerHTML=areas.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('');}
+function populateMgmtSuggestions(){
+  const all=[...leads,...wins].map(x=>x.mgmt).filter(Boolean);
+  const unique=[...new Set(all)].sort();
+  const dl=document.getElementById('mgmt-suggestions');
+  if(dl) dl.innerHTML=unique.map(m=>`<option value="${esc(m)}">`).join('');
+}
 function openAdd(){
   editId=null;document.getElementById('modal-title').textContent='Add lead';
   populateAreaSelect();
-  ['company','contact','phone','email','address','units','style','notes'].forEach(k=>document.getElementById('f-'+k).value='');
+  ['company','contact','phone','email','address','units','style','notes','mgmt'].forEach(k=>document.getElementById('f-'+k).value='');
   document.getElementById('f-status').value='New';
   document.getElementById('f-area').value=activeArea!=='All Areas'?activeArea:areas[0];
   document.getElementById('lookup-input').value='';
   document.getElementById('autofill-btn').disabled=true;
   document.getElementById('autofill-status').innerHTML='';
+  populateMgmtSuggestions();
   document.getElementById('lead-modal').classList.add('open');
   setTimeout(()=>document.getElementById('lookup-input').focus(),60);
 }
@@ -867,18 +903,19 @@ function openEdit(id){
   const l=leads.find(x=>x.id===id);if(!l)return;
   editId=id;document.getElementById('modal-title').textContent='Edit lead';
   populateAreaSelect();
-  ['company','contact','phone','email','address','style','notes'].forEach(k=>document.getElementById('f-'+k).value=l[k]||'');
+  ['company','contact','phone','email','address','style','notes','mgmt'].forEach(k=>document.getElementById('f-'+k).value=l[k]||'');
   document.getElementById('f-units').value=l.units||'';
   document.getElementById('f-status').value=l.status||'New';
   document.getElementById('f-area').value=l.area||areas[0];
   document.getElementById('lookup-input').value=l.company||'';
   document.getElementById('autofill-btn').disabled=!l.company;
+  populateMgmtSuggestions();
   document.getElementById('autofill-status').innerHTML='';
   document.getElementById('lead-modal').classList.add('open');
 }
 async function saveLead(){
   const co=document.getElementById('f-company').value.trim();if(!co){document.getElementById('f-company').focus();return;}
-  const obj={id:editId||Date.now()+'',company:co,contact:document.getElementById('f-contact').value.trim(),phone:document.getElementById('f-phone').value.trim(),email:document.getElementById('f-email').value.trim(),address:document.getElementById('f-address').value.trim(),units:parseInt(document.getElementById('f-units').value)||0,style:document.getElementById('f-style').value.trim(),area:document.getElementById('f-area').value,status:document.getElementById('f-status').value,notes:document.getElementById('f-notes').value.trim()};
+  const obj={id:editId||Date.now()+'',company:co,contact:document.getElementById('f-contact').value.trim(),phone:document.getElementById('f-phone').value.trim(),email:document.getElementById('f-email').value.trim(),address:document.getElementById('f-address').value.trim(),units:parseInt(document.getElementById('f-units').value)||0,style:document.getElementById('f-style').value.trim(),area:document.getElementById('f-area').value,status:document.getElementById('f-status').value,notes:document.getElementById('f-notes').value.trim(),mgmt:document.getElementById('f-mgmt').value.trim()};
   if(editId){const i=leads.findIndex(x=>x.id===editId);if(i>-1)leads[i]=obj;}else leads.unshift(obj);
   closeModal('lead-modal');render();
   isSaving=true;
