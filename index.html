@@ -570,26 +570,31 @@ async function saveAreas_db(list){try{await sb.from('areas').upsert({id:1,list:l
 async function loadAll(){
   showLoading();
   try{
+    console.log('loadAll: starting...');
+
     // Load leads
     const leadsRes = await sb.from('leads').select('*').order('created_at',{ascending:false});
+    console.log('leads result:', leadsRes.error || leadsRes.data?.length + ' rows');
     if(leadsRes.data) leads = leadsRes.data.map(dbToLead);
 
     // Load wins
     const winsRes = await sb.from('wins').select('*').order('created_at',{ascending:false});
+    console.log('wins result:', winsRes.error || winsRes.data?.length + ' rows');
     if(winsRes.data) wins = winsRes.data.map(dbToWin);
 
-    // Load areas — always fetch fresh
+    // Load areas
     const areasRes = await sb.from('areas').select('list').eq('id',1).maybeSingle();
+    console.log('areas result:', areasRes.error, areasRes.data);
     if(areasRes.data && Array.isArray(areasRes.data.list) && areasRes.data.list.length > 0){
       areas = areasRes.data.list;
+      console.log('areas loaded:', areas.length, 'areas');
     } else {
-      // First ever load — seed defaults
+      console.log('No areas in DB — seeding defaults');
       areas = [...DEFAULT_AREAS];
       await saveAreas_db(areas);
     }
   } catch(e){
-    console.error('loadAll error', e);
-    // Keep defaults on error so UI still works
+    console.error('loadAll error:', e);
     if(!areas.length) areas = [...DEFAULT_AREAS];
   }
   hideLoading();
