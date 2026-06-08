@@ -468,7 +468,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
 </div>
 
 <!-- ADD/EDIT LEAD MODAL -->
-<div class="overlay" id="lead-modal" onclick="bgClose(event,'lead-modal')">
+<div class="overlay" id="lead-modal">
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title" id="modal-title">Add lead</span>
@@ -584,6 +584,37 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
   </div>
 </div>
 
+<!-- EDIT WIN MODAL -->
+<div class="overlay" id="win-edit-modal" onclick="bgClose(event,'win-edit-modal')">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Edit win</span>
+      <button class="modal-close" onclick="closeModal('win-edit-modal')">×</button>
+    </div>
+    <div class="field"><label>Property / company name *</label><input id="we-company"></div>
+    <div class="field-row">
+      <div class="field"><label>Contact name</label><input id="we-contact"></div>
+      <div class="field"><label>Phone</label><input id="we-phone" type="tel" oninput="this.value=formatPhone(this.value)"></div>
+    </div>
+    <div class="field"><label>Email</label><input id="we-email" type="email"></div>
+    <div class="field"><label>Physical address</label><input id="we-address"></div>
+    <div class="field"><label>Management company</label><input id="we-mgmt" list="we-mgmt-suggestions" autocomplete="off"><datalist id="we-mgmt-suggestions"></datalist></div>
+    <div class="field-row">
+      <div class="field"><label>Unit count</label><input id="we-units" type="number" min="0"></div>
+      <div class="field"><label>Property style</label><input id="we-style"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Area</label><select id="we-area"></select></div>
+      <div class="field"><label>Won date</label><input type="date" id="we-wonDate"></div>
+    </div>
+    <div class="field"><label>Win notes</label><textarea id="we-winNotes" style="min-height:88px"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('win-edit-modal')">Cancel</button>
+      <button class="btn btn-green" onclick="saveWinEdit()">Save win</button>
+    </div>
+  </div>
+</div>  
+  
 <script>
 // ── Stars ──
 (function(){
@@ -966,10 +997,11 @@ function renderWins(){
       </td>
       <td style="white-space:nowrap">
         <div style="display:flex;gap:6px;align-items:center">
+          <button class="btn btn-ghost btn-sm" onclick="openEditWin('${w.id}')" style="min-height:34px;touch-action:manipulation">Edit</button>
           <button class="btn btn-ghost btn-sm" onclick="moveWinBackToLeads('${w.id}')" style="min-height:34px;touch-action:manipulation;background:rgba(0,255,179,0.08);border-color:rgba(0,255,179,0.3);color:var(--green)">↩ Pipeline</button>
           <button class="btn-danger-sm" onclick="removeWin('${w.id}')" style="min-height:34px;min-width:34px;touch-action:manipulation">✕</button>
         </div>
-      </td>
+    </td>
     </tr>`;
   }).join('');
 }
@@ -1177,6 +1209,43 @@ function bgClose(e,id){if(e.target===document.getElementById(id))closeModal(id);
 function exportCSV(){const hdr='Company,Contact,Phone,Email,Address,Units,Style,Area,Status,Notes';const rows=leads.map(l=>[l.company,l.contact,l.phone,l.email,l.address,l.units,l.style,l.area,l.status,l.notes].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(','));const blob=new Blob([[hdr,...rows].join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pm_leads.csv';a.click();}
 function exportWinsCSV(){const hdr='Company,Contact,Phone,Email,Address,Units,Style,Area,Won Date,Win Notes';const rows=wins.map(w=>[w.company,w.contact,w.phone,w.email,w.address,w.units,w.style,w.area,w.wonDate,w.winNotes].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(','));const blob=new Blob([[hdr,...rows].join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pm_wins.csv';a.click();}
 
+let winEditId = null;
+function openEditWin(id){
+  const w=wins.find(x=>x.id===id);if(!w)return;
+  winEditId=id;
+  document.getElementById('we-area').innerHTML=areas.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('');
+  document.getElementById('we-company').value=w.company||'';
+  document.getElementById('we-contact').value=w.contact||'';
+  document.getElementById('we-phone').value=w.phone||'';
+  document.getElementById('we-email').value=w.email||'';
+  document.getElementById('we-address').value=w.address||'';
+  document.getElementById('we-mgmt').value=w.mgmt||'';
+  document.getElementById('we-units').value=w.units||'';
+  document.getElementById('we-style').value=w.style||'';
+  document.getElementById('we-area').value=w.area||areas[0];
+  document.getElementById('we-wonDate').value=w.wonDate||'';
+  document.getElementById('we-winNotes').value=w.winNotes||'';
+  const unique=[...new Set([...leads,...wins].map(x=>x.mgmt).filter(Boolean))].sort();
+  document.getElementById('we-mgmt-suggestions').innerHTML=unique.map(m=>`<option value="${esc(m)}">`).join('');
+  document.getElementById('win-edit-modal').classList.add('open');
+}
+async function saveWinEdit(){
+  const co=document.getElementById('we-company').value.trim();if(!co){document.getElementById('we-company').focus();return;}
+  const w=wins.find(x=>x.id===winEditId);if(!w)return;
+  w.company=co;w.contact=document.getElementById('we-contact').value.trim();
+  w.phone=formatPhone(document.getElementById('we-phone').value.trim());
+  w.email=document.getElementById('we-email').value.trim();
+  w.address=document.getElementById('we-address').value.trim();
+  w.mgmt=document.getElementById('we-mgmt').value.trim();
+  w.units=parseInt(document.getElementById('we-units').value)||0;
+  w.style=document.getElementById('we-style').value.trim();
+  w.area=document.getElementById('we-area').value;
+  w.wonDate=document.getElementById('we-wonDate').value;
+  w.winNotes=document.getElementById('we-winNotes').value.trim();
+  closeModal('win-edit-modal');renderWins();
+  isSaving=true;await saveWin_db(w);isSaving=false;
+}
+  
 loadAll();
 </script>
 <!-- Loading overlay -->
