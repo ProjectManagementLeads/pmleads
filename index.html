@@ -812,7 +812,7 @@ function renderTabs(){
     const cnt=a==="All Areas"?leads.length:(counts[a]||0);
     const act=activeArea===a?' active':'';
     const badge=cnt>0?`<span class="tab-cnt">${cnt}</span>`:'';
-    return`<button class="tab${act}" onclick="setArea('${a.replace(/'/g,"\\'")}'">${esc(a)}${badge}</button>`;
+    return`<button class="tab${act}" onclick="setArea('${a.replace(/'/g,"\\'")}')"> ${esc(a)}${badge}</button>`;
   }).join('');
 }
 function setArea(a){activeArea=a;render();}
@@ -894,7 +894,7 @@ function renderWinsTabs(){
     const cnt=a==="All Areas"?wins.length:(counts[a]||0);
     const act=activeWinArea===a?' active':'';
     const badge=cnt>0?`<span class="tab-cnt">${cnt}</span>`:'';
-    return`<button class="tab${act}" onclick="setWinArea('${a.replace(/'/g,"\\'")}'">${esc(a)}${badge}</button>`;
+    return`<button class="tab${act}" onclick="setWinArea('${a.replace(/'/g,"\\'")}')"> ${esc(a)}${badge}</button>`;
   }).join('');
 }
 function setWinArea(a){activeWinArea=a;renderWins();}
