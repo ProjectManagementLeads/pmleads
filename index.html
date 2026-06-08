@@ -41,7 +41,6 @@ body{font-family:'Inter',sans-serif;background:#010209;color:var(--ink);-webkit-
 /* ── TOPBAR ── */
 .topbar{position:sticky;top:0;z-index:30;background:rgba(3,4,15,0.75);backdrop-filter:saturate(200%) blur(28px);-webkit-backdrop-filter:saturate(200%) blur(28px);border-bottom:1px solid var(--b);padding:0 28px;height:62px;display:flex;align-items:center;justify-content:space-between;overflow:hidden;}
 
-50%{background-position:-200% 0}}
 .brand{display:flex;flex-direction:row;align-items:center;gap:12px;position:relative;z-index:1;flex-wrap:nowrap;}
 .brand-icon{width:38px;height:38px;border-radius:11px;flex-shrink:0;background:linear-gradient(135deg,var(--pink),var(--purple),var(--cyan));display:flex;align-items:center;justify-content:center;box-shadow:0 0 32px rgba(255,0,110,0.9),0 0 64px rgba(153,0,255,0.6),0 0 96px rgba(0,255,255,0.3),inset 0 1px 0 rgba(255,255,255,0.3);animation:icon-pulse 2.5s ease-in-out infinite;position:relative;overflow:hidden;}
 .brand-icon::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.2),transparent);}
@@ -959,8 +958,7 @@ function renderWins(){
       <td><span class="win-badge">
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/><path d="M4 22h16"/></svg>
         ${dateStr}</span></td>
-      <td class="hide-mob" style="font-size:12px;color:var(--ink2);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${w.mgmt?`<span style="background:rgba(180,79,255,0.15);color:var(--purple3);border:1px solid rgba(180,79,255,0.3);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">${esc(w.mgmt)}</span>`:'<span class="muted">—</span>'}</td>
-      <td class="hide-mob notes-cell" onclick="openQuickNote('${l.id}', event)" style="font-size:12px;color:var(--ink3);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:14px 18px" title="${note?note:'Tap to add note'}">
+      <td class="hide-mob notes-cell" onclick="openQuickNote('${w.id}', event, true)" style="font-size:12px;color:var(--ink3);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:14px 18px" title="${note?note:'Tap to add note'}">
         ${note
           ? `<span style="display:flex;align-items:center;gap:5px">${esc(note.split('\n')[0])}<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;opacity:0.4"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>`
           : '<span style="color:var(--ink4);display:flex;align-items:center;gap:5px">Add note <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>'
@@ -1019,6 +1017,13 @@ function openEdit(id){
   document.getElementById('autofill-btn').disabled=!l.company;
   populateMgmtSuggestions();
   document.getElementById('autofill-status').innerHTML='';
+  if(l.notes){
+    document.getElementById('notes-log-wrap').style.display='block';
+    document.getElementById('notes-log').textContent=l.notes;
+  } else {
+    document.getElementById('notes-log-wrap').style.display='none';
+  }
+  document.getElementById('f-new-note').value='';
   document.getElementById('lead-modal').classList.add('open');
 }
 async function saveLead(){
@@ -1096,45 +1101,37 @@ function sortAreasAlpha(){
 }
 // ── Quick note popup ──
 let quickNoteId = null;
+let quickNoteIsWin = false;
 
-function openQuickNote(id, e){
+function openQuickNote(id, e, isWin){
   e.stopPropagation();
-  const l = leads.find(x=>x.id===id);
-  if(!l) return;
+  const record = isWin ? wins.find(x=>x.id===id) : leads.find(x=>x.id===id);
+  if(!record) return;
   quickNoteId = id;
-  document.getElementById('qn-company').textContent = l.company;
+  quickNoteIsWin = !!isWin;
+  document.getElementById('qn-company').textContent = record.company;
   document.getElementById('qn-text').value = '';
-  // Show history
-  if(l.notes){
+  const existing = isWin ? record.winNotes : record.notes;
+  if(existing){
     document.getElementById('qn-history').style.display='block';
-    document.getElementById('qn-history').textContent = l.notes;
-    document.getElementById('qn-history').style.fontSize='13px';
-    document.getElementById('qn-history').style.lineHeight='1.7';
+    document.getElementById('qn-history').textContent = existing;
   } else {
     document.getElementById('qn-history').style.display='none';
   }
-  // Position popup near click/tap
   const popup = document.getElementById('quick-note-popup');
   popup.style.display='block';
   document.getElementById('quick-note-backdrop').style.display='block';
-  // Center on tablet, near click on desktop
   const vw = window.innerWidth, vh = window.innerHeight;
   if(vw <= 1024){
-    // Center on screen for tablet/mobile
-    popup.style.left = '50%';
-    popup.style.top = '50%';
-    popup.style.transform = 'translate(-50%, -50%)';
+    popup.style.left='50%'; popup.style.top='50%'; popup.style.transform='translate(-50%,-50%)';
   } else {
-    popup.style.transform = '';
-    let x = e.clientX || vw/2, y = e.clientY || vh/2;
-    if(x + 500 > vw) x = vw - 500;
-    if(y + 320 > vh) y = vh - 320;
-    if(x < 10) x = 10;
-    if(y < 10) y = 10;
-    popup.style.left = x + 'px';
-    popup.style.top = y + 'px';
+    popup.style.transform='';
+    let x = e.clientX||vw/2, y = e.clientY||vh/2;
+    if(x+500>vw) x=vw-500; if(y+320>vh) y=vh-320;
+    if(x<10) x=10; if(y<10) y=10;
+    popup.style.left=x+'px'; popup.style.top=y+'px';
   }
-  setTimeout(()=>document.getElementById('qn-text').focus(), 60);
+  setTimeout(()=>document.getElementById('qn-text').focus(),60);
 }
 
 function closeQuickNote(){
@@ -1146,17 +1143,22 @@ function closeQuickNote(){
 async function saveQuickNote(){
   const newNote = document.getElementById('qn-text').value.trim();
   if(!newNote){ closeQuickNote(); return; }
-  const l = leads.find(x=>x.id===quickNoteId);
-  if(!l) return;
   const now = new Date();
-  const stamp = '[' + (now.getMonth()+1).toString().padStart(2,'0') + '/' + now.getDate().toString().padStart(2,'0') + '/' + now.getFullYear().toString().slice(2) + '] ';
+  const stamp = '['+(now.getMonth()+1).toString().padStart(2,'0')+'/'+now.getDate().toString().padStart(2,'0')+'/'+now.getFullYear().toString().slice(2)+'] ';
   const stamped = stamp + newNote;
-  l.notes = l.notes ? stamped + '\n' + l.notes : stamped;
-  closeQuickNote();
-  render();
-  isSaving=true;
-  await saveLead_db(l);
-  isSaving=false;
+  if(quickNoteIsWin){
+    const w = wins.find(x=>x.id===quickNoteId);
+    if(!w) return;
+    w.winNotes = w.winNotes ? stamped+'\n'+w.winNotes : stamped;
+    closeQuickNote(); renderWins();
+    isSaving=true; await saveWin_db(w); isSaving=false;
+  } else {
+    const l = leads.find(x=>x.id===quickNoteId);
+    if(!l) return;
+    l.notes = l.notes ? stamped+'\n'+l.notes : stamped;
+    closeQuickNote(); render();
+    isSaving=true; await saveLead_db(l); isSaving=false;
+  }
 }
 
 async function deleteLead(id){
