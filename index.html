@@ -288,6 +288,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
 .section-toggle-mob .section-btn{flex:1;height:38px;border-radius:0;font-size:13px;}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
 <div id="loading-overlay" style="display:none;position:fixed;inset:0;background:rgba(1,2,12,0.88);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:16px;backdrop-filter:blur(8px)">
@@ -428,6 +429,38 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
     <div class="stat"><div class="stat-bg"></div><div class="stat-label">Total units</div><div class="stat-val" id="sw-units">0</div></div>
     <div class="stat"><div class="stat-bg"></div><div class="stat-label">This month</div><div class="stat-val" id="sw-month">0</div></div>
     <div class="stat"><div class="stat-bg"></div><div class="stat-label">This year</div><div class="stat-val" id="sw-year">0</div></div>
+  </div>
+  <!-- Wins trend chart -->
+  <div id="wins-chart-section" style="background:rgba(3,4,15,0.7);backdrop-filter:blur(20px);border-bottom:1px solid var(--b);padding:24px 28px;position:relative;z-index:2;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div>
+        <div style="font-size:11px;font-weight:800;letter-spacing:.13em;color:var(--ink3);text-transform:uppercase;margin-bottom:4px">Win Trend</div>
+        <div style="font-size:13px;color:var(--ink2)">Monthly wins — last 12 months</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button id="chart-toggle-count" class="btn btn-ghost btn-sm" onclick="setChartMode('count')" style="min-height:28px">Count</button>
+        <button id="chart-toggle-units" class="btn btn-ghost btn-sm" onclick="setChartMode('units')" style="min-height:28px">Units</button>
+      </div>
+    </div>
+    <div style="height:200px;position:relative"><canvas id="wins-chart"></canvas></div>
+  </div>
+  <!-- Property order history -->
+  <div id="wins-prop-section" style="background:rgba(3,4,15,0.7);backdrop-filter:blur(20px);border-bottom:1px solid var(--b);padding:24px 28px;position:relative;z-index:2;">
+    <div id="prop-chart-prompt" style="text-align:center;padding:16px 0 8px;color:var(--ink4);font-size:13px">
+      <div style="font-size:28px;margin-bottom:8px">🏢</div>
+      Click any property name in the table below to view its order history.
+    </div>
+    <div id="prop-chart-content" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div>
+          <div style="font-size:11px;font-weight:800;letter-spacing:.13em;color:var(--ink3);text-transform:uppercase;margin-bottom:4px">Order History</div>
+          <div style="font-size:16px;font-weight:700;color:var(--ink)" id="prop-chart-company"></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="clearPropertyChart()" style="min-height:28px;font-size:11px">✕ Clear</button>
+      </div>
+      <div style="height:180px;position:relative"><canvas id="wins-prop-chart"></canvas></div>
+      <div id="prop-chart-summary" style="display:flex;gap:24px;flex-wrap:wrap;margin-top:14px;font-size:12px;color:var(--ink3)"></div>
+    </div>
   </div>
   <!-- Wins tabs -->
   <div class="tabs-wrap wins-tabs" id="wins-tabs"></div>
@@ -948,7 +981,7 @@ function renderWinsStats(){
 function sortWinsBy(col){if(wSortCol===col)wSortDir*=-1;else{wSortCol=col;wSortDir=1;}renderWins();}
 
 function renderWins(){
-  renderWinsTabs();renderWinsStats();updateWinsBadge();
+  renderWinsTabs();renderWinsStats();updateWinsBadge();renderWinsChart();if(selectedPropertyForChart)renderPropertyChart();
   const q=document.getElementById('wins-search').value.toLowerCase();
   const fwm=document.getElementById('filter-wins-mgmt')?.value||'';
   const wMgmtSelect=document.getElementById('filter-wins-mgmt');
@@ -981,7 +1014,7 @@ function renderWins(){
     const note=w.winNotes||'';
     const dateStr=w.wonDate?new Date(w.wonDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
     return`<tr>
-      <td><div class="co-name">${esc(w.company)}</div>${w.address?'<div class="co-addr">'+esc(w.address)+'</div>':''}</td>
+      <td><div class="co-name" onclick="selectPropertyChart('${w.company.replace(/'/g,"\\'")}') " style="cursor:pointer" onmouseover="this.style.color='var(--green)'" onmouseout="this.style.color=''">${esc(w.company)}</div>${w.address?'<div class="co-addr">'+esc(w.address)+'</div>':''}</td>
       <td class="hide-mob" style="color:var(--ink2)">${esc(w.contact)||'<span class="muted">—</span>'}</td>
       <td class="hide-mob" style="color:var(--ink2)">${esc(w.phone)||'<span class="muted">—</span>'}</td>
       <td style="text-align:right;font-weight:800;color:var(--ink)">${w.units||'<span class="muted" style="font-weight:400">—</span>'}</td>
@@ -1245,7 +1278,109 @@ async function saveWinEdit(){
   closeModal('win-edit-modal');renderWins();
   isSaving=true;await saveWin_db(w);isSaving=false;
 }
-  
+// ── Wins charts ──
+let winsChart=null,chartMode='count';
+function linReg(data){
+  const n=data.length;if(n<2)return data.map(()=>0);
+  const sumX=data.reduce((_,__,i)=>_+i,0),sumY=data.reduce((a,b)=>a+b,0);
+  const sumXY=data.reduce((s,v,i)=>s+i*v,0),sumXX=data.reduce((s,_,i)=>s+i*i,0);
+  const slope=(n*sumXY-sumX*sumY)/(n*sumXX-sumX*sumX);
+  const int=(sumY-slope*sumX)/n;
+  return data.map((_,i)=>Math.max(0,+(int+slope*i).toFixed(2)));
+}
+function setChartMode(mode){chartMode=mode;renderWinsChart();}
+function renderWinsChart(){
+  const canvas=document.getElementById('wins-chart');if(!canvas)return;
+  const now=new Date();
+  const months=[];
+  for(let i=11;i>=0;i--){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    months.push({key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,label:d.toLocaleDateString('en-US',{month:'short',year:'2-digit'}),count:0,units:0});
+  }
+  wins.forEach(w=>{if(!w.wonDate)return;const m=months.find(x=>x.key===w.wonDate.slice(0,7));if(m){m.count++;m.units+=parseInt(w.units)||0;}});
+  const data=months.map(m=>chartMode==='count'?m.count:m.units);
+  if(winsChart){winsChart.destroy();winsChart=null;}
+  const ctx=canvas.getContext('2d');
+  const grad=ctx.createLinearGradient(0,0,0,200);
+  grad.addColorStop(0,'rgba(0,255,179,0.35)');grad.addColorStop(1,'rgba(0,255,179,0.02)');
+  winsChart=new Chart(ctx,{
+    data:{labels:months.map(m=>m.label),datasets:[
+      {type:'bar',data,backgroundColor:grad,borderColor:'rgba(0,255,179,0.7)',borderWidth:1.5,borderRadius:6,borderSkipped:false,order:2},
+      {type:'line',data:linReg(data),borderColor:'rgba(255,215,0,0.75)',borderWidth:2,borderDash:[5,4],pointRadius:0,fill:false,tension:0.4,order:1}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(8,10,26,0.95)',borderColor:'rgba(0,255,179,0.4)',borderWidth:1,titleColor:'#fff',bodyColor:'#8AAACE',
+        callbacks:{label:c=>c.datasetIndex===0?(chartMode==='count'?`${c.raw} win${c.raw!==1?'s':''}`:`${c.raw} units`):'trend'}}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#8AAACE',font:{size:11,family:'Inter'}},border:{color:'rgba(255,255,255,0.08)'}},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#8AAACE',font:{size:11,family:'Inter'},stepSize:1},border:{color:'rgba(255,255,255,0.08)'},beginAtZero:true}
+      }
+    }
+  });
+  ['count','units'].forEach(m=>{
+    const btn=document.getElementById('chart-toggle-'+m);if(!btn)return;
+    btn.style.background=chartMode===m?'rgba(0,255,179,0.15)':'';
+    btn.style.borderColor=chartMode===m?'rgba(0,255,179,0.4)':'';
+    btn.style.color=chartMode===m?'var(--green)':'';
+  });
+}
+let selectedPropertyForChart=null,propertyChart=null;
+function clearPropertyChart(){
+  selectedPropertyForChart=null;
+  document.getElementById('prop-chart-prompt').style.display='block';
+  document.getElementById('prop-chart-content').style.display='none';
+  if(propertyChart){propertyChart.destroy();propertyChart=null;}
+}
+function selectPropertyChart(company){
+  selectedPropertyForChart=company;
+  document.getElementById('prop-chart-company').textContent=company;
+  document.getElementById('prop-chart-prompt').style.display='none';
+  document.getElementById('prop-chart-content').style.display='block';
+  renderPropertyChart();
+  document.getElementById('wins-prop-section').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function renderPropertyChart(){
+  if(!selectedPropertyForChart)return;
+  const canvas=document.getElementById('wins-prop-chart');if(!canvas)return;
+  const orders=wins.filter(w=>w.company===selectedPropertyForChart)
+    .sort((a,b)=>(a.wonDate||'').localeCompare(b.wonDate||''));
+  if(!orders.length)return;
+  const now=new Date();
+  const first=orders[0].wonDate?new Date(orders[0].wonDate+'T12:00:00'):new Date();
+  const months=[];
+  let d=new Date(first.getFullYear(),first.getMonth(),1);
+  const end=new Date(now.getFullYear(),now.getMonth(),1);
+  while(d<=end){
+    const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    months.push({key,label:d.toLocaleDateString('en-US',{month:'short',year:'2-digit'}),orders:[]});
+    d=new Date(d.getFullYear(),d.getMonth()+1,1);
+  }
+  orders.forEach(o=>{if(!o.wonDate)return;const m=months.find(x=>x.key===o.wonDate.slice(0,7));if(m)m.orders.push(o);});
+  const data=months.map(m=>m.orders.length);
+  const bg=data.map(v=>v>0?'rgba(0,255,179,0.55)':'rgba(255,255,255,0.04)');
+  const bd=data.map(v=>v>0?'rgba(0,255,179,0.85)':'rgba(255,255,255,0.07)');
+  if(propertyChart){propertyChart.destroy();propertyChart=null;}
+  propertyChart=new Chart(document.getElementById('wins-prop-chart').getContext('2d'),{
+    type:'bar',
+    data:{labels:months.map(m=>m.label),datasets:[{data,backgroundColor:bg,borderColor:bd,borderWidth:1.5,borderRadius:5,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(8,10,26,0.95)',borderColor:'rgba(0,255,179,0.4)',borderWidth:1,titleColor:'#fff',bodyColor:'#8AAACE',
+        callbacks:{title:items=>months[items[0].dataIndex].label,
+          label:items=>{const m=months[items[0].dataIndex];if(!m.orders.length)return'No orders this month';
+            return m.orders.map(o=>`Order${o.wonDate?' — '+o.wonDate:''}${o.units?' · '+o.units+' units':''}`);}}}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#8AAACE',font:{size:11,family:'Inter'}},border:{color:'rgba(255,255,255,0.08)'}},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#8AAACE',font:{size:11,family:'Inter'},stepSize:1,precision:0},border:{color:'rgba(255,255,255,0.08)'},beginAtZero:true,
+          title:{display:true,text:'Orders',color:'#8AAACE',font:{size:10,family:'Inter',weight:'700'}}}
+      }
+    }
+  });
+  const fmt=d=>d?new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
+  document.getElementById('prop-chart-summary').innerHTML=`
+    <span>📋 <strong style="color:var(--green)">${orders.length}</strong> order${orders.length!==1?'s':''}</span>
+    <span>📅 First: <strong style="color:var(--ink2)">${fmt(orders[0].wonDate)}</strong></span>
+    <span>📅 Latest: <strong style="color:var(--ink2)">${fmt(orders[orders.length-1].wonDate)}</strong></span>`;
+}  
 loadAll();
 </script>
 <!-- Loading overlay -->
