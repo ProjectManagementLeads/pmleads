@@ -425,10 +425,10 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
   </div>
   <!-- Wins stats -->
   <div class="stats-bar wins-stats-bar" id="wins-stats-bar">
-    <div class="stat"><div class="stat-bg"></div><div class="stat-label">Total wins</div><div class="stat-val" id="sw-total">0</div></div>
-    <div class="stat"><div class="stat-bg"></div><div class="stat-label">Total units</div><div class="stat-val" id="sw-units">0</div></div>
-    <div class="stat"><div class="stat-bg"></div><div class="stat-label">This month</div><div class="stat-val" id="sw-month">0</div></div>
-    <div class="stat"><div class="stat-bg"></div><div class="stat-label">This year</div><div class="stat-val" id="sw-year">0</div></div>
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label" id="sw-label-1">Total wins</div><div class="stat-val" id="sw-total">0</div></div>
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label" id="sw-label-2">Wins this month</div><div class="stat-val" id="sw-units">0</div></div>
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label" id="sw-label-3">Wins this year</div><div class="stat-val" id="sw-month">0</div></div>
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label" id="sw-label-4">Total installs</div><div class="stat-val" id="sw-year">0</div></div>
   </div>
   <!-- Wins trend chart -->
   <div id="wins-chart-section" style="background:rgba(3,4,15,0.7);backdrop-filter:blur(20px);border-bottom:1px solid var(--b);padding:24px 28px;position:relative;z-index:2;">
@@ -439,10 +439,11 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
       </div>
       <div style="display:flex;gap:8px">
         <button id="chart-toggle-count" class="btn btn-ghost btn-sm" onclick="setChartMode('count')" style="min-height:28px">Count</button>
-        <button id="chart-toggle-units" class="btn btn-ghost btn-sm" onclick="setChartMode('units')" style="min-height:28px">Units</button>
+        <button id="chart-toggle-units" class="btn btn-ghost btn-sm" onclick="setChartMode('units')" style="min-height:28px">Installs</button>
       </div>
     </div>
     <div style="height:200px;position:relative"><canvas id="wins-chart"></canvas></div>
+    <div id="chart-month-detail" style="display:none;margin-top:16px;border-top:1px solid rgba(255,255,255,0.07);padding-top:16px"></div>
   </div>
   <!-- Property order history -->
   <div id="wins-prop-section" style="background:rgba(3,4,15,0.7);backdrop-filter:blur(20px);border-bottom:1px solid var(--b);padding:24px 28px;position:relative;z-index:2;">
@@ -460,6 +461,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
       </div>
       <div style="height:180px;position:relative"><canvas id="wins-prop-chart"></canvas></div>
       <div id="prop-chart-summary" style="display:flex;gap:24px;flex-wrap:wrap;margin-top:14px;font-size:12px;color:var(--ink3)"></div>
+      <div id="prop-orders-list" style="margin-top:12px"></div>
     </div>
   </div>
   <!-- Wins tabs -->
@@ -490,6 +492,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
             <th onclick="sortWinsBy('units')" style="text-align:right">Units <span id="warr-units"></span></th>
             <th onclick="sortWinsBy('area')">Area <span id="warr-area"></span></th>
             <th onclick="sortWinsBy('wonDate')">Won date <span id="warr-wonDate"></span></th>
+            <th style="text-align:right">Installs</th>
             <th class="hide-mob">Notes</th>
             <th></th>
           </tr>
@@ -606,6 +609,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
       <div style="font-size:12px;color:var(--ink3);margin-top:4px" id="win-modal-detail"></div>
     </div>
     <div class="field" style="position:relative;z-index:1"><label>Win date</label><input type="date" id="win-date"></div>
+    <div class="field" style="position:relative;z-index:1"><label>Installs ordered</label><input type="number" id="win-installs" min="0" placeholder="e.g. 48"></div>
     <div class="field" style="position:relative;z-index:1"><label>Win notes (optional)</label><textarea id="win-notes" placeholder="e.g. Signed 2-year contract, 120 units…" style="min-height:72px"></textarea></div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('win-modal')">Cancel</button>
@@ -634,8 +638,9 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
     <div class="field"><label>Management company</label><input id="we-mgmt" list="we-mgmt-suggestions" autocomplete="off"><datalist id="we-mgmt-suggestions"></datalist></div>
     <div class="field-row">
       <div class="field"><label>Unit count</label><input id="we-units" type="number" min="0"></div>
-      <div class="field"><label>Property style</label><input id="we-style"></div>
+      <div class="field"><label>Installs ordered</label><input id="we-installs" type="number" min="0"></div>
     </div>
+    <div class="field"><label>Property style</label><input id="we-style"></div>
     <div class="field-row">
       <div class="field"><label>Area</label><select id="we-area"></select></div>
       <div class="field"><label>Won date</label><input type="date" id="we-wonDate"></div>
@@ -644,9 +649,32 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('win-edit-modal')">Cancel</button>
       <button class="btn btn-green" onclick="saveWinEdit()">Save win</button>
-    </div>
+</div>
   </div>
-</div>  
+</div>
+<!-- ADD ORDER MODAL -->
+<div class="overlay" id="order-modal" onclick="bgClose(event,'order-modal')">
+    <div class="modal" style="max-width:420px">
+      <div class="modal-header">
+        <span class="modal-title" style="background:linear-gradient(90deg,var(--cyan),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">New Install Order</span>
+        <button class="modal-close" onclick="closeModal('order-modal')">×</button>
+      </div>
+      <p class="modal-sub">Log a new install order for this property. It will appear in the correct month on the chart.</p>
+      <div style="background:rgba(0,255,255,0.06);border:1px solid rgba(0,255,255,0.2);border-radius:12px;padding:14px 16px;margin-bottom:20px;position:relative;z-index:1">
+        <div style="font-size:16px;font-weight:800;color:var(--ink)" id="order-modal-name"></div>
+      </div>
+      <div class="field" style="position:relative;z-index:1"><label>Order date</label><input type="date" id="order-date"></div>
+      <div class="field" style="position:relative;z-index:1"><label>Installs ordered</label><input type="number" id="order-installs" min="0" placeholder="e.g. 12"></div>
+      <div class="field" style="position:relative;z-index:1"><label>Notes (optional)</label><textarea id="order-notes" placeholder="e.g. Summer turn package…" style="min-height:64px"></textarea></div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('order-modal')">Cancel</button>
+        <button class="btn btn-green" onclick="confirmAddOrder()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Order
+        </button>
+      </div>
+    </div>
+  </div> 
   
 <script>
 // ── Stars ──
@@ -691,8 +719,8 @@ function hideLoading(){const el=document.getElementById('loading-overlay');if(el
 // ── DB mappers ──
 function dbToLead(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,style:r.style||'',area:r.area||'Other',status:r.status||'New',notes:r.notes||'',mgmt:r.mgmt||''};}
 function leadToDB(l){return{id:l.id,company:l.company,contact:l.contact,phone:l.phone,email:l.email,address:l.address,units:l.units||0,style:l.style,area:l.area,status:l.status,notes:l.notes,mgmt:l.mgmt||''};}
-function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||'',mgmt:r.mgmt||''};}
-function winToDB(w){return{id:w.id,company:w.company,contact:w.contact,phone:w.phone,email:w.email,address:w.address,units:w.units||0,style:w.style,area:w.area,won_date:w.wonDate,win_notes:w.winNotes,mgmt:w.mgmt||''};}
+function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,installs:r.installs||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||'',mgmt:r.mgmt||''};}
+function winToDB(w){return{id:w.id,company:w.company,contact:w.contact,phone:w.phone,email:w.email,address:w.address,units:w.units||0,installs:w.installs||0,style:w.style,area:w.area,won_date:w.wonDate,win_notes:w.winNotes,mgmt:w.mgmt||''};}
 
 // ── Supabase CRUD ──
 async function saveLead_db(obj){try{await sb.from('leads').upsert(leadToDB(obj));}catch(e){console.error('saveLead_db',e);}}
@@ -778,7 +806,8 @@ function setSection(s){
 // ── Wins badge count ──
 function updateWinsBadge(){
   const badge=document.getElementById('wins-badge');
-  if(wins.length>0){badge.style.display='inline';badge.textContent=wins.length;}
+  const count=[...new Set(wins.map(w=>w.company))].length;
+  if(count>0){badge.style.display='inline';badge.textContent=count;}
   else badge.style.display='none';
 }
 
@@ -789,13 +818,14 @@ function openWinModal(id){
   document.getElementById('win-modal-name').textContent=l.company;
   document.getElementById('win-modal-detail').textContent=[l.area,l.units?l.units+' units':'',l.style].filter(Boolean).join(' · ');
   document.getElementById('win-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('win-installs').value='';
   document.getElementById('win-notes').value=l.notes||'';
   document.getElementById('win-modal').classList.add('open');
 }
 
 async function confirmMoveToWins(){
   const l=leads.find(x=>x.id===winTargetId);if(!l)return;
-  const win={...l,wonDate:document.getElementById('win-date').value,winNotes:document.getElementById('win-notes').value.trim(),id:l.id};
+  const win={...l,wonDate:document.getElementById('win-date').value,installs:parseInt(document.getElementById('win-installs').value)||0,winNotes:document.getElementById('win-notes').value.trim(),id:l.id};
   wins.unshift(win);
   leads=leads.filter(x=>x.id!==winTargetId);
   const wid=winTargetId;
@@ -812,24 +842,28 @@ async function confirmMoveToWins(){
   isSaving=false;
 }
 
-async function removeWin(id){
-  if(!confirm('Remove this win? This cannot be undone.'))return;
-  wins=wins.filter(x=>x.id!==id);
+async function removeWin(company){
+  const toDelete=wins.filter(x=>x.company===company);
+  const extra=toDelete.length>1?` and ${toDelete.length-1} order${toDelete.length-1!==1?'s':''}`:''
+  if(!confirm(`Remove "${company}"${extra}? This cannot be undone.`))return;
+  wins=wins.filter(x=>x.company!==company);
   renderWins();updateWinsBadge();
-  await deleteWin_db(id);
+  for(const w of toDelete)await deleteWin_db(w.id);
 }
 
 async function moveWinBackToLeads(id){
-  const w=wins.find(x=>x.id===id);if(!w)return;
-  const lead={...w,status:'Qualified'};
+  const primary=wins.find(x=>x.id===id);if(!primary)return;
+  const company=primary.company;
+  const allForCompany=wins.filter(x=>x.company===company);
+  const lead={...primary,status:'Qualified'};
   delete lead.wonDate;delete lead.winNotes;
   leads.unshift(lead);
-  wins=wins.filter(x=>x.id!==id);
+  wins=wins.filter(x=>x.company!==company);
   renderWins();updateWinsBadge();render();
   isSaving=true;
   try{
     await saveLead_db(lead);
-    await deleteWin_db(id);
+    for(const w of allForCompany)await deleteWin_db(w.id);
   }catch(e){console.error('moveBackToLeads error',e);}
   isSaving=false;
 }
@@ -952,10 +986,21 @@ function render(){
 }
 
 // ── Wins render ──
+function getWinGroups(winsArray){
+  const map={};
+  winsArray.forEach(w=>{if(!map[w.company])map[w.company]=[];map[w.company].push(w);});
+  return Object.values(map).map(records=>{
+    const sorted=[...records].sort((a,b)=>(a.wonDate||'').localeCompare(b.wonDate||''));
+    const primary=sorted[0];
+    const totalInstalls=records.reduce((t,r)=>t+(parseInt(r.installs)||0),0);
+    return{primary,records,totalInstalls};
+  });
+}
 function renderWinsTabs(){
-  const counts={};wins.forEach(w=>counts[w.area]=(counts[w.area]||0)+1);
+  const groups=getWinGroups(wins);
+  const counts={};groups.forEach(g=>counts[g.primary.area]=(counts[g.primary.area]||0)+1);
   document.getElementById('wins-tabs').innerHTML=["All Areas",...areas].map(a=>{
-    const cnt=a==="All Areas"?wins.length:(counts[a]||0);
+    const cnt=a==="All Areas"?groups.length:(counts[a]||0);
     const act=activeWinArea===a?' active':'';
     const badge=cnt>0?`<span class="tab-cnt">${cnt}</span>`:'';
     return`<button class="tab${act}" onclick="setWinArea('${a.replace(/'/g,"\\'")}')"> ${esc(a)}${badge}</button>`;
@@ -965,17 +1010,41 @@ function setWinArea(a){activeWinArea=a;renderWins();}
 
 function renderWinsStats(){
   const now=new Date();
-  const s=activeWinArea==="All Areas"?wins:wins.filter(w=>w.area===activeWinArea);
-  document.getElementById('sw-total').textContent=s.length;
-  document.getElementById('sw-units').textContent=s.reduce((t,w)=>t+(parseInt(w.units)||0),0).toLocaleString();
-  document.getElementById('sw-month').textContent=s.filter(w=>{
-    if(!w.wonDate)return false;
-    const d=new Date(w.wonDate);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
-  }).length;
-  document.getElementById('sw-year').textContent=s.filter(w=>{
-    if(!w.wonDate)return false;
-    return new Date(w.wonDate).getFullYear()===now.getFullYear();
-  }).length;
+  const allGroups=getWinGroups(wins);
+  const s=activeWinArea==="All Areas"?allGroups:allGroups.filter(g=>g.primary.area===activeWinArea);
+  const filteredWins=activeWinArea==="All Areas"?wins:wins.filter(w=>w.area===activeWinArea);
+  const totalInstalls=s.reduce((t,g)=>t+g.totalInstalls,0);
+  if(chartMode==='count'){
+    document.getElementById('sw-label-1').textContent='Total wins';
+    document.getElementById('sw-label-2').textContent='Wins this month';
+    document.getElementById('sw-label-3').textContent='Wins this year';
+    document.getElementById('sw-label-4').textContent='Total installs';
+    document.getElementById('sw-total').textContent=s.length;
+    document.getElementById('sw-units').textContent=s.filter(g=>{
+      if(!g.primary.wonDate)return false;
+      const d=new Date(g.primary.wonDate);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+    }).length;
+    document.getElementById('sw-month').textContent=s.filter(g=>{
+      if(!g.primary.wonDate)return false;
+      return new Date(g.primary.wonDate).getFullYear()===now.getFullYear();
+    }).length;
+    document.getElementById('sw-year').textContent=totalInstalls.toLocaleString();
+  } else {
+    document.getElementById('sw-label-1').textContent='Total installs';
+    document.getElementById('sw-label-2').textContent='Installs this month';
+    document.getElementById('sw-label-3').textContent='Installs this year';
+    document.getElementById('sw-label-4').textContent='Avg per win';
+    document.getElementById('sw-total').textContent=totalInstalls.toLocaleString();
+    document.getElementById('sw-units').textContent=filteredWins.filter(w=>{
+      if(!w.wonDate)return false;
+      const d=new Date(w.wonDate);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+    }).reduce((t,w)=>t+(parseInt(w.installs)||0),0).toLocaleString();
+    document.getElementById('sw-month').textContent=filteredWins.filter(w=>{
+      if(!w.wonDate)return false;
+      return new Date(w.wonDate).getFullYear()===now.getFullYear();
+    }).reduce((t,w)=>t+(parseInt(w.installs)||0),0).toLocaleString();
+    document.getElementById('sw-year').textContent=s.length?Math.round(totalInstalls/s.length).toLocaleString():'0';
+  }
 }
 
 function sortWinsBy(col){if(wSortCol===col)wSortDir*=-1;else{wSortCol=col;wSortDir=1;}renderWins();}
@@ -990,27 +1059,29 @@ function renderWins(){
     const mgmtList=[...new Set([...leads,...wins].map(x=>x.mgmt).filter(Boolean))].sort();
     wMgmtSelect.innerHTML='<option value="">All companies</option>'+mgmtList.map(m=>`<option value="${esc(m)}"${m===cur?' selected':''}>${esc(m)}</option>`).join('');
   }
-  let rows=wins.filter(w=>{
-    if(activeWinArea!=="All Areas"&&w.area!==activeWinArea)return false;
-    if(fwm&&w.mgmt!==fwm)return false;
-    if(q&&!(w.company+w.contact+(w.winNotes||'')+(w.mgmt||'')).toLowerCase().includes(q))return false;
+  const propGroups=getWinGroups(wins).filter(g=>{
+    const p=g.primary;
+    if(activeWinArea!=="All Areas"&&p.area!==activeWinArea)return false;
+    if(fwm&&p.mgmt!==fwm)return false;
+    if(q&&!(p.company+p.contact+(p.winNotes||'')+(p.mgmt||'')).toLowerCase().includes(q))return false;
     return true;
   }).sort((a,b)=>{
-    if(wSortCol==='units')return((a.units||0)-(b.units||0))*wSortDir;
-    if(wSortCol==='wonDate')return((a.wonDate||'').localeCompare(b.wonDate||''))*wSortDir;
-    return(a[wSortCol]||'').toString().localeCompare((b[wSortCol]||'').toString())*wSortDir;
+    const pa=a.primary,pb=b.primary;
+    if(wSortCol==='units')return((pa.units||0)-(pb.units||0))*wSortDir;
+    if(wSortCol==='wonDate')return((pa.wonDate||'').localeCompare(pb.wonDate||''))*wSortDir;
+    return(pa[wSortCol]||'').toString().localeCompare((pb[wSortCol]||'').toString())*wSortDir;
   });
   ['company','contact','units','area','wonDate','mgmt'].forEach(c=>{const el=document.getElementById('warr-'+c);if(el)el.textContent=wSortCol===c?(wSortDir===1?' ↑':' ↓'):'';});
   const tb=document.getElementById('wins-tbody');
-  if(!rows.length){
-    tb.innerHTML=`<tr><td colspan="8"><div class="empty">
+  if(!propGroups.length){
+    tb.innerHTML=`<tr><td colspan="9"><div class="empty">
       <span class="empty-icon-wrap" style="font-size:52px;display:block;margin-bottom:18px;animation:empty-bounce 3s ease-in-out infinite">🏆</span>
       <div class="empty-title" style="background:linear-gradient(90deg,var(--green),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent">${wins.length?'No wins match your filter':'No wins yet'}</div>
       <div class="empty-sub">${wins.length?'Try adjusting your search.':'Hit the "Win" button on a lead to record a closed deal.'}</div>
     </div></td></tr>`;
     return;
   }
-  tb.innerHTML=rows.map(w=>{
+  tb.innerHTML=propGroups.map(({primary:w,totalInstalls})=>{
     const note=w.winNotes||'';
     const dateStr=w.wonDate?new Date(w.wonDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
     return`<tr>
@@ -1022,6 +1093,7 @@ function renderWins(){
       <td><span class="win-badge">
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/><path d="M4 22h16"/></svg>
         ${dateStr}</span></td>
+        <td style="text-align:right;font-weight:800;color:var(--green)">${totalInstalls||'<span class="muted" style="font-weight:400">—</span>'}</td>
       <td class="hide-mob notes-cell" onclick="openQuickNote('${w.id}', event, true)" style="font-size:12px;color:var(--ink3);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:14px 18px" title="${note?note:'Tap to add note'}">
         ${note
           ? `<span style="display:flex;align-items:center;gap:5px">${esc(note.split('\n')[0])}<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;opacity:0.4"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>`
@@ -1031,8 +1103,9 @@ function renderWins(){
       <td style="white-space:nowrap">
         <div style="display:flex;gap:6px;align-items:center">
           <button class="btn btn-ghost btn-sm" onclick="moveWinBackToLeads('${w.id}')" style="min-height:34px;touch-action:manipulation;background:rgba(0,255,179,0.08);border-color:rgba(0,255,179,0.3);color:var(--green)">↩ Pipeline</button>
+          <button class="btn btn-ghost btn-sm" onclick="openAddOrder('${w.id}')" style="min-height:34px;touch-action:manipulation;background:rgba(0,255,255,0.08);border-color:rgba(0,255,255,0.3);color:var(--cyan)">+ Order</button>
           <button class="btn btn-ghost btn-sm" onclick="openEditWin('${w.id}')" style="min-height:34px;touch-action:manipulation">Edit</button>
-          <button class="btn-danger-sm" onclick="removeWin('${w.id}')" style="min-height:34px;min-width:34px;touch-action:manipulation">✕</button>
+          <button class="btn-danger-sm" onclick="removeWin('${w.company.replace(/'/g,"\\'")}') " style="min-height:34px;min-width:34px;touch-action:manipulation">✕</button>
         </div>
     </td>
     </tr>`;
@@ -1254,6 +1327,7 @@ function openEditWin(id){
   document.getElementById('we-address').value=w.address||'';
   document.getElementById('we-mgmt').value=w.mgmt||'';
   document.getElementById('we-units').value=w.units||'';
+  document.getElementById('we-installs').value=w.installs||'';
   document.getElementById('we-style').value=w.style||'';
   document.getElementById('we-area').value=w.area||areas[0];
   document.getElementById('we-wonDate').value=w.wonDate||'';
@@ -1271,6 +1345,7 @@ async function saveWinEdit(){
   w.address=document.getElementById('we-address').value.trim();
   w.mgmt=document.getElementById('we-mgmt').value.trim();
   w.units=parseInt(document.getElementById('we-units').value)||0;
+  w.installs=parseInt(document.getElementById('we-installs').value)||0;
   w.style=document.getElementById('we-style').value.trim();
   w.area=document.getElementById('we-area').value;
   w.wonDate=document.getElementById('we-wonDate').value;
@@ -1288,7 +1363,7 @@ function linReg(data){
   const int=(sumY-slope*sumX)/n;
   return data.map((_,i)=>Math.max(0,+(int+slope*i).toFixed(2)));
 }
-function setChartMode(mode){chartMode=mode;renderWinsChart();}
+function setChartMode(mode){chartMode=mode;renderWinsChart();renderWinsStats();}
 function renderWinsChart(){
   const canvas=document.getElementById('wins-chart');if(!canvas)return;
   const now=new Date();
@@ -1297,9 +1372,13 @@ function renderWinsChart(){
     const d=new Date(now.getFullYear(),now.getMonth()-i,1);
     months.push({key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,label:d.toLocaleDateString('en-US',{month:'short',year:'2-digit'}),count:0,units:0});
   }
-  wins.forEach(w=>{if(!w.wonDate)return;const m=months.find(x=>x.key===w.wonDate.slice(0,7));if(m){m.count++;m.units+=parseInt(w.units)||0;}});
+  const primaryDates={};
+  wins.forEach(w=>{if(!w.wonDate)return;if(!primaryDates[w.company]||w.wonDate<primaryDates[w.company])primaryDates[w.company]=w.wonDate;});
+  Object.values(primaryDates).forEach(date=>{const m=months.find(x=>x.key===date.slice(0,7));if(m)m.count++;});
+  wins.forEach(w=>{if(!w.wonDate)return;const m=months.find(x=>x.key===w.wonDate.slice(0,7));if(m)m.units+=parseInt(w.installs)||0;});
   const data=months.map(m=>chartMode==='count'?m.count:m.units);
   if(winsChart){winsChart.destroy();winsChart=null;}
+  const detailEl=document.getElementById('chart-month-detail');if(detailEl)detailEl.style.display='none';
   const ctx=canvas.getContext('2d');
   const grad=ctx.createLinearGradient(0,0,0,200);
   grad.addColorStop(0,'rgba(0,255,179,0.35)');grad.addColorStop(1,'rgba(0,255,179,0.02)');
@@ -1309,8 +1388,10 @@ function renderWinsChart(){
       {type:'line',data:linReg(data),borderColor:'rgba(255,215,0,0.75)',borderWidth:2,borderDash:[5,4],pointRadius:0,fill:false,tension:0.4,order:1}
     ]},
     options:{responsive:true,maintainAspectRatio:false,
+      onClick:(evt,elements)=>{if(elements.length){const m=months[elements[0].index];showMonthDetail(m,wins.filter(w=>w.wonDate&&w.wonDate.slice(0,7)===m.key));}},
+      onHover:(evt,elements)=>{evt.native.target.style.cursor=elements.length?'pointer':'default';},
       plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(8,10,26,0.95)',borderColor:'rgba(0,255,179,0.4)',borderWidth:1,titleColor:'#fff',bodyColor:'#8AAACE',
-        callbacks:{label:c=>c.datasetIndex===0?(chartMode==='count'?`${c.raw} win${c.raw!==1?'s':''}`:`${c.raw} units`):'trend'}}},
+        callbacks:{label:c=>c.datasetIndex===0?(chartMode==='count'?`${c.raw} win${c.raw!==1?'s':''}`:`${c.raw} install${c.raw!==1?'s':''}`):'trend'}}},
       scales:{
         x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#8AAACE',font:{size:11,family:'Inter'}},border:{color:'rgba(255,255,255,0.08)'}},
         y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#8AAACE',font:{size:11,family:'Inter'},stepSize:1},border:{color:'rgba(255,255,255,0.08)'},beginAtZero:true}
@@ -1324,6 +1405,27 @@ function renderWinsChart(){
     btn.style.color=chartMode===m?'var(--green)':'';
   });
 }
+function showMonthDetail(month,monthWins){
+  const el=document.getElementById('chart-month-detail');if(!el)return;
+  if(!monthWins.length){el.style.display='none';return;}
+  const fmt=d=>d?new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
+  const totalInstalls=monthWins.reduce((t,w)=>t+(parseInt(w.installs)||0),0);
+  el.innerHTML=`
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:800;letter-spacing:.13em;color:var(--ink3);text-transform:uppercase">${month.label} — ${monthWins.length} win${monthWins.length!==1?'s':''}</div>
+      ${totalInstalls?`<div style="font-size:12px;font-weight:800;color:var(--green)">${totalInstalls} total install${totalInstalls!==1?'s':''}</div>`:''}
+    </div>`+
+    monthWins.map(w=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:8px">
+        <div style="flex:1;min-width:0">
+          <div class="co-name" onclick="selectPropertyChart('${w.company.replace(/'/g,"\\'")}') " style="cursor:pointer;font-size:13px" onmouseover="this.style.color='var(--green)'" onmouseout="this.style.color=''">${esc(w.company)}</div>
+          ${w.winNotes?`<div style="font-size:11px;color:var(--ink3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(w.winNotes.split('\n')[0])}</div>`:''}
+        </div>
+        ${w.installs?`<span style="font-size:12px;font-weight:800;color:var(--green);flex-shrink:0">${w.installs} install${w.installs!==1?'s':''}</span>`:'<span style="font-size:11px;color:var(--ink4);flex-shrink:0">no installs logged</span>'}
+        <span class="win-badge" style="font-size:10px;flex-shrink:0">${fmt(w.wonDate)}</span>
+      </div>`).join('');
+  el.style.display='block';
+}  
 let selectedPropertyForChart=null,propertyChart=null;
 function clearPropertyChart(){
   selectedPropertyForChart=null;
@@ -1342,7 +1444,7 @@ function selectPropertyChart(company){
 function renderPropertyChart(){
   if(!selectedPropertyForChart)return;
   const canvas=document.getElementById('wins-prop-chart');if(!canvas)return;
-  const orders=wins.filter(w=>w.company===selectedPropertyForChart)
+  const orders=wins.filter(w=>w.company===selectedPropertyForChart&&((parseInt(w.installs)||0)>0||w.wonDate))
     .sort((a,b)=>(a.wonDate||'').localeCompare(b.wonDate||''));
   if(!orders.length)return;
   const now=new Date();
@@ -1356,7 +1458,7 @@ function renderPropertyChart(){
     d=new Date(d.getFullYear(),d.getMonth()+1,1);
   }
   orders.forEach(o=>{if(!o.wonDate)return;const m=months.find(x=>x.key===o.wonDate.slice(0,7));if(m)m.orders.push(o);});
-  const data=months.map(m=>m.orders.length);
+  const data=months.map(m=>m.orders.reduce((t,o)=>t+(parseInt(o.installs)||0),0));
   const bg=data.map(v=>v>0?'rgba(0,255,179,0.55)':'rgba(255,255,255,0.04)');
   const bd=data.map(v=>v>0?'rgba(0,255,179,0.85)':'rgba(255,255,255,0.07)');
   if(propertyChart){propertyChart.destroy();propertyChart=null;}
@@ -1364,23 +1466,79 @@ function renderPropertyChart(){
     type:'bar',
     data:{labels:months.map(m=>m.label),datasets:[{data,backgroundColor:bg,borderColor:bd,borderWidth:1.5,borderRadius:5,borderSkipped:false}]},
     options:{responsive:true,maintainAspectRatio:false,
+      onClick:(evt,elements)=>{if(elements.length){const m=months[elements[0].index];showMonthDetail(m,wins.filter(w=>w.wonDate&&w.wonDate.slice(0,7)===m.key));}},
+      onHover:(evt,elements)=>{evt.native.target.style.cursor=elements.length?'pointer':'default';},
       plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(8,10,26,0.95)',borderColor:'rgba(0,255,179,0.4)',borderWidth:1,titleColor:'#fff',bodyColor:'#8AAACE',
         callbacks:{title:items=>months[items[0].dataIndex].label,
           label:items=>{const m=months[items[0].dataIndex];if(!m.orders.length)return'No orders this month';
-            return m.orders.map(o=>`Order${o.wonDate?' — '+o.wonDate:''}${o.units?' · '+o.units+' units':''}`);}}}},
+            const tot=m.orders.reduce((t,o)=>t+(parseInt(o.installs)||0),0);
+            return[`${tot} install${tot!==1?'s':''} total`,...m.orders.map(o=>`  • ${o.wonDate||'?'}${o.installs?' — '+o.installs+' install'+(parseInt(o.installs)!==1?'s':''):''}`)];},}}},
       scales:{
         x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#8AAACE',font:{size:11,family:'Inter'}},border:{color:'rgba(255,255,255,0.08)'}},
         y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#8AAACE',font:{size:11,family:'Inter'},stepSize:1,precision:0},border:{color:'rgba(255,255,255,0.08)'},beginAtZero:true,
-          title:{display:true,text:'Orders',color:'#8AAACE',font:{size:10,family:'Inter',weight:'700'}}}
+          title:{display:true,text:'Installs',color:'#8AAACE',font:{size:10,family:'Inter',weight:'700'}}}
       }
     }
   });
   const fmt=d=>d?new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
+  const totalInstalls=orders.reduce((t,o)=>t+(parseInt(o.installs)||0),0);
   document.getElementById('prop-chart-summary').innerHTML=`
     <span>📋 <strong style="color:var(--green)">${orders.length}</strong> order${orders.length!==1?'s':''}</span>
+    ${totalInstalls?`<span>🔧 <strong style="color:var(--green)">${totalInstalls}</strong> total install${totalInstalls!==1?'s':''}</span>`:''}
     <span>📅 First: <strong style="color:var(--ink2)">${fmt(orders[0].wonDate)}</strong></span>
     <span>📅 Latest: <strong style="color:var(--ink2)">${fmt(orders[orders.length-1].wonDate)}</strong></span>`;
+  document.getElementById('prop-orders-list').innerHTML=
+    `<div style="font-size:10px;font-weight:800;letter-spacing:.13em;color:var(--ink4);text-transform:uppercase;margin-bottom:8px">Orders</div>`+
+    orders.map(o=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:9px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:6px">
+      <div style="flex:1;min-width:0">
+        <span style="font-size:12px;font-weight:700;color:var(--ink)">${fmt(o.wonDate)}</span>
+        ${o.winNotes?`<span style="font-size:11px;color:var(--ink4);margin-left:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(o.winNotes.split('\n')[0])}</span>`:''}
+      </div>
+      <span style="font-size:12px;font-weight:800;color:var(--green);flex-shrink:0">${o.installs||0} install${parseInt(o.installs)!==1?'s':''}</span>
+      <button onclick="deleteOrder('${o.id}')" style="background:rgba(255,68,102,0.1);border:1px solid rgba(255,68,102,0.3);color:var(--pink);font-size:11px;font-weight:700;font-family:inherit;padding:3px 10px;border-radius:7px;cursor:pointer;flex-shrink:0" onmouseover="this.style.background='rgba(255,68,102,0.2)'" onmouseout="this.style.background='rgba(255,68,102,0.1)'">Delete</button>
+    </div>`).join('');
+}
+let orderSourceId=null;
+function openAddOrder(id){
+  const w=wins.find(x=>x.id===id);if(!w)return;
+  orderSourceId=id;
+  document.getElementById('order-modal-name').textContent=w.company;
+  document.getElementById('order-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('order-installs').value='';
+  document.getElementById('order-notes').value='';
+  document.getElementById('order-modal').classList.add('open');
+}
+async function confirmAddOrder(){
+  const src=wins.find(x=>x.id===orderSourceId);if(!src)return;
+  const installs=parseInt(document.getElementById('order-installs').value)||0;
+  const date=document.getElementById('order-date').value;
+  if(!date){document.getElementById('order-date').focus();return;}
+  if(!installs){document.getElementById('order-installs').focus();return;}
+  const newOrder={...src,id:Date.now()+'',wonDate:date,installs:installs,winNotes:document.getElementById('order-notes').value.trim()};
+  wins.unshift(newOrder);
+  closeModal('order-modal');
+  orderSourceId=null;
+  renderWins();updateWinsBadge();
+  isSaving=true;await saveWin_db(newOrder);isSaving=false;
 }  
+async function deleteOrder(id){
+  const order=wins.find(w=>w.id===id);if(!order)return;
+  const company=order.company;
+  const allForCompany=wins.filter(w=>w.company===company);
+  if(!confirm(`Delete order from ${order.wonDate||'no date'} (${order.installs||0} installs)?`))return;
+  if(allForCompany.length<=1){
+    order.installs=0;order.wonDate='';order.winNotes='';
+    renderWins();updateWinsBadge();
+    if(selectedPropertyForChart===company)renderPropertyChart();
+    isSaving=true;try{await saveWin_db(order);}catch(e){console.error(e);}isSaving=false;
+  } else {
+    wins=wins.filter(w=>w.id!==id);
+    renderWins();updateWinsBadge();
+    if(selectedPropertyForChart===company)renderPropertyChart();
+    isSaving=true;try{await deleteWin_db(id);}catch(e){console.error(e);}isSaving=false;
+  }
+}
 loadAll();
 </script>
 <!-- Loading overlay -->
