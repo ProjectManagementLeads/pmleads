@@ -1371,7 +1371,8 @@ function linReg(data){
   return data.map((_,i)=>Math.max(0,+(int+slope*i).toFixed(2)));
 }
 function setChartMode(mode){chartMode=mode;renderWinsChart();renderWinsStats();}
-const stackTotalPlugin={id:'stackTotal',afterDatasetsDraw(chart){const{ctx,data,scales:{x,y}}=chart;const totals=data.labels.map((_,i)=>data.datasets.reduce((s,ds)=>s+(ds.type==='line'?0:(ds.data[i]||0)),0));ctx.save();ctx.font='800 11px Inter';ctx.textAlign='center';ctx.fillStyle='#00FFB3';ctx.shadowColor='rgba(0,255,179,0.8)';ctx.shadowBlur=8;totals.forEach((t,i)=>{if(!t)return;const xp=x.getPixelForValue(i),yp=y.getPixelForValue(t);ctx.fillText(t,xp,yp-15);});ctx.shadowBlur=0;
+const stackTotalPlugin={id:'stackTotal',afterDatasetsDraw(chart){const{ctx,data,scales:{x,y}}=chart;const totals=data.labels.map((_,i)=>data.datasets.reduce((s,ds)=>s+(ds.type==='line'?0:(ds.data[i]||0)),0));ctx.save();ctx.font='800 11px Inter';ctx.textAlign='center';ctx.fillStyle='#00FFB3';ctx.shadowColor='rgba(0,255,179,0.8)';ctx.shadowBlur=8;totals.forEach((t,i)=>{if(!t)return;const xp=x.getPixelForValue(i),yp=y.getPixelForValue(t);ctx.fillText(t,xp,yp-15);});ctx.shadowBlur=0;ctx.restore();}};
+function renderWinsChart(){
   const canvas=document.getElementById('wins-chart');if(!canvas)return;
   const now=new Date();
   const months=[];
