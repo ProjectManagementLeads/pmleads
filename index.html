@@ -1396,17 +1396,16 @@ function renderWinsChart(){
     const grad=ctx.createLinearGradient(0,0,0,200);
     grad.addColorStop(0,'rgba(0,255,179,0.35)');grad.addColorStop(1,'rgba(0,255,179,0.02)');
     datasets=[
-      {type:'bar',data,backgroundColor:grad,borderColor:'rgba(0,255,179,0.7)',borderWidth:1.5,borderRadius:6,borderSkipped:false,order:2},
+      {type:'bar',data,backgroundColor:grad,borderColor:'rgba(0,255,179,0.7)',borderWidth:1.5,borderRadius:{topLeft:5,topRight:5,bottomLeft:0,bottomRight:0},borderSkipped:false,order:2},
       {type:'line',data:linReg(data),borderColor:'rgba(255,215,0,0.75)',borderWidth:2,borderDash:[5,4],pointRadius:0,fill:false,tension:0.4,order:1}
     ];
     stacked=false;
   } else {
     const totalData=months.map(m=>m.carpet+m.hard||m.units);
     datasets=[
-      {type:'bar',data:months.map(m=>m.carpet),label:'Carpet',backgroundColor:'rgba(0,255,179,0.55)',borderColor:'rgba(0,255,179,0.7)',borderWidth:{top:0,right:1.5,bottom:1.5,left:1.5},borderRadius:0,borderSkipped:false,stack:'s',order:2},
+      {type:'bar',data:months.map(m=>m.carpet),label:'Carpet',backgroundColor:'rgba(0,255,179,0.25)',borderColor:'rgba(0,255,179,0.5)',borderWidth:{top:0,right:1.5,bottom:1.5,left:1.5},borderRadius:0,borderSkipped:false,stack:'s',order:2},
       {type:'bar',data:months.map(m=>m.hard),label:'Hard Surface',backgroundColor:'rgba(255,0,110,0.45)',borderColor:'rgba(255,0,110,0.65)',borderWidth:{top:1.5,right:1.5,bottom:0,left:1.5},borderRadius:{topLeft:5,topRight:5,bottomLeft:0,bottomRight:0},borderSkipped:false,stack:'s',order:2},
-      {type:'bar',data:months.map(m=>m.carpet+m.hard>0?0:m.units),label:'Legacy',backgroundColor:'rgba(153,0,255,0.45)',borderColor:'rgba(153,0,255,0.65)',borderWidth:1.5,borderRadius:5,borderSkipped:false,stack:'s',order:2},
-      {type:'line',data:linReg(totalData),borderColor:'rgba(255,215,0,0.75)',borderWidth:2,borderDash:[5,4],pointRadius:0,fill:false,tension:0.4,order:1}
+      {type:'bar',data:months.map(m=>m.carpet+m.hard>0?0:m.units),label:'Legacy',backgroundColor:'rgba(153,0,255,0.45)',borderColor:'rgba(153,0,255,0.65)',borderWidth:1.5,borderRadius:{topLeft:5,topRight:5,bottomLeft:0,bottomRight:0},borderSkipped:false,stack:'s',order:2},      {type:'line',data:linReg(totalData),borderColor:'rgba(255,215,0,0.75)',borderWidth:2,borderDash:[5,4],pointRadius:0,fill:false,tension:0.4,order:1}
     ];
     stacked=true;
   }
@@ -1436,11 +1435,16 @@ function showMonthDetail(month,monthWins){
   const el=document.getElementById('chart-month-detail');if(!el)return;
   if(!monthWins.length){el.style.display='none';return;}
   const fmt=d=>d?new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
-  const totalInstalls=monthWins.reduce((t,w)=>t+(parseInt(w.installs)||0),0);
+  const totalCarpet=monthWins.reduce((t,w)=>t+(parseInt(w.carpet)||0),0);
+  const totalHard=monthWins.reduce((t,w)=>t+(parseInt(w.hard)||0),0);
+  const totalInstalls=totalCarpet+totalHard||monthWins.reduce((t,w)=>t+(parseInt(w.installs)||0),0);
+  const installBreakdown=totalCarpet>0||totalHard>0
+    ?`<span style="color:var(--green)">${totalCarpet}C</span> <span style="color:var(--ink4)">/</span> <span style="color:var(--pink)">${totalHard}H</span> <span style="color:var(--ink3)">(${totalInstalls} total)</span>`
+    :`${totalInstalls} total install${totalInstalls!==1?'s':''}`;
   el.innerHTML=`
     <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px">
       <div style="font-size:11px;font-weight:800;letter-spacing:.13em;color:var(--ink3);text-transform:uppercase">${month.label} — ${monthWins.length} win${monthWins.length!==1?'s':''}</div>
-      ${totalInstalls?`<div style="font-size:12px;font-weight:800;color:var(--green)">${totalInstalls} total install${totalInstalls!==1?'s':''}</div>`:''}
+      ${totalInstalls?`<div style="font-size:12px;font-weight:800">${installBreakdown}</div>`:''}
     </div>`+
     monthWins.map(w=>`
       <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:8px">
@@ -1492,10 +1496,9 @@ function renderPropertyChart(){
   propertyChart=new Chart(document.getElementById('wins-prop-chart').getContext('2d'),{
     type:'bar',
     data:{labels:months.map(m=>m.label),datasets:[
-      {data:carpetData,label:'Carpet',backgroundColor:'rgba(0,255,179,0.55)',borderColor:'rgba(0,255,179,0.85)',borderWidth:{top:0,right:1.5,bottom:1.5,left:1.5},borderRadius:0,borderSkipped:false,stack:'s'},
+      {data:carpetData,label:'Carpet',backgroundColor:'rgba(0,255,179,0.25)',borderColor:'rgba(0,255,179,0.5)',borderWidth:{top:0,right:1.5,bottom:1.5,left:1.5},borderRadius:0,borderSkipped:false,stack:'s'},
       {data:hardData,label:'Hard Surface',backgroundColor:'rgba(255,0,110,0.45)',borderColor:'rgba(255,0,110,0.7)',borderWidth:{top:1.5,right:1.5,bottom:0,left:1.5},borderRadius:{topLeft:5,topRight:5,bottomLeft:0,bottomRight:0},borderSkipped:false,stack:'s'},
-      {data:months.map((m,i)=>carpetData[i]+hardData[i]>0?0:totalData[i]),label:'Legacy',backgroundColor:'rgba(153,0,255,0.45)',borderColor:'rgba(153,0,255,0.65)',borderWidth:1.5,borderRadius:5,borderSkipped:false,stack:'s'}
-    ]},
+      {data:months.map((m,i)=>carpetData[i]+hardData[i]>0?0:totalData[i]),label:'Legacy',backgroundColor:'rgba(153,0,255,0.45)',borderColor:'rgba(153,0,255,0.65)',borderWidth:1.5,borderRadius:{topLeft:5,topRight:5,bottomLeft:0,bottomRight:0},borderSkipped:false,stack:'s'}    ]},
     options:{responsive:true,maintainAspectRatio:false,
       onClick:(evt,elements)=>{if(elements.length){const m=months[elements[0].index];showMonthDetail(m,wins.filter(w=>w.wonDate&&w.wonDate.slice(0,7)===m.key));}},
       onHover:(evt,elements)=>{evt.native.target.style.cursor=elements.length?'pointer':'default';},
