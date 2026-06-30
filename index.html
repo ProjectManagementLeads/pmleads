@@ -609,7 +609,10 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
       <div style="font-size:12px;color:var(--ink3);margin-top:4px" id="win-modal-detail"></div>
     </div>
     <div class="field" style="position:relative;z-index:1"><label>Win date</label><input type="date" id="win-date"></div>
-    <div class="field" style="position:relative;z-index:1"><label>Installs ordered</label><input type="number" id="win-installs" min="0" placeholder="e.g. 48"></div>
+    <div class="field-row" style="position:relative;z-index:1">
+      <div class="field"><label>Carpet</label><input type="number" id="win-carpet" min="0" placeholder="e.g. 24"></div>
+      <div class="field"><label>Hard Surface</label><input type="number" id="win-hard" min="0" placeholder="e.g. 24"></div>
+    </div>
     <div class="field" style="position:relative;z-index:1"><label>Win notes (optional)</label><textarea id="win-notes" placeholder="e.g. Signed 2-year contract, 120 units…" style="min-height:72px"></textarea></div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('win-modal')">Cancel</button>
@@ -636,9 +639,10 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
     <div class="field"><label>Email</label><input id="we-email" type="email"></div>
     <div class="field"><label>Physical address</label><input id="we-address"></div>
     <div class="field"><label>Management company</label><input id="we-mgmt" list="we-mgmt-suggestions" autocomplete="off"><datalist id="we-mgmt-suggestions"></datalist></div>
+    <div class="field"><label>Unit count</label><input id="we-units" type="number" min="0"></div>
     <div class="field-row">
-      <div class="field"><label>Unit count</label><input id="we-units" type="number" min="0"></div>
-      <div class="field"><label>Installs ordered</label><input id="we-installs" type="number" min="0"></div>
+      <div class="field"><label>Carpet</label><input id="we-carpet" type="number" min="0"></div>
+      <div class="field"><label>Hard Surface</label><input id="we-hard" type="number" min="0"></div>
     </div>
     <div class="field"><label>Property style</label><input id="we-style"></div>
     <div class="field-row">
@@ -664,7 +668,10 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
         <div style="font-size:16px;font-weight:800;color:var(--ink)" id="order-modal-name"></div>
       </div>
       <div class="field" style="position:relative;z-index:1"><label>Order date</label><input type="date" id="order-date"></div>
-      <div class="field" style="position:relative;z-index:1"><label>Installs ordered</label><input type="number" id="order-installs" min="0" placeholder="e.g. 12"></div>
+      <div class="field-row" style="position:relative;z-index:1">
+        <div class="field"><label>Carpet</label><input type="number" id="order-carpet" min="0" placeholder="e.g. 12"></div>
+        <div class="field"><label>Hard Surface</label><input type="number" id="order-hard" min="0" placeholder="e.g. 12"></div>
+      </div>
       <div class="field" style="position:relative;z-index:1"><label>Notes (optional)</label><textarea id="order-notes" placeholder="e.g. Summer turn package…" style="min-height:64px"></textarea></div>
       <div class="modal-actions">
         <button class="btn btn-ghost" onclick="closeModal('order-modal')">Cancel</button>
@@ -719,9 +726,8 @@ function hideLoading(){const el=document.getElementById('loading-overlay');if(el
 // ── DB mappers ──
 function dbToLead(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,style:r.style||'',area:r.area||'Other',status:r.status||'New',notes:r.notes||'',mgmt:r.mgmt||''};}
 function leadToDB(l){return{id:l.id,company:l.company,contact:l.contact,phone:l.phone,email:l.email,address:l.address,units:l.units||0,style:l.style,area:l.area,status:l.status,notes:l.notes,mgmt:l.mgmt||''};}
-function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,installs:r.installs||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||'',mgmt:r.mgmt||''};}
-function winToDB(w){return{id:w.id,company:w.company,contact:w.contact,phone:w.phone,email:w.email,address:w.address,units:w.units||0,installs:w.installs||0,style:w.style,area:w.area,won_date:w.wonDate,win_notes:w.winNotes,mgmt:w.mgmt||''};}
-
+function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,installs:r.installs||0,carpet:r.carpet||0,hard:r.hard||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||'',mgmt:r.mgmt||''};}
+function winToDB(w){return{id:w.id,company:w.company,contact:w.contact,phone:w.phone,email:w.email,address:w.address,units:w.units||0,installs:w.installs||0,carpet:w.carpet||0,hard:w.hard||0,style:w.style,area:w.area,won_date:w.wonDate,win_notes:w.winNotes,mgmt:w.mgmt||''};}
 // ── Supabase CRUD ──
 async function saveLead_db(obj){try{await sb.from('leads').upsert(leadToDB(obj));}catch(e){console.error('saveLead_db',e);}}
 async function deleteLead_db(id){try{await sb.from('leads').delete().eq('id',id);}catch(e){console.error('deleteLead_db',e);}}
@@ -817,15 +823,18 @@ function openWinModal(id){
   winTargetId=id;
   document.getElementById('win-modal-name').textContent=l.company;
   document.getElementById('win-modal-detail').textContent=[l.area,l.units?l.units+' units':'',l.style].filter(Boolean).join(' · ');
-  document.getElementById('win-date').value=new Date().toISOString().split('T')[0];
-  document.getElementById('win-installs').value='';
+document.getElementById('win-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('win-carpet').value='';
+  document.getElementById('win-hard').value='';
   document.getElementById('win-notes').value=l.notes||'';
   document.getElementById('win-modal').classList.add('open');
 }
 
 async function confirmMoveToWins(){
   const l=leads.find(x=>x.id===winTargetId);if(!l)return;
-  const win={...l,wonDate:document.getElementById('win-date').value,installs:parseInt(document.getElementById('win-installs').value)||0,winNotes:document.getElementById('win-notes').value.trim(),id:l.id};
+  const carpet=parseInt(document.getElementById('win-carpet').value)||0;
+  const hard=parseInt(document.getElementById('win-hard').value)||0;
+  const win={...l,wonDate:document.getElementById('win-date').value,carpet,hard,installs:carpet+hard,winNotes:document.getElementById('win-notes').value.trim(),id:l.id};
   wins.unshift(win);
   leads=leads.filter(x=>x.id!==winTargetId);
   const wid=winTargetId;
@@ -992,8 +1001,10 @@ function getWinGroups(winsArray){
   return Object.values(map).map(records=>{
     const sorted=[...records].sort((a,b)=>(a.wonDate||'').localeCompare(b.wonDate||''));
     const primary=sorted[0];
-    const totalInstalls=records.reduce((t,r)=>t+(parseInt(r.installs)||0),0);
-    return{primary,records,totalInstalls};
+    const totalCarpet=records.reduce((t,r)=>t+(parseInt(r.carpet)||0),0);
+    const totalHard=records.reduce((t,r)=>t+(parseInt(r.hard)||0),0);
+    const totalInstalls=totalCarpet+totalHard||records.reduce((t,r)=>t+(parseInt(r.installs)||0),0);
+    return{primary,records,totalInstalls,totalCarpet,totalHard};
   });
 }
 function renderWinsTabs(){
@@ -1029,20 +1040,14 @@ function renderWinsStats(){
       return new Date(g.primary.wonDate).getFullYear()===now.getFullYear();
     }).length;
     document.getElementById('sw-year').textContent=totalInstalls.toLocaleString();
-  } else {
+ } else {
     document.getElementById('sw-label-1').textContent='Total installs';
-    document.getElementById('sw-label-2').textContent='Installs this month';
-    document.getElementById('sw-label-3').textContent='Installs this year';
+    document.getElementById('sw-label-2').textContent='Total carpet';
+    document.getElementById('sw-label-3').textContent='Total hard surface';
     document.getElementById('sw-label-4').textContent='Avg per win';
     document.getElementById('sw-total').textContent=totalInstalls.toLocaleString();
-    document.getElementById('sw-units').textContent=filteredWins.filter(w=>{
-      if(!w.wonDate)return false;
-      const d=new Date(w.wonDate);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
-    }).reduce((t,w)=>t+(parseInt(w.installs)||0),0).toLocaleString();
-    document.getElementById('sw-month').textContent=filteredWins.filter(w=>{
-      if(!w.wonDate)return false;
-      return new Date(w.wonDate).getFullYear()===now.getFullYear();
-    }).reduce((t,w)=>t+(parseInt(w.installs)||0),0).toLocaleString();
+    document.getElementById('sw-units').textContent=s.reduce((t,g)=>t+g.totalCarpet,0).toLocaleString();
+    document.getElementById('sw-month').textContent=s.reduce((t,g)=>t+g.totalHard,0).toLocaleString();
     document.getElementById('sw-year').textContent=s.length?Math.round(totalInstalls/s.length).toLocaleString():'0';
   }
 }
@@ -1081,7 +1086,7 @@ function renderWins(){
     </div></td></tr>`;
     return;
   }
-  tb.innerHTML=propGroups.map(({primary:w,totalInstalls})=>{
+  tb.innerHTML=propGroups.map(({primary:w,totalInstalls,totalCarpet,totalHard})=>{
     const note=w.winNotes||'';
     const dateStr=w.wonDate?new Date(w.wonDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
     return`<tr>
@@ -1093,7 +1098,7 @@ function renderWins(){
       <td><span class="win-badge">
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/><path d="M4 22h16"/></svg>
         ${dateStr}</span></td>
-        <td style="text-align:right;font-weight:800;color:var(--green)">${totalInstalls||'<span class="muted" style="font-weight:400">—</span>'}</td>
+        <td style="text-align:right;font-weight:800">${(()=>{if(totalCarpet>0||totalHard>0){const p=[];if(totalCarpet>0)p.push(`<span style="color:var(--green)">${totalCarpet}C</span>`);if(totalHard>0)p.push(`<span style="color:var(--cyan2)">${totalHard}H</span>`);return p.join(' <span style="color:var(--ink4);font-weight:400">/</span> ');}return totalInstalls?`<span style="color:var(--green)">${totalInstalls}</span>`:'<span class="muted" style="font-weight:400">—</span>';})()}</td>
       <td class="hide-mob notes-cell" onclick="openQuickNote('${w.id}', event, true)" style="font-size:12px;color:var(--ink3);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:14px 18px" title="${note?note:'Tap to add note'}">
         ${note
           ? `<span style="display:flex;align-items:center;gap:5px">${esc(note.split('\n')[0])}<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;opacity:0.4"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>`
@@ -1327,7 +1332,8 @@ function openEditWin(id){
   document.getElementById('we-address').value=w.address||'';
   document.getElementById('we-mgmt').value=w.mgmt||'';
   document.getElementById('we-units').value=w.units||'';
-  document.getElementById('we-installs').value=w.installs||'';
+  document.getElementById('we-carpet').value=w.carpet||'';
+  document.getElementById('we-hard').value=w.hard||'';
   document.getElementById('we-style').value=w.style||'';
   document.getElementById('we-area').value=w.area||areas[0];
   document.getElementById('we-wonDate').value=w.wonDate||'';
@@ -1345,7 +1351,9 @@ async function saveWinEdit(){
   w.address=document.getElementById('we-address').value.trim();
   w.mgmt=document.getElementById('we-mgmt').value.trim();
   w.units=parseInt(document.getElementById('we-units').value)||0;
-  w.installs=parseInt(document.getElementById('we-installs').value)||0;
+  w.carpet=parseInt(document.getElementById('we-carpet').value)||0;
+  w.hard=parseInt(document.getElementById('we-hard').value)||0;
+  w.installs=w.carpet+w.hard;
   w.style=document.getElementById('we-style').value.trim();
   w.area=document.getElementById('we-area').value;
   w.wonDate=document.getElementById('we-wonDate').value;
@@ -1370,31 +1378,50 @@ function renderWinsChart(){
   const months=[];
   for(let i=11;i>=0;i--){
     const d=new Date(now.getFullYear(),now.getMonth()-i,1);
-    months.push({key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,label:d.toLocaleDateString('en-US',{month:'short',year:'2-digit'}),count:0,units:0});
+    months.push({key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,label:d.toLocaleDateString('en-US',{month:'short',year:'2-digit'}),count:0,carpet:0,hard:0,units:0});
   }
   const primaryDates={};
   wins.forEach(w=>{if(!w.wonDate)return;if(!primaryDates[w.company]||w.wonDate<primaryDates[w.company])primaryDates[w.company]=w.wonDate;});
   Object.values(primaryDates).forEach(date=>{const m=months.find(x=>x.key===date.slice(0,7));if(m)m.count++;});
-  wins.forEach(w=>{if(!w.wonDate)return;const m=months.find(x=>x.key===w.wonDate.slice(0,7));if(m)m.units+=parseInt(w.installs)||0;});
-  const data=months.map(m=>chartMode==='count'?m.count:m.units);
+  wins.forEach(w=>{
+    if(!w.wonDate)return;
+    const m=months.find(x=>x.key===w.wonDate.slice(0,7));
+    if(m){const c=parseInt(w.carpet)||0,h=parseInt(w.hard)||0;m.carpet+=c;m.hard+=h;m.units+=c+h||(parseInt(w.installs)||0);}
+  });
   if(winsChart){winsChart.destroy();winsChart=null;}
   const detailEl=document.getElementById('chart-month-detail');if(detailEl)detailEl.style.display='none';
   const ctx=canvas.getContext('2d');
-  const grad=ctx.createLinearGradient(0,0,0,200);
-  grad.addColorStop(0,'rgba(0,255,179,0.35)');grad.addColorStop(1,'rgba(0,255,179,0.02)');
-  winsChart=new Chart(ctx,{
-    data:{labels:months.map(m=>m.label),datasets:[
+  let datasets,stacked;
+  if(chartMode==='count'){
+    const data=months.map(m=>m.count);
+    const grad=ctx.createLinearGradient(0,0,0,200);
+    grad.addColorStop(0,'rgba(0,255,179,0.35)');grad.addColorStop(1,'rgba(0,255,179,0.02)');
+    datasets=[
       {type:'bar',data,backgroundColor:grad,borderColor:'rgba(0,255,179,0.7)',borderWidth:1.5,borderRadius:6,borderSkipped:false,order:2},
       {type:'line',data:linReg(data),borderColor:'rgba(255,215,0,0.75)',borderWidth:2,borderDash:[5,4],pointRadius:0,fill:false,tension:0.4,order:1}
-    ]},
+    ];
+    stacked=false;
+  } else {
+    const totalData=months.map(m=>m.carpet+m.hard||m.units);
+    datasets=[
+      {type:'bar',data:months.map(m=>m.carpet),label:'Carpet',backgroundColor:'rgba(0,255,179,0.55)',borderColor:'rgba(0,255,179,0.7)',borderWidth:1.5,borderRadius:0,borderSkipped:false,stack:'s',order:2},
+      {type:'bar',data:months.map(m=>m.hard),label:'Hard Surface',backgroundColor:'rgba(0,200,255,0.45)',borderColor:'rgba(0,200,255,0.65)',borderWidth:1.5,borderRadius:5,borderSkipped:false,stack:'s',order:2},
+      {type:'line',data:linReg(totalData),borderColor:'rgba(255,215,0,0.75)',borderWidth:2,borderDash:[5,4],pointRadius:0,fill:false,tension:0.4,order:1}
+    ];
+    stacked=true;
+  }
+  winsChart=new Chart(ctx,{
+    data:{labels:months.map(m=>m.label),datasets},
     options:{responsive:true,maintainAspectRatio:false,
       onClick:(evt,elements)=>{if(elements.length){const m=months[elements[0].index];showMonthDetail(m,wins.filter(w=>w.wonDate&&w.wonDate.slice(0,7)===m.key));}},
       onHover:(evt,elements)=>{evt.native.target.style.cursor=elements.length?'pointer':'default';},
-      plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(8,10,26,0.95)',borderColor:'rgba(0,255,179,0.4)',borderWidth:1,titleColor:'#fff',bodyColor:'#8AAACE',
-        callbacks:{label:c=>c.datasetIndex===0?(chartMode==='count'?`${c.raw} win${c.raw!==1?'s':''}`:`${c.raw} install${c.raw!==1?'s':''}`):'trend'}}},
+      plugins:{
+        legend:{display:stacked,labels:{color:'#8AAACE',font:{size:11,family:'Inter'},boxWidth:12,padding:16}},
+        tooltip:{backgroundColor:'rgba(8,10,26,0.95)',borderColor:'rgba(0,255,179,0.4)',borderWidth:1,titleColor:'#fff',bodyColor:'#8AAACE',
+          callbacks:{label:c=>c.dataset.type==='line'?'trend':chartMode==='count'?`${c.raw} win${c.raw!==1?'s':''}`:c.raw+' '+c.dataset.label}}},
       scales:{
-        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#8AAACE',font:{size:11,family:'Inter'}},border:{color:'rgba(255,255,255,0.08)'}},
-        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#8AAACE',font:{size:11,family:'Inter'},stepSize:1},border:{color:'rgba(255,255,255,0.08)'},beginAtZero:true}
+        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#8AAACE',font:{size:11,family:'Inter'}},border:{color:'rgba(255,255,255,0.08)'},stacked},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#8AAACE',font:{size:11,family:'Inter'},stepSize:1},border:{color:'rgba(255,255,255,0.08)'},beginAtZero:true,stacked}
       }
     }
   });
@@ -1458,24 +1485,27 @@ function renderPropertyChart(){
     d=new Date(d.getFullYear(),d.getMonth()+1,1);
   }
   orders.forEach(o=>{if(!o.wonDate)return;const m=months.find(x=>x.key===o.wonDate.slice(0,7));if(m)m.orders.push(o);});
-  const data=months.map(m=>m.orders.reduce((t,o)=>t+(parseInt(o.installs)||0),0));
-  const bg=data.map(v=>v>0?'rgba(0,255,179,0.55)':'rgba(255,255,255,0.04)');
-  const bd=data.map(v=>v>0?'rgba(0,255,179,0.85)':'rgba(255,255,255,0.07)');
+  const carpetData=months.map(m=>m.orders.reduce((t,o)=>t+(parseInt(o.carpet)||0),0));
+  const hardData=months.map(m=>m.orders.reduce((t,o)=>t+(parseInt(o.hard)||0),0));
+  const totalData=months.map((m,i)=>carpetData[i]+hardData[i]||m.orders.reduce((t,o)=>t+(parseInt(o.installs)||0),0));
   if(propertyChart){propertyChart.destroy();propertyChart=null;}
   propertyChart=new Chart(document.getElementById('wins-prop-chart').getContext('2d'),{
     type:'bar',
-    data:{labels:months.map(m=>m.label),datasets:[{data,backgroundColor:bg,borderColor:bd,borderWidth:1.5,borderRadius:5,borderSkipped:false}]},
+    data:{labels:months.map(m=>m.label),datasets:[
+      {data:carpetData,label:'Carpet',backgroundColor:'rgba(0,255,179,0.55)',borderColor:'rgba(0,255,179,0.85)',borderWidth:1.5,borderRadius:0,borderSkipped:false,stack:'s'},
+      {data:hardData,label:'Hard Surface',backgroundColor:'rgba(0,200,255,0.45)',borderColor:'rgba(0,200,255,0.7)',borderWidth:1.5,borderRadius:5,borderSkipped:false,stack:'s'}
+    ]},
     options:{responsive:true,maintainAspectRatio:false,
       onClick:(evt,elements)=>{if(elements.length){const m=months[elements[0].index];showMonthDetail(m,wins.filter(w=>w.wonDate&&w.wonDate.slice(0,7)===m.key));}},
       onHover:(evt,elements)=>{evt.native.target.style.cursor=elements.length?'pointer':'default';},
-      plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(8,10,26,0.95)',borderColor:'rgba(0,255,179,0.4)',borderWidth:1,titleColor:'#fff',bodyColor:'#8AAACE',
+      plugins:{legend:{display:true,labels:{color:'#8AAACE',font:{size:11,family:'Inter'},boxWidth:12,padding:12}},tooltip:{backgroundColor:'rgba(8,10,26,0.95)',borderColor:'rgba(0,255,179,0.4)',borderWidth:1,titleColor:'#fff',bodyColor:'#8AAACE',
         callbacks:{title:items=>months[items[0].dataIndex].label,
           label:items=>{const m=months[items[0].dataIndex];if(!m.orders.length)return'No orders this month';
             const tot=m.orders.reduce((t,o)=>t+(parseInt(o.installs)||0),0);
             return[`${tot} install${tot!==1?'s':''} total`,...m.orders.map(o=>`  • ${o.wonDate||'?'}${o.installs?' — '+o.installs+' install'+(parseInt(o.installs)!==1?'s':''):''}`)];},}}},
       scales:{
-        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#8AAACE',font:{size:11,family:'Inter'}},border:{color:'rgba(255,255,255,0.08)'}},
-        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#8AAACE',font:{size:11,family:'Inter'},stepSize:1,precision:0},border:{color:'rgba(255,255,255,0.08)'},beginAtZero:true,
+        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#8AAACE',font:{size:11,family:'Inter'}},border:{color:'rgba(255,255,255,0.08)'},stacked:true},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#8AAACE',font:{size:11,family:'Inter'},stepSize:1,precision:0},border:{color:'rgba(255,255,255,0.08)'},beginAtZero:true,stacked:true,
           title:{display:true,text:'Installs',color:'#8AAACE',font:{size:10,family:'Inter',weight:'700'}}}
       }
     }
@@ -1505,17 +1535,19 @@ function openAddOrder(id){
   orderSourceId=id;
   document.getElementById('order-modal-name').textContent=w.company;
   document.getElementById('order-date').value=new Date().toISOString().split('T')[0];
-  document.getElementById('order-installs').value='';
+  document.getElementById('order-carpet').value='';
+  document.getElementById('order-hard').value='';
   document.getElementById('order-notes').value='';
   document.getElementById('order-modal').classList.add('open');
 }
 async function confirmAddOrder(){
   const src=wins.find(x=>x.id===orderSourceId);if(!src)return;
-  const installs=parseInt(document.getElementById('order-installs').value)||0;
+  const carpet=parseInt(document.getElementById('order-carpet').value)||0;
+  const hard=parseInt(document.getElementById('order-hard').value)||0;
   const date=document.getElementById('order-date').value;
   if(!date){document.getElementById('order-date').focus();return;}
-  if(!installs){document.getElementById('order-installs').focus();return;}
-  const newOrder={...src,id:Date.now()+'',wonDate:date,installs:installs,winNotes:document.getElementById('order-notes').value.trim()};
+  if(!carpet&&!hard){document.getElementById('order-carpet').focus();return;}
+  const newOrder={...src,id:Date.now()+'',wonDate:date,carpet,hard,installs:carpet+hard,winNotes:document.getElementById('order-notes').value.trim()};
   wins.unshift(newOrder);
   closeModal('order-modal');
   orderSourceId=null;
@@ -1528,7 +1560,7 @@ async function deleteOrder(id){
   const allForCompany=wins.filter(w=>w.company===company);
   if(!confirm(`Delete order from ${order.wonDate||'no date'} (${order.installs||0} installs)?`))return;
   if(allForCompany.length<=1){
-    order.installs=0;order.wonDate='';order.winNotes='';
+    order.installs=0;order.carpet=0;order.hard=0;order.wonDate='';order.winNotes='';
     renderWins();updateWinsBadge();
     if(selectedPropertyForChart===company)renderPropertyChart();
     isSaving=true;try{await saveWin_db(order);}catch(e){console.error(e);}isSaving=false;
