@@ -161,6 +161,8 @@ tr:last-child td{border-bottom:none}
 tr{transition:background .12s}
 tr:hover td{background:rgba(255,255,255,0.03)}
 .co-name{font-weight:700;color:var(--ink);font-size:13px}
+.co-name-clickable{cursor:pointer;transition:color .15s;}
+.co-name-clickable:hover{color:var(--green);}
 .co-addr{font-size:11px;color:var(--ink3);margin-top:2px}
 .badge{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:800;letter-spacing:.07em;padding:5px 12px;border-radius:20px;white-space:nowrap;text-transform:uppercase;}
 .badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;box-shadow:0 0 6px currentColor;animation:dot-pulse 2s ease-in-out infinite;}
@@ -1006,7 +1008,7 @@ function getWinGroups(winsArray){
     const primary=sorted[0];
     const totalCarpet=records.reduce((t,r)=>t+(parseInt(r.carpet)||0),0);
     const totalHard=records.reduce((t,r)=>t+(parseInt(r.hard)||0),0);
-    const totalInstalls=totalCarpet+totalHard||records.reduce((t,r)=>t+(parseInt(r.installs)||0),0);
+    const totalInstalls=records.reduce((t,r)=>t+(Math.max(parseInt(r.carpet)||0,parseInt(r.hard)||0)||(parseInt(r.installs)||0)),0);
     return{primary,records,totalInstalls,totalCarpet,totalHard};
   });
 }
@@ -1093,7 +1095,7 @@ function renderWins(){
     const note=w.winNotes||'';
     const dateStr=w.wonDate?new Date(w.wonDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
     return`<tr>
-      <td><div class="co-name co-name-clickable" onclick="selectPropertyChart('${w.company.replace(/'/g,"\\'")}')">${esc(w.company)}</div>${w.address?'<div class="co-addr">'+esc(w.address)+'</div>':''}</td>
+      <td><div class="co-name co-name-clickable" onclick="selectPropertyChart('${w.company.replace(/'/g,"\\'")}') ">${esc(w.company)}</div>${w.address?'<div class="co-addr">'+esc(w.address)+'</div>':''}</td>
       <td class="hide-mob" style="color:var(--ink2)">${esc(w.contact)||'<span class="muted">—</span>'}</td>
       <td class="hide-mob" style="color:var(--ink2)">${esc(w.phone)||'<span class="muted">—</span>'}</td>
       <td style="text-align:right;font-weight:800;color:var(--ink)">${w.units||'<span class="muted" style="font-weight:400">—</span>'}</td>
@@ -1413,6 +1415,8 @@ function renderWinsChart(){
     const m=months.find(x=>x.key===w.wonDate.slice(0,7));
     if(m){const c=parseInt(w.carpet)||0,h=parseInt(w.hard)||0;m.carpet+=c;m.hard+=h;if(c+h===0)m.legacy+=(parseInt(w.installs)||0);m.units+=Math.max(c,h)||(parseInt(w.installs)||0);}
   });
+  const maxVal=chartMode==='units'?Math.max(...months.map(m=>m.carpet+m.hard+m.legacy),1):Math.max(...months.map(m=>m.count),1);
+  canvas.parentElement.style.height=Math.min(Math.max(280,160+maxVal*14),500)+'px';
   if(winsChart){winsChart.destroy();winsChart=null;}
   const detailEl=document.getElementById('chart-month-detail');if(detailEl)detailEl.style.display='none';
   const ctx=canvas.getContext('2d');
@@ -1526,6 +1530,8 @@ function renderPropertyChart(){
   const hardData=months.map(m=>m.orders.reduce((t,o)=>t+(parseInt(o.hard)||0),0));
   const legacyData=months.map(m=>m.orders.reduce((t,o)=>{const c=parseInt(o.carpet)||0,h=parseInt(o.hard)||0;return t+(c+h===0?(parseInt(o.installs)||0):0);},0));
   const totalData=months.map((m,i)=>legacyData[i]+carpetData[i]+hardData[i]);
+  const maxTotal=Math.max(...totalData,1);
+  canvas.parentElement.style.height=Math.min(Math.max(260,160+maxTotal*14),500)+'px';
   const legacyRadius=months.map((_,i)=>legacyData[i]>0&&carpetData[i]===0&&hardData[i]===0?{topLeft:8,topRight:8,bottomLeft:0,bottomRight:0}:0);
   const carpetRadius=months.map((_,i)=>carpetData[i]>0&&hardData[i]===0?{topLeft:8,topRight:8,bottomLeft:0,bottomRight:0}:0);
   if(propertyChart){propertyChart.destroy();propertyChart=null;}
