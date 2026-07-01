@@ -833,7 +833,7 @@ async function confirmMoveToWins(){
   const l=leads.find(x=>x.id===winTargetId);if(!l)return;
   const carpet=parseInt(document.getElementById('win-carpet').value)||0;
   const hard=parseInt(document.getElementById('win-hard').value)||0;
-  const win={...l,wonDate:document.getElementById('win-date').value,carpet,hard,installs:carpet+hard,winNotes:document.getElementById('win-notes').value.trim(),id:l.id};
+  const win={...l,wonDate:document.getElementById('win-date').value,carpet,hard,installs:Math.max(carpet,hard)||carpet||hard,winNotes:document.getElementById('win-notes').value.trim(),id:l.id};
   wins.unshift(win);
   leads=leads.filter(x=>x.id!==winTargetId);
   const wid=winTargetId;
@@ -1352,7 +1352,7 @@ async function saveWinEdit(){
   w.units=parseInt(document.getElementById('we-units').value)||0;
   w.carpet=parseInt(document.getElementById('we-carpet').value)||0;
   w.hard=parseInt(document.getElementById('we-hard').value)||0;
-  w.installs=w.carpet+w.hard;
+  w.installs=Math.max(w.carpet,w.hard)||w.carpet||w.hard;
   w.style=document.getElementById('we-style').value.trim();
   w.area=document.getElementById('we-area').value;
   w.wonDate=document.getElementById('we-wonDate').value;
@@ -1384,20 +1384,10 @@ const stackTotalPlugin={id:'stackTotal',afterDatasetsDraw(chart){
     const text=String(t);
     const xp=x.getPixelForValue(i);
     const tw=ctx.measureText(text).width;
-    const pad=7;
-    const bw=tw+pad*2;
-    const bh=38;
-    // Stagger if this label would collide with previous
-    const thisLeft=xp-bw/2;
+    const thisLeft=xp-tw/2;
     const extra=thisLeft<lastRight+4?22:0;
-    lastRight=xp+bw/2;
+    lastRight=xp+tw/2;
     const textY=y.getPixelForValue(t)-20-extra;
-    // Dark pill background
-    ctx.fillStyle='rgba(3,4,20,0.88)';
-    ctx.beginPath();
-    ctx.roundRect(xp-bw/2,textY-30,bw,bh,6);
-    ctx.fill();
-    // Glowing text
     ctx.fillStyle='#00FFB3';
     ctx.fillText(text,xp,textY);
   });
@@ -1417,7 +1407,7 @@ function renderWinsChart(){
   wins.forEach(w=>{
     if(!w.wonDate)return;
     const m=months.find(x=>x.key===w.wonDate.slice(0,7));
-    if(m){const c=parseInt(w.carpet)||0,h=parseInt(w.hard)||0;m.carpet+=c;m.hard+=h;if(c+h===0)m.legacy+=(parseInt(w.installs)||0);m.units+=c+h||(parseInt(w.installs)||0);}
+    if(m){const c=parseInt(w.carpet)||0,h=parseInt(w.hard)||0;m.carpet+=c;m.hard+=h;if(c+h===0)m.legacy+=(parseInt(w.installs)||0);m.units+=Math.max(c,h)||(parseInt(w.installs)||0);}
   });
   if(winsChart){winsChart.destroy();winsChart=null;}
   const detailEl=document.getElementById('chart-month-detail');if(detailEl)detailEl.style.display='none';
@@ -1429,7 +1419,7 @@ function renderWinsChart(){
     grad.addColorStop(0,'rgba(0,255,179,0.35)');grad.addColorStop(1,'rgba(0,255,179,0.02)');
     datasets=[
       {type:'bar',data,backgroundColor:grad,borderColor:'rgba(0,255,179,0.7)',borderWidth:1.5,borderRadius:{topLeft:5,topRight:5,bottomLeft:0,bottomRight:0},borderSkipped:false,order:2},
-      {type:'line',data:linReg(data),borderColor:'rgba(255,215,0,0.75)',borderWidth:2,borderDash:[5,4],pointRadius:0,fill:false,tension:0.4,order:1}
+      {type:'line',data:linReg(data),label:'Trending Average',borderColor:'rgba(255,215,0,0.75)',borderWidth:2,borderDash:[5,4],pointRadius:0,fill:false,tension:0.4,order:1}
     ];
     stacked=false;
   } else {
@@ -1443,7 +1433,7 @@ function renderWinsChart(){
       {type:'bar',data:months.map(m=>m.legacy),label:'Legacy',backgroundColor:lg,borderColor:'rgba(153,0,255,0.65)',borderWidth:{top:0,right:1.5,bottom:1.5,left:1.5},borderRadius:legacyRadius,borderSkipped:false,stack:'s',order:2},
       {type:'bar',data:months.map(m=>m.carpet),label:'Carpet',backgroundColor:cg,borderColor:'rgba(0,255,179,0.5)',borderWidth:{top:0,right:1.5,bottom:0,left:1.5},borderRadius:carpetRadius,borderSkipped:false,stack:'s',order:2},
       {type:'bar',data:months.map(m=>m.hard),label:'Hard Surface',backgroundColor:hg,borderColor:'rgba(255,0,110,0.65)',borderWidth:{top:1.5,right:1.5,bottom:0,left:1.5},borderRadius:{topLeft:8,topRight:8,bottomLeft:0,bottomRight:0},borderSkipped:false,stack:'s',order:2},
-      {type:'line',data:linReg(totalData),borderColor:'rgba(255,215,0,0.75)',borderWidth:2,borderDash:[5,4],pointRadius:0,fill:false,tension:0.4,order:1}
+      {type:'line',data:linReg(totalData),label:'Trending Average',borderColor:'rgba(255,215,0,0.75)',borderWidth:2,borderDash:[5,4],pointRadius:0,fill:false,tension:0.4,order:1}
     ];
     stacked=true;
   }
@@ -1456,7 +1446,7 @@ function renderWinsChart(){
       plugins:{
         legend:{display:stacked,labels:{color:'#8AAACE',font:{size:11,family:'Inter'},boxWidth:12,padding:16}},
         tooltip:{backgroundColor:'rgba(8,10,26,0.95)',borderColor:'rgba(0,255,179,0.4)',borderWidth:1,titleColor:'#fff',bodyColor:'#8AAACE',
-          callbacks:{label:c=>c.dataset.type==='line'?'trend':chartMode==='count'?`${c.raw} win${c.raw!==1?'s':''}`:c.raw+' '+c.dataset.label}}},
+          callbacks:{label:c=>c.dataset.type==='line'?'Trending Average':chartMode==='count'?`${c.raw} win${c.raw!==1?'s':''}`:c.raw+' '+c.dataset.label}}},
       scales:{
         x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#8AAACE',font:{size:11,family:'Inter'}},border:{color:'rgba(255,255,255,0.08)'},stacked},
         y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#8AAACE',font:{size:11,family:'Inter'},stepSize:1},border:{color:'rgba(255,255,255,0.08)'},beginAtZero:true,stacked}
@@ -1599,7 +1589,7 @@ async function confirmAddOrder(){
   const date=document.getElementById('order-date').value;
   if(!date){document.getElementById('order-date').focus();return;}
   if(!carpet&&!hard){document.getElementById('order-carpet').focus();return;}
-  const newOrder={...src,id:Date.now()+'',wonDate:date,carpet,hard,installs:carpet+hard,winNotes:document.getElementById('order-notes').value.trim()};
+  const newOrder={...src,id:Date.now()+'',wonDate:date,carpet,hard,installs:Math.max(carpet,hard)||carpet||hard,winNotes:document.getElementById('order-notes').value.trim()};
   wins.unshift(newOrder);
   closeModal('order-modal');
   orderSourceId=null;
