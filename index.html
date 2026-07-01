@@ -1434,7 +1434,7 @@ function renderWinsChart(){
     const totalData=months.map(m=>m.carpet+m.hard+m.both+m.legacy);
     const legacyRadius=months.map(m=>m.legacy>0&&m.carpet===0&&m.hard===0&&m.both===0?{topLeft:8,topRight:8,bottomLeft:0,bottomRight:0}:0);
     const carpetRadius=months.map(m=>m.carpet>0&&m.hard===0&&m.both===0?{topLeft:8,topRight:8,bottomLeft:0,bottomRight:0}:0);
-    const bothg=ctx.createLinearGradient(0,0,0,280);bothg.addColorStop(0,'rgba(255,0,136,0.55)');hg.addColorStop(1,'rgba(255,0,136,0.10)');
+    const bothg=ctx.createLinearGradient(0,0,0,280);bothg.addColorStop(0,'rgba(255,0,136,0.55)');bothhg.addColorStop(1,'rgba(255,0,136,0.10)');
     const cg=ctx.createLinearGradient(0,0,0,280);cg.addColorStop(0,'rgba(0,180,255,0.45)');cg.addColorStop(1,'rgba(0,180,255,0.05)');
     const hg=ctx.createLinearGradient(0,0,0,280);hg.addColorStop(0,'rgba(153,0,255,0.55)');hg.addColorStop(1,'rgba(153,0,255,0.10)');
     const lg=ctx.createLinearGradient(0,0,0,280);lg.addColorStop(0,'rgba(0,255,179,0.55)');lg.addColorStop(1,'rgba(0,255,179,0.10)');
