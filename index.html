@@ -1405,7 +1405,7 @@ function renderWinsChart(){
   const months=[];
   for(let i=11;i>=0;i--){
     const d=new Date(now.getFullYear(),now.getMonth()-i,1);
-    months.push({key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,label:d.toLocaleDateString('en-US',{month:'short',year:'2-digit'}),count:0,carpet:0,hard:0,units:0,legacy:0});
+    months.push({key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,label:d.toLocaleDateString('en-US',{month:'short',year:'2-digit'}),count:0,carpet:0,hard:0,both:0,units:0,legacy:0});
   }
   const primaryDates={};
   wins.forEach(w=>{if(!w.wonDate)return;if(!primaryDates[w.company]||w.wonDate<primaryDates[w.company])primaryDates[w.company]=w.wonDate;});
@@ -1413,7 +1413,7 @@ function renderWinsChart(){
   wins.forEach(w=>{
     if(!w.wonDate)return;
     const m=months.find(x=>x.key===w.wonDate.slice(0,7));
-    if(m){const c=parseInt(w.carpet)||0,h=parseInt(w.hard)||0;m.carpet+=c;m.hard+=h;if(c+h===0)m.legacy+=(parseInt(w.installs)||0);m.units+=Math.max(c,h)||(parseInt(w.installs)||0);}
+    if(m){const c=parseInt(w.carpet)||0,h=parseInt(w.hard)||0;if(c>0&&h>0){m.both+=Math.max(c,h);}else{m.carpet+=c;m.hard+=h;}if(c+h===0)m.legacy+=(parseInt(w.installs)||0);m.units+=Math.max(c,h)||(parseInt(w.installs)||0);}
   });
   const maxVal=chartMode==='units'?Math.max(...months.map(m=>m.carpet+m.hard+m.legacy),1):Math.max(...months.map(m=>m.count),1);
   canvas.parentElement.style.height=Math.min(Math.max(280,160+maxVal*14),500)+'px';
@@ -1431,9 +1431,10 @@ function renderWinsChart(){
     ];
     stacked=false;
   } else {
-    const totalData=months.map(m=>m.carpet+m.hard+m.legacy);
-    const legacyRadius=months.map(m=>m.legacy>0&&m.carpet===0&&m.hard===0?{topLeft:8,topRight:8,bottomLeft:0,bottomRight:0}:0);
-    const carpetRadius=months.map(m=>m.carpet>0&&m.hard===0?{topLeft:8,topRight:8,bottomLeft:0,bottomRight:0}:0);
+    const totalData=months.map(m=>m.carpet+m.hard+m.both+m.legacy);
+    const legacyRadius=months.map(m=>m.legacy>0&&m.carpet===0&&m.hard===0&&m.both===0?{topLeft:8,topRight:8,bottomLeft:0,bottomRight:0}:0);
+    const carpetRadius=months.map(m=>m.carpet>0&&m.hard===0&&m.both===0?{topLeft:8,topRight:8,bottomLeft:0,bottomRight:0}:0);
+    const bothg=ctx.createLinearGradient(0,0,0,280);bothg.addColorStop(0,'rgba(0,180,255,0.55)');bothg.addColorStop(1,'rgba(0,180,255,0.10)');
     const cg=ctx.createLinearGradient(0,0,0,280);cg.addColorStop(0,'rgba(0,255,179,0.32)');cg.addColorStop(1,'rgba(0,255,179,0.04)');
     const hg=ctx.createLinearGradient(0,0,0,280);hg.addColorStop(0,'rgba(255,0,110,0.55)');hg.addColorStop(1,'rgba(255,0,110,0.10)');
     const lg=ctx.createLinearGradient(0,0,0,280);lg.addColorStop(0,'rgba(153,0,255,0.55)');lg.addColorStop(1,'rgba(153,0,255,0.10)');
@@ -1441,6 +1442,7 @@ function renderWinsChart(){
       {type:'bar',data:months.map(m=>m.legacy),label:'Legacy',backgroundColor:lg,borderColor:'rgba(153,0,255,0.65)',borderWidth:{top:0,right:1.5,bottom:1.5,left:1.5},borderRadius:legacyRadius,borderSkipped:false,stack:'s',order:2},
       {type:'bar',data:months.map(m=>m.carpet),label:'Carpet',backgroundColor:cg,borderColor:'rgba(0,255,179,0.5)',borderWidth:{top:0,right:1.5,bottom:0,left:1.5},borderRadius:carpetRadius,borderSkipped:false,stack:'s',order:2},
       {type:'bar',data:months.map(m=>m.hard),label:'Hard Surface',backgroundColor:hg,borderColor:'rgba(255,0,110,0.65)',borderWidth:{top:1.5,right:1.5,bottom:0,left:1.5},borderRadius:{topLeft:8,topRight:8,bottomLeft:0,bottomRight:0},borderSkipped:false,stack:'s',order:2},
+      {type:'bar',data:months.map(m=>m.both),label:'Carpet + Hard',backgroundColor:bothg,borderColor:'rgba(0,180,255,0.65)',borderWidth:{top:1.5,right:1.5,bottom:0,left:1.5},borderRadius:{topLeft:8,topRight:8,bottomLeft:0,bottomRight:0},borderSkipped:false,stack:'s',order:2},
       {type:'line',data:linReg(totalData),label:'Trending Average',borderColor:'rgba(255,215,0,0.75)',borderWidth:2,borderDash:[5,4],pointRadius:0,fill:false,tension:0.4,order:1}
     ];
     stacked=true;
