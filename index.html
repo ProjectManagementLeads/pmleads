@@ -85,6 +85,10 @@ body{font-family:'Inter',sans-serif;background:#010209;color:var(--ink);-webkit-
 .btn-ai:hover::before{opacity:1}
 .btn-ai:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;transform:none;}
 
+/* ── CLICKABLE ── */
+.co-name-clickable{cursor:pointer;transition:color .15s;}
+.co-name-clickable:hover{color:var(--green);}
+
 /* ── STATS BAR ── */
 .stats-bar{background:rgba(3,4,15,0.6);backdrop-filter:blur(24px);border-bottom:none;display:grid;grid-template-columns:repeat(4,1fr);position:relative;z-index:2;}
 .stats-bar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--pink),var(--purple),var(--cyan),var(--green),var(--amber),var(--orange),var(--blue),var(--pink));opacity:1.0;}
@@ -887,10 +891,10 @@ function doAutofill(){
     <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
       <span style="color:#8AAACE">↗ Google opened — copy the details back into the fields below.</span>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button onclick="googleMgmt()" style="font-size:11px;font-weight:700;font-family:inherit;padding:4px 12px;border-radius:8px;background:rgba(180,79,255,0.15);color:var(--purple3);border:1px solid rgba(180,79,255,0.4);cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(180,79,255,0.28)'" onmouseout="this.style.background='rgba(180,79,255,0.15)'">
+        <button onclick="googleMgmt()" style="font-size:11px;font-weight:700;font-family:inherit;padding:8px 12px;border-radius:8px;background:rgba(180,79,255,0.15);color:var(--purple3);border:1px solid rgba(180,79,255,0.4);cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent">
           🔍 Search management company
         </button>
-        <button onclick="googleUnits()" style="font-size:11px;font-weight:700;font-family:inherit;padding:4px 12px;border-radius:8px;background:rgba(0,212,255,0.12);color:var(--cyan);border:1px solid rgba(0,212,255,0.35);cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(0,212,255,0.22)'" onmouseout="this.style.background='rgba(0,212,255,0.12)'">
+        <button onclick="googleUnits()" style="font-size:11px;font-weight:700;font-family:inherit;padding:8px 12px;border-radius:8px;background:rgba(0,212,255,0.12);color:var(--cyan);border:1px solid rgba(0,212,255,0.35);cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent">
           🔍 Search unit count
         </button>
       </div>
@@ -1089,7 +1093,7 @@ function renderWins(){
     const note=w.winNotes||'';
     const dateStr=w.wonDate?new Date(w.wonDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
     return`<tr>
-      <td><div class="co-name" onclick="selectPropertyChart('${w.company.replace(/'/g,"\\'")}') " style="cursor:pointer" onmouseover="this.style.color='var(--green)'" onmouseout="this.style.color=''">${esc(w.company)}</div>${w.address?'<div class="co-addr">'+esc(w.address)+'</div>':''}</td>
+      <td><div class="co-name co-name-clickable" onclick="selectPropertyChart('${w.company.replace(/'/g,"\\'")}')">${esc(w.company)}</div>${w.address?'<div class="co-addr">'+esc(w.address)+'</div>':''}</td>
       <td class="hide-mob" style="color:var(--ink2)">${esc(w.contact)||'<span class="muted">—</span>'}</td>
       <td class="hide-mob" style="color:var(--ink2)">${esc(w.phone)||'<span class="muted">—</span>'}</td>
       <td style="text-align:right;font-weight:800;color:var(--ink)">${w.units||'<span class="muted" style="font-weight:400">—</span>'}</td>
@@ -1478,7 +1482,7 @@ function showMonthDetail(month,monthWins){
     monthWins.map(w=>`
       <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:8px">
         <div style="flex:1;min-width:0">
-          <div class="co-name" onclick="selectPropertyChart('${w.company.replace(/'/g,"\\'")}') " style="cursor:pointer;font-size:13px" onmouseover="this.style.color='var(--green)'" onmouseout="this.style.color=''">${esc(w.company)}</div>
+          <div class="co-name co-name-clickable" onclick="selectPropertyChart('${w.company.replace(/'/g,"\\'")}') " style="font-size:13px">${esc(w.company)}</div>
           ${w.winNotes?`<div style="font-size:11px;color:var(--ink3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(w.winNotes.split('\n')[0])}</div>`:''}
         </div>
         ${w.installs?`<span style="font-size:12px;font-weight:800;color:var(--green);flex-shrink:0">${w.installs} install${w.installs!==1?'s':''}</span>`:'<span style="font-size:11px;color:var(--ink4);flex-shrink:0">no installs logged</span>'}
@@ -1535,7 +1539,7 @@ function renderPropertyChart(){
     data:{labels:months.map(m=>m.label),datasets:[
       {data:legacyData,label:'Legacy',backgroundColor:plg,borderColor:'rgba(153,0,255,0.65)',borderWidth:{top:0,right:1.5,bottom:1.5,left:1.5},borderRadius:legacyRadius,borderSkipped:false,stack:'s'},
       {data:carpetData,label:'Carpet',backgroundColor:pcg,borderColor:'rgba(0,255,179,0.5)',borderWidth:{top:0,right:1.5,bottom:0,left:1.5},borderRadius:carpetRadius,borderSkipped:false,stack:'s'},
-      {data:hardData,label:'Hard Surface',backgroundColor:phg,borderColor:'rgba(255,0,110,0.7)',borderWidth:{top:1.5,right:1.5,bottom:0,left:1.5},borderRadius:{topLeft:5,topRight:5,bottomLeft:0,bottomRight:0},borderSkipped:false,stack:'s'}
+      {data:hardData,label:'Hard Surface',backgroundColor:phg,borderColor:'rgba(255,0,110,0.7)',borderWidth:{top:1.5,right:1.5,bottom:0,left:1.5},borderRadius:{topLeft:8,topRight:8,bottomLeft:0,bottomRight:0},borderSkipped:false,stack:'s'}
     ]},
     options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:48}},
       onClick:(evt,elements)=>{if(elements.length){const m=months[elements[0].index];showMonthDetail(m,wins.filter(w=>w.wonDate&&w.wonDate.slice(0,7)===m.key));}},
@@ -1568,7 +1572,7 @@ function renderPropertyChart(){
         ${o.winNotes?`<span style="font-size:11px;color:var(--ink4);margin-left:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(o.winNotes.split('\n')[0])}</span>`:''}
       </div>
       <span style="font-size:12px;font-weight:800;color:var(--green);flex-shrink:0">${o.installs||0} install${parseInt(o.installs)!==1?'s':''}</span>
-      <button onclick="deleteOrder('${o.id}')" style="background:rgba(255,68,102,0.1);border:1px solid rgba(255,68,102,0.3);color:var(--pink);font-size:11px;font-weight:700;font-family:inherit;padding:3px 10px;border-radius:7px;cursor:pointer;flex-shrink:0" onmouseover="this.style.background='rgba(255,68,102,0.2)'" onmouseout="this.style.background='rgba(255,68,102,0.1)'">Delete</button>
+      <button onclick="deleteOrder('${o.id}')" style="background:rgba(255,68,102,0.1);border:1px solid rgba(255,68,102,0.3);color:var(--pink);font-size:11px;font-weight:700;font-family:inherit;padding:6px 12px;border-radius:7px;cursor:pointer;flex-shrink:0;touch-action:manipulation;-webkit-tap-highlight-color:transparent">Delete</button>
     </div>`).join('');
 }
 let orderSourceId=null;
