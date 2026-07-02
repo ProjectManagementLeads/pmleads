@@ -665,7 +665,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
 <div class="overlay" id="order-modal" onclick="bgClose(event,'order-modal')">
     <div class="modal" style="max-width:420px">
       <div class="modal-header">
-        <span class="modal-title" style="background:linear-gradient(90deg,var(--cyan),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">New Install Order</span>
+        <span id="order-modal-title" class="modal-title" style="background:linear-gradient(90deg,var(--cyan),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">New Install Order</span>
         <button class="modal-close" onclick="closeModal('order-modal')">×</button>
       </div>
       <p class="modal-sub">Log a new install order for this property. It will appear in the correct month on the chart.</p>
@@ -682,7 +682,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
         <button class="btn btn-ghost" onclick="closeModal('order-modal')">Cancel</button>
         <button class="btn btn-green" onclick="confirmAddOrder()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add Order
+          <span id="order-btn-text">Add Order</span>
         </button>
       </div>
     </div>
@@ -1427,9 +1427,9 @@ function renderWinsChart(){
     grad.addColorStop(0,'rgba(0,255,179,0.35)');grad.addColorStop(1,'rgba(0,255,179,0.02)');
     datasets=[
       {type:'bar',data,backgroundColor:grad,borderColor:'rgba(0,255,179,0.7)',borderWidth:1.5,borderRadius:{topLeft:5,topRight:5,bottomLeft:0,bottomRight:0},borderSkipped:false,order:2},
-      {type:'line',data:linReg(data),label:'Trending Average',borderColor:'rgba(255,215,0,0.75)',borderWidth:2,borderDash:[5,4],pointRadius:0,fill:false,tension:0.4,order:1}
-    ];
+      {type:'line',data:linReg(data),label:'Trending Average',borderColor:'rgba(255,215,0,0.75)',backgroundColor:'transparent',borderWidth:2,borderDash:[5,4],pointRadius:0,fill:false,tension:0.4,order:1}
     stacked=false;
+  ];
   } else {
     const totalData=months.map(m=>m.carpet+m.hard+m.both+m.legacy);
     const legacyRadius=months.map(m=>m.legacy>0&&m.carpet===0&&m.hard===0&&m.both===0?{topLeft:8,topRight:8,bottomLeft:0,bottomRight:0}:0);
@@ -1443,7 +1443,7 @@ function renderWinsChart(){
       {type:'bar',data:months.map(m=>m.carpet),label:'Carpet',backgroundColor:cg,borderColor:'rgba(0,47,218,0.65)',borderWidth:{top:0,right:1.5,bottom:0,left:1.5},borderRadius:carpetRadius,borderSkipped:false,stack:'s',order:2},
       {type:'bar',data:months.map(m=>m.hard),label:'Hard Surface',backgroundColor:hg,borderColor:'rgba(153,0,255,0.65)',borderWidth:{top:1.5,right:1.5,bottom:0,left:1.5},borderRadius:{topLeft:8,topRight:8,bottomLeft:0,bottomRight:0},borderSkipped:false,stack:'s',order:2},
       {type:'bar',data:months.map(m=>m.both),label:'Carpet + Hard',backgroundColor:bothg,borderColor:'rgba(255,0,136,0.65)',borderWidth:{top:1.5,right:1.5,bottom:0,left:1.5},borderRadius:{topLeft:8,topRight:8,bottomLeft:0,bottomRight:0},borderSkipped:false,stack:'s',order:2},
-      {type:'line',data:linReg(totalData),label:'Trending Average',borderColor:'rgba(255,215,0,0.75)',borderWidth:2,borderDash:[5,4],pointRadius:0,fill:false,tension:0.4,order:1}
+      {type:'line',data:linReg(totalData),label:'Trending Average',borderColor:'rgba(255,215,0,0.75)',backgroundColor:'transparent',borderWidth:2,borderDash:[5,4],pointRadius:0,fill:false,tension:0.4,order:1}
     ];
     stacked=true;
   }
@@ -1536,18 +1536,19 @@ function renderPropertyChart(){
   canvas.parentElement.style.height=Math.min(Math.max(260,160+maxTotal*14),500)+'px';
   const legacyRadius=months.map((_,i)=>legacyData[i]>0&&carpetData[i]===0&&hardData[i]===0?{topLeft:8,topRight:8,bottomLeft:0,bottomRight:0}:0);
   const carpetRadius=months.map((_,i)=>carpetData[i]>0&&hardData[i]===0?{topLeft:8,topRight:8,bottomLeft:0,bottomRight:0}:0);
+  const hardRadius=months.map((_,i)=>hardData[i]>0?{topLeft:8,topRight:8,bottomLeft:0,bottomRight:0}:0);
   if(propertyChart){propertyChart.destroy();propertyChart=null;}
   const pCtx=document.getElementById('wins-prop-chart').getContext('2d');
-  const pcg=pCtx.createLinearGradient(0,0,0,260);pcg.addColorStop(0,'rgba(0,255,179,0.32)');pcg.addColorStop(1,'rgba(0,255,179,0.04)');
-  const phg=pCtx.createLinearGradient(0,0,0,260);phg.addColorStop(0,'rgba(255,0,110,0.55)');phg.addColorStop(1,'rgba(255,0,110,0.10)');
-  const plg=pCtx.createLinearGradient(0,0,0,260);plg.addColorStop(0,'rgba(153,0,255,0.55)');plg.addColorStop(1,'rgba(153,0,255,0.10)');
+  const pcg=pCtx.createLinearGradient(0,0,0,260);pcg.addColorStop(0,'rgba(0,180,255,0.45)');pcg.addColorStop(1,'rgba(0,180,255,0.05)');
+  const phg=pCtx.createLinearGradient(0,0,0,260);phg.addColorStop(0,'rgba(153,0,255,0.55)');phg.addColorStop(1,'rgba(153,0,255,0.10)');
+  const plg=pCtx.createLinearGradient(0,0,0,260);plg.addColorStop(0,'rgba(0,255,179,0.55)');plg.addColorStop(1,'rgba(0,255,179,0.10)');
   propertyChart=new Chart(pCtx,{
     type:'bar',
     plugins:[stackTotalPlugin],
     data:{labels:months.map(m=>m.label),datasets:[
       {data:legacyData,label:'Legacy',backgroundColor:plg,borderColor:'rgba(153,0,255,0.65)',borderWidth:{top:0,right:1.5,bottom:1.5,left:1.5},borderRadius:legacyRadius,borderSkipped:false,stack:'s'},
       {data:carpetData,label:'Carpet',backgroundColor:pcg,borderColor:'rgba(0,255,179,0.5)',borderWidth:{top:0,right:1.5,bottom:0,left:1.5},borderRadius:carpetRadius,borderSkipped:false,stack:'s'},
-      {data:hardData,label:'Hard Surface',backgroundColor:phg,borderColor:'rgba(255,0,110,0.7)',borderWidth:{top:1.5,right:1.5,bottom:0,left:1.5},borderRadius:{topLeft:8,topRight:8,bottomLeft:0,bottomRight:0},borderSkipped:false,stack:'s'}
+      {data:hardData,label:'Hard Surface',backgroundColor:phg,borderColor:'rgba(153,0,255,0.65)',borderWidth:{top:1.5,right:1.5,bottom:0,left:1.5},borderRadius:hardRadius,borderSkipped:false,stack:'s'}
     ]},
     options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:48}},
       onClick:(evt,elements)=>{if(elements.length){const m=months[elements[0].index];showMonthDetail(m,wins.filter(w=>w.wonDate&&w.wonDate.slice(0,7)===m.key));}},
@@ -1580,13 +1581,16 @@ function renderPropertyChart(){
         ${o.winNotes?`<span style="font-size:11px;color:var(--ink4);margin-left:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(o.winNotes.split('\n')[0])}</span>`:''}
       </div>
       <span style="font-size:12px;font-weight:800;color:var(--green);flex-shrink:0">${o.installs||0} install${parseInt(o.installs)!==1?'s':''}</span>
+      <button onclick="openEditOrder('${o.id}')" style="background:rgba(0,255,255,0.08);border:1px solid rgba(0,255,255,0.3);color:var(--cyan);font-size:11px;font-weight:700;font-family:inherit;padding:6px 12px;border-radius:7px;cursor:pointer;flex-shrink:0;touch-action:manipulation;-webkit-tap-highlight-color:transparent">Edit</button>
       <button onclick="deleteOrder('${o.id}')" style="background:rgba(255,68,102,0.1);border:1px solid rgba(255,68,102,0.3);color:var(--pink);font-size:11px;font-weight:700;font-family:inherit;padding:6px 12px;border-radius:7px;cursor:pointer;flex-shrink:0;touch-action:manipulation;-webkit-tap-highlight-color:transparent">Delete</button>
     </div>`).join('');
 }
-let orderSourceId=null;
+let orderSourceId=null,orderEditId=null;
 function openAddOrder(id){
   const w=wins.find(x=>x.id===id);if(!w)return;
-  orderSourceId=id;
+  orderSourceId=id;orderEditId=null;
+  document.getElementById('order-modal-title').textContent='New Install Order';
+  document.getElementById('order-btn-text').textContent='Add Order';
   document.getElementById('order-modal-name').textContent=w.company;
   document.getElementById('order-date').value=new Date().toISOString().split('T')[0];
   document.getElementById('order-carpet').value='';
@@ -1594,17 +1598,38 @@ function openAddOrder(id){
   document.getElementById('order-notes').value='';
   document.getElementById('order-modal').classList.add('open');
 }
+function openEditOrder(id){
+  const order=wins.find(x=>x.id===id);if(!order)return;
+  orderEditId=id;orderSourceId=null;
+  document.getElementById('order-modal-title').textContent='Edit Install Order';
+  document.getElementById('order-btn-text').textContent='Save Changes';
+  document.getElementById('order-modal-name').textContent=order.company;
+  document.getElementById('order-date').value=order.wonDate||'';
+  document.getElementById('order-carpet').value=order.carpet||'';
+  document.getElementById('order-hard').value=order.hard||'';
+  document.getElementById('order-notes').value=order.winNotes||'';
+  document.getElementById('order-modal').classList.add('open');
+}  
 async function confirmAddOrder(){
-  const src=wins.find(x=>x.id===orderSourceId);if(!src)return;
   const carpet=parseInt(document.getElementById('order-carpet').value)||0;
   const hard=parseInt(document.getElementById('order-hard').value)||0;
   const date=document.getElementById('order-date').value;
   if(!date){document.getElementById('order-date').focus();return;}
   if(!carpet&&!hard){document.getElementById('order-carpet').focus();return;}
+  if(orderEditId){
+    const order=wins.find(x=>x.id===orderEditId);if(!order)return;
+    order.wonDate=date;order.carpet=carpet;order.hard=hard;
+    order.installs=Math.max(carpet,hard)||carpet||hard;
+    order.winNotes=document.getElementById('order-notes').value.trim();
+    closeModal('order-modal');orderEditId=null;orderSourceId=null;
+    renderWins();updateWinsBadge();
+    isSaving=true;await saveWin_db(order);isSaving=false;
+    return;
+  }
+  const src=wins.find(x=>x.id===orderSourceId);if(!src)return;
   const newOrder={...src,id:Date.now()+'',wonDate:date,carpet,hard,installs:Math.max(carpet,hard)||carpet||hard,winNotes:document.getElementById('order-notes').value.trim()};
   wins.unshift(newOrder);
-  closeModal('order-modal');
-  orderSourceId=null;
+  closeModal('order-modal');orderSourceId=null;
   renderWins();updateWinsBadge();
   isSaving=true;await saveWin_db(newOrder);isSaving=false;
 }  
