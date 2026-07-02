@@ -1428,8 +1428,8 @@ function renderWinsChart(){
     datasets=[
       {type:'bar',data,backgroundColor:grad,borderColor:'rgba(0,255,179,0.7)',borderWidth:1.5,borderRadius:{topLeft:5,topRight:5,bottomLeft:0,bottomRight:0},borderSkipped:false,order:2},
       {type:'line',data:linReg(data),label:'Trending Average',borderColor:'rgba(255,215,0,0.75)',backgroundColor:'transparent',borderWidth:2,borderDash:[5,4],pointRadius:0,fill:false,tension:0.4,order:1}
+    ];
     stacked=false;
-  ];
   } else {
     const totalData=months.map(m=>m.carpet+m.hard+m.both+m.legacy);
     const legacyRadius=months.map(m=>m.legacy>0&&m.carpet===0&&m.hard===0&&m.both===0?{topLeft:8,topRight:8,bottomLeft:0,bottomRight:0}:0);
