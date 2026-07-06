@@ -1177,6 +1177,11 @@ function openEdit(id){
 }
 async function saveLead(){
   const co=document.getElementById('f-company').value.trim();if(!co){document.getElementById('f-company').focus();return;}
+  const _nameChanged=!editId||(leads.find(x=>x.id===editId)?.company||'').toLowerCase()!==co.toLowerCase();
+    if(_nameChanged){
+      if(leads.find(l=>l.id!==editId&&l.company.toLowerCase()===co.toLowerCase())){alert(`"${co}" already exists in your Pipeline.`);return;}
+      if(wins.find(w=>w.company.toLowerCase()===co.toLowerCase())){alert(`"${co}" already exists in your Wins.`);return;}
+  }
     const newNote = document.getElementById('f-new-note').value.trim();
   const existingNotes = document.getElementById('f-notes').value.trim();
   let finalNotes = existingNotes;
@@ -1350,6 +1355,11 @@ function openEditWin(id){
 }
 async function saveWinEdit(){
   const co=document.getElementById('we-company').value.trim();if(!co){document.getElementById('we-company').focus();return;}
+  const _origCo=(wins.find(x=>x.id===winEditId)?.company||'').toLowerCase();
+    if(_origCo!==co.toLowerCase()){
+      if(leads.find(l=>l.company.toLowerCase()===co.toLowerCase())){alert(`"${co}" already exists in your Pipeline.`);return;}
+      if(wins.find(w=>w.company.toLowerCase()===co.toLowerCase()&&w.company.toLowerCase()!==_origCo)){alert(`"${co}" already exists in your Wins.`);return;}
+  }
   const w=wins.find(x=>x.id===winEditId);if(!w)return;
   w.company=co;w.contact=document.getElementById('we-contact').value.trim();
   w.phone=formatPhone(document.getElementById('we-phone').value.trim());
