@@ -444,7 +444,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
         <div style="font-size:13px;color:var(--ink2)">Monthly wins — last 12 months</div>
       </div>
       <div style="display:flex;gap:8px">
-        <button id="chart-toggle-count" class="btn btn-ghost btn-sm" onclick="setChartMode('count')" style="min-height:28px">Count</button>
+        <button id="chart-toggle-count" class="btn btn-ghost btn-sm" onclick="setChartMode('count')" style="min-height:28px">Wins</button>
         <button id="chart-toggle-units" class="btn btn-ghost btn-sm" onclick="setChartMode('units')" style="min-height:28px">Installs</button>
       </div>
     </div>
@@ -1460,7 +1460,7 @@ function renderWinsChart(){
   }
   winsChart=new Chart(ctx,{
     data:{labels:months.map(m=>m.label),datasets},
-    plugins:stacked?[stackTotalPlugin]:[],
+    plugins:[stackTotalPlugin],
     options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:56}},
       onClick:(evt,elements)=>{if(elements.length){const m=months[elements[0].index];showMonthDetail(m,wins.filter(w=>w.wonDate&&w.wonDate.slice(0,7)===m.key));}},
       onHover:(evt,elements)=>{evt.native.target.style.cursor=elements.length?'pointer':'default';},
