@@ -59,6 +59,7 @@ body{font-family:'Inter',sans-serif;background:#010209;color:var(--ink);-webkit-
 .section-btn{font-size:12px;font-weight:700;font-family:inherit;padding:0 16px;height:30px;border:none;border-radius:7px;cursor:pointer;white-space:nowrap;transition:all .2s;letter-spacing:0.03em;background:transparent;color:var(--ink3);}
 .section-btn.active-leads{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;box-shadow:0 0 16px rgba(255,0,110,0.4);}
 .section-btn.active-wins{background:linear-gradient(135deg,var(--green2),var(--green));color:#03040F;box-shadow:0 0 16px rgba(0,255,179,0.4);}
+.section-btn.active-calendar{background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#03040F;box-shadow:0 0 16px rgba(0,180,255,0.4);}
 .section-btn:hover:not(.active-leads):not(.active-wins){color:var(--ink2);background:rgba(255,255,255,0.08);}
 
 /* ── BUTTONS ── */
@@ -271,6 +272,17 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
 .quick-note-actions .btn{height:52px;font-size:15px;min-width:112px;touch-action:manipulation;}
 .notes-cell{cursor:pointer;transition:background .15s;}
 .notes-cell:hover{background:rgba(255,0,110,0.08)!important;border-radius:6px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-day-header{font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--ink4);text-align:center;padding:8px 0;text-transform:uppercase;}
+.cal-day{min-height:64px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);padding:6px;cursor:default;transition:all .15s;position:relative;}
+.cal-day.has-installs{border-color:rgba(0,255,179,0.3);background:rgba(0,255,179,0.06);cursor:pointer;}
+.cal-day.has-installs:hover{background:rgba(0,255,179,0.12);border-color:rgba(0,255,179,0.5);box-shadow:0 0 16px rgba(0,255,179,0.15);}
+.cal-day.today{border-color:rgba(0,180,255,0.5);background:rgba(0,180,255,0.08);}
+.cal-day.today.has-installs{border-color:rgba(0,255,179,0.6);background:rgba(0,255,179,0.12);box-shadow:0 0 20px rgba(0,255,179,0.2);}
+.cal-day.other-month{opacity:0.3;}
+.cal-day-num{font-size:12px;font-weight:700;color:var(--ink3);}
+.cal-day.today .cal-day-num{color:var(--cyan);font-weight:900;}
+.cal-install-dot{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:20px;border-radius:6px;background:rgba(0,255,179,0.2);color:var(--green);font-size:10px;font-weight:800;margin-top:4px;padding:0 4px;}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--pink),var(--purple),var(--cyan));border-radius:4px;box-shadow:0 0 8px rgba(255,0,110,0.5);}
@@ -347,6 +359,11 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
         Wins
         <span id="wins-badge" style="display:none;background:linear-gradient(135deg,var(--green2),var(--green));color:#03040F;font-size:10px;font-weight:800;padding:1px 6px;border-radius:20px;margin-left:4px"></span>
       </button>
+      <button class="section-btn" id="toggle-calendar" onclick="setSection('calendar')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Calendar
+          <span id="calendar-badge" style="display:none;background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#03040F;font-size:10px;font-weight:800;padding:1px 6px;border-radius:20px;margin-left:4px"></span>
+      </button>
     </div>
     <div class="top-actions" id="top-actions">
       <button class="btn btn-ghost-top" onclick="openAreas()">
@@ -365,6 +382,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
 <div class="section-toggle-mob" style="position:relative;z-index:2;background:rgba(3,4,15,0.8);border-bottom:1px solid var(--b);">
   <button class="section-btn active-leads" id="toggle-leads-mob" onclick="setSection('leads')" style="flex:1;height:42px;border-radius:0;font-size:13px;">Pipeline</button>
   <button class="section-btn" id="toggle-wins-mob" onclick="setSection('wins')" style="flex:1;height:42px;border-radius:0;font-size:13px;">Wins</button>
+  <button class="section-btn" id="toggle-calendar-mob" onclick="setSection('calendar')" style="flex:1;height:42px;border-radius:0;font-size:13px;">Calendar</button>
 </div>
 
 <!-- ═══════════ LEADS SECTION ═══════════ -->
@@ -508,7 +526,28 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
     </div>
   </div>
 </div>
-
+  
+<!-- ═══════════ CALENDAR SECTION ═══════════ -->
+<div id="calendar-section" style="display:none">
+  <!-- Today panel -->
+  <div style="background:rgba(3,4,15,0.7);backdrop-filter:blur(20px);border-bottom:1px solid var(--b);padding:24px 28px;position:relative;z-index:2;">
+    <div style="font-size:11px;font-weight:800;letter-spacing:.13em;color:var(--ink3);text-transform:uppercase;margin-bottom:4px">Today's Installs</div>
+    <div id="today-date" style="font-size:13px;color:var(--ink2);margin-bottom:16px"></div>
+    <div id="today-list"></div>
+  </div>
+  <!-- Month calendar -->
+  <div style="background:rgba(3,4,15,0.7);backdrop-filter:blur(20px);padding:24px 28px;position:relative;z-index:2;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <button class="btn btn-ghost btn-sm" onclick="prevMonth()">← Prev</button>
+      <div id="cal-month-label" style="font-size:16px;font-weight:800;color:var(--ink)"></div>
+      <button class="btn btn-ghost btn-sm" onclick="nextMonth()">Next →</button>
+    </div>
+    <div class="cal-grid" id="cal-headers"></div>
+    <div class="cal-grid" style="margin-top:4px" id="cal-grid"></div>
+    <div id="cal-day-detail" style="display:none;margin-top:20px;border-top:1px solid rgba(255,255,255,0.07);padding-top:20px"></div>
+  </div>
+</div>
+  
 <!-- ADD/EDIT LEAD MODAL -->
 <div class="overlay" id="lead-modal">
   <div class="modal">
@@ -679,6 +718,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
         <div class="field"><label>Hard Surface</label><input type="number" id="order-hard" min="0" placeholder="e.g. 12"></div>
       </div>
       <div class="field" style="position:relative;z-index:1"><label>Notes (optional)</label><textarea id="order-notes" placeholder="e.g. Summer turn package…" style="min-height:64px"></textarea></div>
+      <div class="field" style="position:relative;z-index:1"><label>Scheduled install date (optional)</label><input type="date" id="order-scheduled"></div>
       <div class="modal-actions">
         <button class="btn btn-ghost" onclick="closeModal('order-modal')">Cancel</button>
         <button class="btn btn-green" onclick="confirmAddOrder()">
@@ -732,8 +772,8 @@ function hideLoading(){const el=document.getElementById('loading-overlay');if(el
 // ── DB mappers ──
 function dbToLead(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,style:r.style||'',area:r.area||'Other',status:r.status||'New',notes:r.notes||'',mgmt:r.mgmt||''};}
 function leadToDB(l){return{id:l.id,company:l.company,contact:l.contact,phone:l.phone,email:l.email,address:l.address,units:l.units||0,style:l.style,area:l.area,status:l.status,notes:l.notes,mgmt:l.mgmt||''};}
-function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,installs:r.installs||0,carpet:r.carpet||0,hard:r.hard||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||'',mgmt:r.mgmt||''};}
-function winToDB(w){return{id:w.id,company:w.company,contact:w.contact,phone:w.phone,email:w.email,address:w.address,units:w.units||0,installs:w.installs||0,carpet:w.carpet||0,hard:w.hard||0,style:w.style,area:w.area,won_date:w.wonDate,win_notes:w.winNotes,mgmt:w.mgmt||''};}
+function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,installs:r.installs||0,carpet:r.carpet||0,hard:r.hard||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||'',mgmt:r.mgmt||'',scheduledDate:r.scheduled_date||''};}
+function winToDB(w){return{id:w.id,company:w.company,contact:w.contact,phone:w.phone,email:w.email,address:w.address,units:w.units||0,installs:w.installs||0,carpet:w.carpet||0,hard:w.hard||0,style:w.style,area:w.area,won_date:w.wonDate,win_notes:w.winNotes,mgmt:w.mgmt||'',scheduled_date:w.scheduledDate||null};}
 // ── Supabase CRUD ──
 async function saveLead_db(obj){try{await sb.from('leads').upsert(leadToDB(obj));}catch(e){console.error('saveLead_db',e);}}
 async function deleteLead_db(id){try{await sb.from('leads').delete().eq('id',id);}catch(e){console.error('deleteLead_db',e);}}
@@ -804,15 +844,20 @@ function setSection(s){
   currentSection=s;
   document.getElementById('leads-section').style.display=s==='leads'?'':'none';
   document.getElementById('wins-section').style.display=s==='wins'?'':'none';
+  document.getElementById('calendar-section').style.display=s==='calendar'?'':'none';
   // Desktop toggle
   document.getElementById('toggle-leads').className='section-btn'+(s==='leads'?' active-leads':'');
   document.getElementById('toggle-wins').className='section-btn'+(s==='wins'?' active-wins':'');
+  document.getElementById('toggle-calendar').className='section-btn'+(s==='calendar'?' active-calendar':'');
   // Mobile toggle
   document.getElementById('toggle-leads-mob').className='section-btn'+(s==='leads'?' active-leads':'');
   document.getElementById('toggle-wins-mob').className='section-btn'+(s==='wins'?' active-wins':'');
-  // Top actions — hide Areas/Add when in wins
+  document.getElementById('toggle-calendar-mob').className='section-btn'+(s==='calendar'?' active-calendar':'');
+  // Top actions — hide Areas/Add when in wins or calendar
   document.getElementById('top-actions').style.display=s==='leads'?'flex':'none';
-  if(s==='wins') renderWins(); else render();
+  if(s==='wins') renderWins();
+  else if(s==='calendar') renderCalendar();
+  else render();
 }
 
 // ── Wins badge count ──
@@ -821,6 +866,8 @@ function updateWinsBadge(){
   const count=[...new Set(wins.map(w=>w.company))].length;
   if(count>0){badge.style.display='inline';badge.textContent=count;}
   else badge.style.display='none';
+  const cbadge=document.getElementById('calendar-badge');
+  if(cbadge){const todayStr=new Date().toISOString().split('T')[0];const tc=wins.filter(w=>w.scheduledDate===todayStr).length;if(tc>0){cbadge.style.display='inline';cbadge.textContent=tc;}else cbadge.style.display='none';}
 }
 
 // ── Move to wins ──
@@ -1607,6 +1654,7 @@ function openAddOrder(id){
   document.getElementById('order-carpet').value='';
   document.getElementById('order-hard').value='';
   document.getElementById('order-notes').value='';
+  document.getElementById('order-scheduled').value='';
   document.getElementById('order-modal').classList.add('open');
 }
 function openEditOrder(id){
@@ -1619,6 +1667,7 @@ function openEditOrder(id){
   document.getElementById('order-carpet').value=order.carpet||'';
   document.getElementById('order-hard').value=order.hard||'';
   document.getElementById('order-notes').value=order.winNotes||'';
+  document.getElementById('order-scheduled').value=order.scheduledDate||'';
   document.getElementById('order-modal').classList.add('open');
 }  
 async function confirmAddOrder(){
@@ -1632,13 +1681,14 @@ async function confirmAddOrder(){
     order.wonDate=date;order.carpet=carpet;order.hard=hard;
     order.installs=Math.max(carpet,hard)||carpet||hard;
     order.winNotes=document.getElementById('order-notes').value.trim();
+    order.scheduledDate=document.getElementById('order-scheduled').value;
     closeModal('order-modal');orderEditId=null;orderSourceId=null;
     renderWins();updateWinsBadge();
     isSaving=true;await saveWin_db(order);isSaving=false;
     return;
   }
   const src=wins.find(x=>x.id===orderSourceId);if(!src)return;
-  const newOrder={...src,id:Date.now()+'',wonDate:date,carpet,hard,installs:Math.max(carpet,hard)||carpet||hard,winNotes:document.getElementById('order-notes').value.trim()};
+  const newOrder={...src,id:Date.now()+'',wonDate:date,carpet,hard,installs:Math.max(carpet,hard)||carpet||hard,winNotes:document.getElementById('order-notes').value.trim(),scheduledDate:document.getElementById('order-scheduled').value};
   wins.unshift(newOrder);
   closeModal('order-modal');orderSourceId=null;
   renderWins();updateWinsBadge();
@@ -1661,6 +1711,114 @@ async function deleteOrder(id){
     isSaving=true;try{await deleteWin_db(id);}catch(e){console.error(e);}isSaving=false;
   }
 }
+  
+// ── Calendar ──
+let calYear=new Date().getFullYear(),calMonth=new Date().getMonth();
+
+function renderCalendar(){
+  updateWinsBadge();
+  renderTodayPanel();
+  renderCalendarGrid();
+}
+
+function renderTodayPanel(){
+  const todayStr=new Date().toISOString().split('T')[0];
+  const todayInstalls=wins.filter(w=>w.scheduledDate===todayStr);
+  document.getElementById('today-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const list=document.getElementById('today-list');
+  if(!todayInstalls.length){
+    list.innerHTML=`<div style="color:var(--ink4);font-size:13px;padding:8px 0;display:flex;align-items:center;gap:8px"><span style="font-size:20px">✓</span> Nothing scheduled for today.</div>`;
+    return;
+  }
+  list.innerHTML=todayInstalls.map(w=>{
+    const carpet=parseInt(w.carpet)||0,hard=parseInt(w.hard)||0;
+    const breakdown=carpet>0||hard>0?`<span style="color:var(--green)">${carpet}C</span> <span style="color:var(--ink4)">/</span> <span style="color:var(--cyan)">${hard}H</span>`:`${w.installs||0} installs`;
+    return`<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;background:rgba(0,255,179,0.08);border:1px solid rgba(0,255,179,0.25);margin-bottom:8px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:800;color:var(--ink)">${esc(w.company)}</div>
+        <div style="font-size:12px;color:var(--ink3);margin-top:3px">${breakdown}${w.winNotes?' · '+esc(w.winNotes.split('\n')[0]):''}</div>
+      </div>
+      <a href="${googleCalendarLink(w)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;font-family:inherit;padding:7px 13px;border-radius:8px;background:rgba(0,180,255,0.12);border:1px solid rgba(0,180,255,0.35);color:var(--cyan);text-decoration:none;flex-shrink:0;white-space:nowrap;touch-action:manipulation">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Add to Google Calendar
+      </a>
+    </div>`;
+  }).join('');
+}
+
+function renderCalendarGrid(){
+  const todayStr=new Date().toISOString().split('T')[0];
+  document.getElementById('cal-month-label').textContent=new Date(calYear,calMonth,1).toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  document.getElementById('cal-headers').innerHTML=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="cal-day-header">${d}</div>`).join('');
+  const firstDay=new Date(calYear,calMonth,1).getDay();
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  const daysInPrev=new Date(calYear,calMonth,0).getDate();
+  const schedMap={};
+  wins.forEach(w=>{if(w.scheduledDate){if(!schedMap[w.scheduledDate])schedMap[w.scheduledDate]=[];schedMap[w.scheduledDate].push(w);}});
+  let cells=[];
+  for(let i=firstDay-1;i>=0;i--){
+    const d=daysInPrev-i;
+    const m=calMonth===0?12:calMonth;
+    const y=calMonth===0?calYear-1:calYear;
+    const key=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    cells.push({day:d,key,otherMonth:true,installs:schedMap[key]||[]});
+  }
+  for(let d=1;d<=daysInMonth;d++){
+    const key=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    cells.push({day:d,key,otherMonth:false,installs:schedMap[key]||[],isToday:key===todayStr});
+  }
+  const remaining=(7-cells.length%7)%7;
+  for(let d=1;d<=remaining;d++){
+    const m=calMonth+2>12?1:calMonth+2;
+    const y=calMonth+2>12?calYear+1:calYear;
+    const key=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    cells.push({day:d,key,otherMonth:true,installs:schedMap[key]||[]});
+  }
+  document.getElementById('cal-grid').innerHTML=cells.map(c=>{
+    const total=c.installs.reduce((t,w)=>t+(Math.max(parseInt(w.carpet)||0,parseInt(w.hard)||0)||(parseInt(w.installs)||0)),0);
+    const cls=['cal-day',c.otherMonth?'other-month':'',c.isToday?'today':'',c.installs.length?'has-installs':''].filter(Boolean).join(' ');
+    return`<div class="${cls}" ${c.installs.length?`onclick="calDayClick('${c.key}')"`:''}>
+      <div class="cal-day-num">${c.day}</div>
+      ${c.installs.length?`<div class="cal-install-dot">${total||c.installs.length}</div>`:''}
+    </div>`;
+  }).join('');
+  document.getElementById('cal-day-detail').style.display='none';
+}
+
+function calDayClick(key){
+  const detail=document.getElementById('cal-day-detail');
+  const installs=wins.filter(w=>w.scheduledDate===key);
+  if(!installs.length){detail.style.display='none';return;}
+  const fmt=new Date(key+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  detail.innerHTML=`<div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:14px">${fmt}</div>`+
+    installs.map(w=>{
+      const carpet=parseInt(w.carpet)||0,hard=parseInt(w.hard)||0;
+      const breakdown=carpet>0||hard>0?`<span style="color:var(--green)">${carpet}C</span> <span style="color:var(--ink4)">/</span> <span style="color:var(--cyan)">${hard}H</span>`:`${w.installs||0} installs`;
+      return`<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);margin-bottom:8px;flex-wrap:wrap">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:800;color:var(--ink)">${esc(w.company)}</div>
+          <div style="font-size:12px;color:var(--ink3);margin-top:3px">${breakdown}</div>
+          ${w.winNotes?`<div style="font-size:11px;color:var(--ink4);margin-top:3px">${esc(w.winNotes.split('\n')[0])}</div>`:''}
+        </div>
+        <a href="${googleCalendarLink(w)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;font-family:inherit;padding:7px 13px;border-radius:8px;background:rgba(0,180,255,0.12);border:1px solid rgba(0,180,255,0.35);color:var(--cyan);text-decoration:none;flex-shrink:0;white-space:nowrap;touch-action:manipulation">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Add to Google Calendar
+        </a>
+      </div>`;
+    }).join('');
+  detail.style.display='block';
+}
+
+function googleCalendarLink(w){
+  const date=(w.scheduledDate||'').replace(/-/g,'');
+  if(!date)return'#';
+  const carpet=parseInt(w.carpet)||0,hard=parseInt(w.hard)||0;
+  const details=[carpet>0?carpet+' carpet units':'',hard>0?hard+' hard surface units':'',w.winNotes?w.winNotes.split('\n')[0]:''].filter(Boolean).join(' · ');
+  return`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Install: '+w.company)}&dates=${date}/${date}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(w.address||'')}`;
+}
+
+function prevMonth(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendarGrid();}
+function nextMonth(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendarGrid();}
 loadAll();
 </script>
 <!-- Loading overlay -->
