@@ -718,13 +718,14 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
       <div style="background:rgba(0,255,255,0.06);border:1px solid rgba(0,255,255,0.2);border-radius:12px;padding:14px 16px;margin-bottom:20px;position:relative;z-index:1">
         <div style="font-size:16px;font-weight:800;color:var(--ink)" id="order-modal-name"></div>
       </div>
+      <div class="field" style="position:relative;z-index:1"><label>Order number</label><input type="text" id="order-number" placeholder="e.g. PO-1042"></div>
       <div class="field" style="position:relative;z-index:1"><label>Order date</label><input type="date" id="order-date"></div>
       <div class="field-row" style="position:relative;z-index:1">
         <div class="field"><label>Carpet</label><input type="number" id="order-carpet" min="0" placeholder="e.g. 12"></div>
         <div class="field"><label>Hard Surface</label><input type="number" id="order-hard" min="0" placeholder="e.g. 12"></div>
       </div>
-      <div class="field" style="position:relative;z-index:1"><label>Notes (optional)</label><textarea id="order-notes" placeholder="e.g. Summer turn package…" style="min-height:64px"></textarea></div>
-      <div class="field" style="position:relative;z-index:1"><label>Scheduled install date (optional)</label><input type="date" id="order-scheduled"></div>
+      <div class="field" style="position:relative;z-index:1"><label>Notes</label><textarea id="order-notes" placeholder="e.g. Summer turn package…" style="min-height:64px"></textarea></div>
+      <div class="field" style="position:relative;z-index:1"><label>Scheduled install date</label><input type="date" id="order-scheduled"></div>
       <div class="modal-actions">
         <button class="btn btn-ghost" onclick="closeModal('order-modal')">Cancel</button>
         <button class="btn btn-green" onclick="confirmAddOrder()">
@@ -785,9 +786,10 @@ function hideLoading(){const el=document.getElementById('loading-overlay');if(el
 // ── DB mappers ──
 function dbToLead(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,style:r.style||'',area:r.area||'Other',status:r.status||'New',notes:r.notes||'',mgmt:r.mgmt||''};}
 function leadToDB(l){return{id:l.id,company:l.company,contact:l.contact,phone:l.phone,email:l.email,address:l.address,units:l.units||0,style:l.style,area:l.area,status:l.status,notes:l.notes,mgmt:l.mgmt||''};}
-function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,installs:r.installs||0,carpet:r.carpet||0,hard:r.hard||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||'',mgmt:r.mgmt||'',scheduledDate:r.scheduled_date||''};}
+function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,installs:r.installs||0,carpet:r.carpet||0,hard:r.hard||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||'',mgmt:r.mgmt||'',scheduledDate:r.scheduled_date||'',orderNumber:r.order_number||''};}
 function winToDB(w){return{id:w.id,company:w.company,contact:w.contact,phone:w.phone,email:w.email,address:w.address,units:w.units||0,installs:w.installs||0,carpet:w.carpet||0,hard:w.hard||0,style:w.style,area:w.area,won_date:w.wonDate,win_notes:w.winNotes,mgmt:w.mgmt||'',scheduled_date:w.scheduledDate||null};}
-// ── Supabase CRUD ──
+
+  // ── Supabase CRUD ──
 async function saveLead_db(obj){try{await sb.from('leads').upsert(leadToDB(obj));}catch(e){console.error('saveLead_db',e);}}
 async function deleteLead_db(id){try{await sb.from('leads').delete().eq('id',id);}catch(e){console.error('deleteLead_db',e);}}
 async function saveWin_db(obj){try{await sb.from('wins').upsert(winToDB(obj));}catch(e){console.error('saveWin_db',e);}}
@@ -1668,6 +1670,7 @@ function openAddOrder(id){
   document.getElementById('order-hard').value='';
   document.getElementById('order-notes').value='';
   document.getElementById('order-scheduled').value='';
+  document.getElementById('order-number').value='';
   document.getElementById('order-modal').classList.add('open');
 }
 function openEditOrder(id){
@@ -1681,6 +1684,7 @@ function openEditOrder(id){
   document.getElementById('order-hard').value=order.hard||'';
   document.getElementById('order-notes').value=order.winNotes||'';
   document.getElementById('order-scheduled').value=order.scheduledDate||'';
+  document.getElementById('order-number').value=order.orderNumber||'';
   document.getElementById('order-modal').classList.add('open');
 }  
 async function confirmAddOrder(){
@@ -1695,13 +1699,14 @@ async function confirmAddOrder(){
     order.installs=Math.max(carpet,hard)||carpet||hard;
     order.winNotes=document.getElementById('order-notes').value.trim();
     order.scheduledDate=document.getElementById('order-scheduled').value;
+    order.orderNumber=document.getElementById('order-number').value.trim();
     closeModal('order-modal');orderEditId=null;orderSourceId=null;
     renderWins();updateWinsBadge();
     isSaving=true;await saveWin_db(order);isSaving=false;
     return;
   }
   const src=wins.find(x=>x.id===orderSourceId);if(!src)return;
-  const newOrder={...src,id:Date.now()+'',wonDate:date,carpet,hard,installs:Math.max(carpet,hard)||carpet||hard,winNotes:document.getElementById('order-notes').value.trim(),scheduledDate:document.getElementById('order-scheduled').value};
+  const newOrder={...src,id:Date.now()+'',wonDate:date,carpet,hard,installs:Math.max(carpet,hard)||carpet||hard,winNotes:document.getElementById('order-notes').value.trim(),scheduledDate:document.getElementById('order-scheduled').value,orderNumber:document.getElementById('order-number').value.trim()};
   wins.unshift(newOrder);
   closeModal('order-modal');orderSourceId=null;
   renderWins();updateWinsBadge();
