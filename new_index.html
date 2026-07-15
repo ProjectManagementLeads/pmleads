@@ -725,6 +725,10 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
         <div class="field"><label>Carpet</label><input type="number" id="order-carpet" min="0" placeholder="e.g. 12"></div>
         <div class="field"><label>Hard Surface</label><input type="number" id="order-hard" min="0" placeholder="e.g. 12"></div>
       </div>
+      <div class="field-row" style="position:relative;z-index:1">
+        <div class="field"><label>Carpet PO</label><input type="text" id="order-carpet-po" placeholder="e.g. CP-1042"></div>
+        <div class="field"><label>Hard Surface PO</label><input type="text" id="order-hard-po" placeholder="e.g. HP-1042"></div>
+      </div>
       <div class="field" style="position:relative;z-index:1"><label>Notes</label><textarea id="order-notes" placeholder="e.g. Summer turn package…" style="min-height:64px"></textarea></div>
       <div class="field" style="position:relative;z-index:1"><label>Scheduled install date</label><input type="date" id="order-scheduled"></div>
       <div class="modal-actions">
@@ -787,8 +791,8 @@ function hideLoading(){const el=document.getElementById('loading-overlay');if(el
 // ── DB mappers ──
 function dbToLead(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,style:r.style||'',area:r.area||'Other',status:r.status||'New',notes:r.notes||'',mgmt:r.mgmt||''};}
 function leadToDB(l){return{id:l.id,company:l.company,contact:l.contact,phone:l.phone,email:l.email,address:l.address,units:l.units||0,style:l.style,area:l.area,status:l.status,notes:l.notes,mgmt:l.mgmt||''};}
-function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,installs:r.installs||0,carpet:r.carpet||0,hard:r.hard||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||'',mgmt:r.mgmt||'',scheduledDate:r.scheduled_date||'',orderNumber:r.order_number||'',propertyPO:r.property_po||''};}
-function winToDB(w){return{id:w.id,company:w.company,contact:w.contact,phone:w.phone,email:w.email,address:w.address,units:w.units||0,installs:w.installs||0,carpet:w.carpet||0,hard:w.hard||0,style:w.style,area:w.area,won_date:w.wonDate,win_notes:w.winNotes,mgmt:w.mgmt||'',scheduled_date:w.scheduledDate||null,order_number:w.orderNumber||null,property_po:w.propertyPO||null};}
+function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,installs:r.installs||0,carpet:r.carpet||0,hard:r.hard||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||'',mgmt:r.mgmt||'',scheduledDate:r.scheduled_date||'',orderNumber:r.order_number||'',propertyPO:r.property_po||'',carpetPO:r.carpet_po||'',hardPO:r.hard_po||''};}
+function winToDB(w){return{id:w.id,company:w.company,contact:w.contact,phone:w.phone,email:w.email,address:w.address,units:w.units||0,installs:w.installs||0,carpet:w.carpet||0,hard:w.hard||0,style:w.style,area:w.area,won_date:w.wonDate,win_notes:w.winNotes,mgmt:w.mgmt||'',scheduled_date:w.scheduledDate||null,order_number:w.orderNumber||null,property_po:w.propertyPO||null,carpet_po:w.carpetPO||null,hard_po:w.hardPO||null};}
 
   // ── Supabase CRUD ──
 async function saveLead_db(obj){try{await sb.from('leads').upsert(leadToDB(obj));}catch(e){console.error('saveLead_db',e);}}
@@ -1673,6 +1677,8 @@ function openAddOrder(id){
   document.getElementById('order-scheduled').value='';
   document.getElementById('order-number').value='';
   document.getElementById('order-property-po').value='';
+  document.getElementById('order-carpet-po').value='';
+  document.getElementById('order-hard-po').value='';
   document.getElementById('order-modal').classList.add('open');
 }
 function openEditOrder(id){
@@ -1688,6 +1694,8 @@ function openEditOrder(id){
   document.getElementById('order-scheduled').value=order.scheduledDate||'';
   document.getElementById('order-number').value=order.orderNumber||'';
   document.getElementById('order-property-po').value=order.propertyPO||'';
+  document.getElementById('order-carpet-po').value=order.carpetPO||'';
+  document.getElementById('order-hard-po').value=order.hardPO||'';
   document.getElementById('order-modal').classList.add('open');
 }  
 async function confirmAddOrder(){
@@ -1704,13 +1712,15 @@ async function confirmAddOrder(){
     order.scheduledDate=document.getElementById('order-scheduled').value;
     order.orderNumber=document.getElementById('order-number').value.trim();
     order.propertyPO=document.getElementById('order-property-po').value.trim();
+    order.carpetPO=document.getElementById('order-carpet-po').value.trim();
+    order.hardPO=document.getElementById('order-hard-po').value.trim();
     closeModal('order-modal');orderEditId=null;orderSourceId=null;
     renderWins();updateWinsBadge();
     isSaving=true;await saveWin_db(order);isSaving=false;
     return;
   }
   const src=wins.find(x=>x.id===orderSourceId);if(!src)return;
-  const newOrder={...src,id:Date.now()+'',wonDate:date,carpet,hard,installs:Math.max(carpet,hard)||carpet||hard,winNotes:document.getElementById('order-notes').value.trim(),scheduledDate:document.getElementById('order-scheduled').value,orderNumber:document.getElementById('order-number').value.trim(),propertyPO:document.getElementById('order-property-po').value.trim()};
+  const newOrder={...src,id:Date.now()+'',wonDate:date,carpet,hard,installs:Math.max(carpet,hard)||carpet||hard,winNotes:document.getElementById('order-notes').value.trim(),scheduledDate:document.getElementById('order-scheduled').value,orderNumber:document.getElementById('order-number').value.trim(),propertyPO:document.getElementById('order-property-po').value.trim(),carpetPO:document.getElementById('order-carpet-po').value.trim(),hardPO:document.getElementById('order-hard-po').value.trim()};
   wins.unshift(newOrder);
   closeModal('order-modal');orderSourceId=null;
   renderWins();updateWinsBadge();
@@ -1848,8 +1858,8 @@ function openInstallDetail(w){
         ${w.propertyPO?`<div style="flex:1;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09)"><div style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Property PO</div><div style="font-size:14px;color:var(--ink2)">${esc(w.propertyPO)}</div></div>`:''}
       </div>`:''}
       <div style="display:flex;gap:10px;margin-bottom:10px">
-        ${carpet>0?`<div style="flex:1;padding:16px;border-radius:12px;background:rgba(0,255,179,0.08);border:1px solid rgba(0,255,179,0.25);text-align:center"><div style="font-size:32px;font-weight:900;color:var(--green)">${carpet}</div><div style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.08em;margin-top:4px">Carpet</div></div>`:''}
-        ${hard>0?`<div style="flex:1;padding:16px;border-radius:12px;background:rgba(0,180,255,0.08);border:1px solid rgba(0,180,255,0.25);text-align:center"><div style="font-size:32px;font-weight:900;color:var(--cyan)">${hard}</div><div style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.08em;margin-top:4px">Hard Surface</div></div>`:''}
+        ${carpet>0?`<div style="flex:1;padding:16px;border-radius:12px;background:rgba(0,255,179,0.08);border:1px solid rgba(0,255,179,0.25);text-align:center"><div style="font-size:32px;font-weight:900;color:var(--green)">${carpet}</div><div style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.08em;margin-top:4px">Carpet</div>${w.carpetPO?`<div style="font-size:11px;font-weight:700;color:var(--pink);margin-top:6px">${esc(w.carpetPO)}</div>`:''}</div>`:''}
+        ${hard>0?`<div style="flex:1;padding:16px;border-radius:12px;background:rgba(0,180,255,0.08);border:1px solid rgba(0,180,255,0.25);text-align:center"><div style="font-size:32px;font-weight:900;color:var(--cyan)">${hard}</div><div style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.08em;margin-top:4px">Hard Surface</div>${w.hardPO?`<div style="font-size:11px;font-weight:700;color:var(--purple3);margin-top:6px">${esc(w.hardPO)}</div>`:''}</div>`:''}
         ${carpet===0&&hard===0&&(w.installs||0)>0?`<div style="flex:1;padding:16px;border-radius:12px;background:rgba(0,255,179,0.08);border:1px solid rgba(0,255,179,0.25);text-align:center"><div style="font-size:32px;font-weight:900;color:var(--green)">${w.installs}</div><div style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.08em;margin-top:4px">Installs</div></div>`:''}
       </div>
       ${w.winNotes?`<div style="padding:14px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Notes</div><div style="font-size:14px;color:var(--ink2);line-height:1.6;white-space:pre-wrap">${esc(w.winNotes)}</div></div>`:''}
@@ -1857,6 +1867,12 @@ function openInstallDetail(w){
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         Add to Google Calendar
       </a>
+      <div id="reschedule-wrap-${w.id}" style="margin-top:10px">
+        <button onclick="showReschedule('${w.id}')" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:12px;background:rgba(255,0,110,0.1);border:1px solid rgba(255,0,110,0.3);color:var(--pink);font-size:13px;font-weight:700;box-sizing:border-box;touch-action:manipulation;cursor:pointer;font-family:inherit">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Reschedule Install
+        </button>
+      </div>
     </div>`;
   document.getElementById('install-detail-modal').classList.add('open');
 }
@@ -1867,6 +1883,34 @@ function googleCalendarLink(w){
   const carpet=parseInt(w.carpet)||0,hard=parseInt(w.hard)||0;
   const details=[carpet>0?carpet+' carpet units':'',hard>0?hard+' hard surface units':'',w.winNotes?w.winNotes.split('\n')[0]:''].filter(Boolean).join(' · ');
   return`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Install: '+w.company)}&dates=${date}/${date}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(w.address||'')}`;
+}
+function showReschedule(id){
+  const w=wins.find(x=>x.id===id);if(!w)return;
+  const wrap=document.getElementById('reschedule-wrap-'+id);if(!wrap)return;
+  wrap.innerHTML=`<div style="display:flex;gap:8px;align-items:center;padding:12px;border-radius:12px;background:rgba(255,0,110,0.08);border:1px solid rgba(255,0,110,0.3)">
+    <input type="date" id="reschedule-date-${id}" value="${w.scheduledDate||''}" style="flex:1;font-size:14px;font-family:inherit;padding:10px 12px;border:1px solid rgba(255,0,110,0.4);border-radius:9px;background:rgba(255,255,255,0.07);color:var(--ink);outline:none">
+    <button onclick="doReschedule('${id}')" style="padding:10px 16px;border-radius:9px;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border:none;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap">Save</button>
+    <button onclick="cancelReschedule('${id}')" style="padding:10px 12px;border-radius:9px;background:rgba(255,255,255,0.07);color:var(--ink3);border:1px solid rgba(255,255,255,0.12);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer">✕</button>
+  </div>`;
+}
+
+async function doReschedule(id){
+  const w=wins.find(x=>x.id===id);if(!w)return;
+  const newDate=document.getElementById('reschedule-date-'+id).value;
+  w.scheduledDate=newDate;
+  closeModal('install-detail-modal');
+  renderCalendar();
+  updateWinsBadge();
+  isSaving=true;await saveWin_db(w);isSaving=false;
+}
+
+function cancelReschedule(id){
+  const w=wins.find(x=>x.id===id);if(!w)return;
+  const wrap=document.getElementById('reschedule-wrap-'+id);if(!wrap)return;
+  wrap.innerHTML=`<button onclick="showReschedule('${id}')" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:12px;background:rgba(255,0,110,0.1);border:1px solid rgba(255,0,110,0.3);color:var(--pink);font-size:13px;font-weight:700;box-sizing:border-box;touch-action:manipulation;cursor:pointer;font-family:inherit">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Reschedule Install
+  </button>`;
 }
 
 function prevMonth(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendarGrid();}
