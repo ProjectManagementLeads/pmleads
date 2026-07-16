@@ -12,7 +12,7 @@
   --pink:#FF0088;--pink2:#FF0055;--pink3:#FF55CC;
   --purple:#CC00FF;--purple2:#9900EE;--purple3:#EE88FF;
   --green:#00FFB3;--green2:#00EE88;--green3:#BBFFEE;
-  --amber:#FFD700;--amber2:#EEA800;--amber3:#FFEE77;
+  --amber:#FFD700;--amber2:#EEA800;--amber3:#FFEE77;borderRadius:{topLeft:5,topRight:5,bottomLeft:0,bottomRight:0},borderSkipped:false,stack:'s',order:2},
   --orange:#FF4400;--blue:#2266FF;--blue2:#1144BB;
   --cyan:#00B4FF;--cyan2:#00D4FF;--cyan3:#80DAFF;
   --ink:#FFFFFF;--ink2:#C8D8F0;--ink3:#8AAACE;--ink4:#4A6080;
@@ -1626,7 +1626,7 @@ function renderPropertyChart(){
     data:{labels:months.map(m=>m.label),datasets:[
       {data:legacyData,label:'Legacy',backgroundColor:plg,borderColor:'rgba(0,255,179,0.65)',borderWidth:{top:0,right:1.5,bottom:1.5,left:1.5},borderRadius:legacyRadius,borderSkipped:false,stack:'s'},
       {data:carpetData,label:'Carpet',backgroundColor:pcg,borderColor:'rgba(0,180,255,0.65)',borderWidth:{top:0,right:1.5,bottom:0,left:1.5},borderRadius:carpetRadius,borderSkipped:false,stack:'s'},
-      {data:hardData,label:'Hard Surface',backgroundColor:phg,borderColor:'rgba(153,0,255,0.65)',borderWidth:{top:1.5,right:1.5,bottom:0,left:1.5},borderRadius:hardRadius,borderSkipped:false,stack:'s'}
+      {data:hardData,label:'Hard Surface',backgroundColor:phg,borderColor:'rgba(153,0,255,0.65)',borderWidth:{top:0,right:1.5,bottom:0,left:1.5},borderRadius:hardRadius,borderSkipped:false,stack:'s'}
     ]},
     options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:48}},
       onClick:(evt,elements)=>{if(elements.length){const m=months[elements[0].index];showMonthDetail(m,wins.filter(w=>w.wonDate&&w.wonDate.slice(0,7)===m.key));}},
