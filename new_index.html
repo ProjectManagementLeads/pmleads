@@ -12,7 +12,7 @@
   --pink:#FF0088;--pink2:#FF0055;--pink3:#FF55CC;
   --purple:#CC00FF;--purple2:#9900EE;--purple3:#EE88FF;
   --green:#00FFB3;--green2:#00EE88;--green3:#BBFFEE;
-  --amber:#FFD700;--amber2:#EEA800;--amber3:#FFEE77;borderRadius:{topLeft:5,topRight:5,bottomLeft:0,bottomRight:0},borderSkipped:false,stack:'s',order:2},
+  --amber:#FFD700;--amber2:#EEA800;--amber3:#FFEE77;
   --orange:#FF4400;--blue:#2266FF;--blue2:#1144BB;
   --cyan:#00B4FF;--cyan2:#00D4FF;--cyan3:#80DAFF;
   --ink:#FFFFFF;--ink2:#C8D8F0;--ink3:#8AAACE;--ink4:#4A6080;
@@ -725,10 +725,6 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
         <div class="field"><label>Carpet</label><input type="number" id="order-carpet" min="0" placeholder="e.g. 12"></div>
         <div class="field"><label>Hard Surface</label><input type="number" id="order-hard" min="0" placeholder="e.g. 12"></div>
       </div>
-      <div class="field-row" style="position:relative;z-index:1">
-        <div class="field"><label>Carpet PO</label><input type="text" id="order-carpet-po" placeholder="e.g. CP-1042"></div>
-        <div class="field"><label>Hard Surface PO</label><input type="text" id="order-hard-po" placeholder="e.g. HP-1042"></div>
-      </div>
       <div class="field" style="position:relative;z-index:1"><label>Notes</label><textarea id="order-notes" placeholder="e.g. Summer turn package…" style="min-height:64px"></textarea></div>
       <div class="field" style="position:relative;z-index:1"><label>Scheduled install date</label><input type="date" id="order-scheduled"></div>
       <div class="modal-actions">
@@ -791,8 +787,8 @@ function hideLoading(){const el=document.getElementById('loading-overlay');if(el
 // ── DB mappers ──
 function dbToLead(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,style:r.style||'',area:r.area||'Other',status:r.status||'New',notes:r.notes||'',mgmt:r.mgmt||''};}
 function leadToDB(l){return{id:l.id,company:l.company,contact:l.contact,phone:l.phone,email:l.email,address:l.address,units:l.units||0,style:l.style,area:l.area,status:l.status,notes:l.notes,mgmt:l.mgmt||''};}
-function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,installs:r.installs||0,carpet:r.carpet||0,hard:r.hard||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||'',mgmt:r.mgmt||'',scheduledDate:r.scheduled_date||'',orderNumber:r.order_number||'',propertyPO:r.property_po||'',carpetPO:r.carpet_po||'',hardPO:r.hard_po||''};}
-function winToDB(w){return{id:w.id,company:w.company,contact:w.contact,phone:w.phone,email:w.email,address:w.address,units:w.units||0,installs:w.installs||0,carpet:w.carpet||0,hard:w.hard||0,style:w.style,area:w.area,won_date:w.wonDate,win_notes:w.winNotes,mgmt:w.mgmt||'',scheduled_date:w.scheduledDate||null,order_number:w.orderNumber||null,property_po:w.propertyPO||null,carpet_po:w.carpetPO||null,hard_po:w.hardPO||null};}
+function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,installs:r.installs||0,carpet:r.carpet||0,hard:r.hard||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||'',mgmt:r.mgmt||'',scheduledDate:r.scheduled_date||'',orderNumber:r.order_number||'',propertyPO:r.property_po||''};}
+function winToDB(w){return{id:w.id,company:w.company,contact:w.contact,phone:w.phone,email:w.email,address:w.address,units:w.units||0,installs:w.installs||0,carpet:w.carpet||0,hard:w.hard||0,style:w.style,area:w.area,won_date:w.wonDate,win_notes:w.winNotes,mgmt:w.mgmt||'',scheduled_date:w.scheduledDate||null,order_number:w.orderNumber||null,property_po:w.propertyPO||null};}
 
   // ── Supabase CRUD ──
 async function saveLead_db(obj){try{await sb.from('leads').upsert(leadToDB(obj));}catch(e){console.error('saveLead_db',e);}}
@@ -1626,7 +1622,7 @@ function renderPropertyChart(){
     data:{labels:months.map(m=>m.label),datasets:[
       {data:legacyData,label:'Legacy',backgroundColor:plg,borderColor:'rgba(0,255,179,0.65)',borderWidth:{top:0,right:1.5,bottom:1.5,left:1.5},borderRadius:legacyRadius,borderSkipped:false,stack:'s'},
       {data:carpetData,label:'Carpet',backgroundColor:pcg,borderColor:'rgba(0,180,255,0.65)',borderWidth:{top:0,right:1.5,bottom:0,left:1.5},borderRadius:carpetRadius,borderSkipped:false,stack:'s'},
-      {data:hardData,label:'Hard Surface',backgroundColor:phg,borderColor:'rgba(153,0,255,0.65)',borderWidth:{top:0,right:1.5,bottom:0,left:1.5},borderRadius:hardRadius,borderSkipped:false,stack:'s'}
+      {data:hardData,label:'Hard Surface',backgroundColor:phg,borderColor:'rgba(153,0,255,0.65)',borderWidth:{top:1.5,right:1.5,bottom:0,left:1.5},borderRadius:hardRadius,borderSkipped:false,stack:'s'}
     ]},
     options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:48}},
       onClick:(evt,elements)=>{if(elements.length){const m=months[elements[0].index];showMonthDetail(m,wins.filter(w=>w.wonDate&&w.wonDate.slice(0,7)===m.key));}},
@@ -1677,8 +1673,6 @@ function openAddOrder(id){
   document.getElementById('order-scheduled').value='';
   document.getElementById('order-number').value='';
   document.getElementById('order-property-po').value='';
-  document.getElementById('order-carpet-po').value='';
-  document.getElementById('order-hard-po').value='';
   document.getElementById('order-modal').classList.add('open');
 }
 function openEditOrder(id){
@@ -1694,8 +1688,6 @@ function openEditOrder(id){
   document.getElementById('order-scheduled').value=order.scheduledDate||'';
   document.getElementById('order-number').value=order.orderNumber||'';
   document.getElementById('order-property-po').value=order.propertyPO||'';
-  document.getElementById('order-carpet-po').value=order.carpetPO||'';
-  document.getElementById('order-hard-po').value=order.hardPO||'';
   document.getElementById('order-modal').classList.add('open');
 }  
 async function confirmAddOrder(){
@@ -1712,15 +1704,13 @@ async function confirmAddOrder(){
     order.scheduledDate=document.getElementById('order-scheduled').value;
     order.orderNumber=document.getElementById('order-number').value.trim();
     order.propertyPO=document.getElementById('order-property-po').value.trim();
-    order.carpetPO=document.getElementById('order-carpet-po').value.trim();
-    order.hardPO=document.getElementById('order-hard-po').value.trim();
     closeModal('order-modal');orderEditId=null;orderSourceId=null;
     renderWins();updateWinsBadge();
     isSaving=true;await saveWin_db(order);isSaving=false;
     return;
   }
   const src=wins.find(x=>x.id===orderSourceId);if(!src)return;
-  const newOrder={...src,id:Date.now()+'',wonDate:date,carpet,hard,installs:Math.max(carpet,hard)||carpet||hard,winNotes:document.getElementById('order-notes').value.trim(),scheduledDate:document.getElementById('order-scheduled').value,orderNumber:document.getElementById('order-number').value.trim(),propertyPO:document.getElementById('order-property-po').value.trim(),carpetPO:document.getElementById('order-carpet-po').value.trim(),hardPO:document.getElementById('order-hard-po').value.trim()};
+  const newOrder={...src,id:Date.now()+'',wonDate:date,carpet,hard,installs:Math.max(carpet,hard)||carpet||hard,winNotes:document.getElementById('order-notes').value.trim(),scheduledDate:document.getElementById('order-scheduled').value,orderNumber:document.getElementById('order-number').value.trim(),propertyPO:document.getElementById('order-property-po').value.trim()};
   wins.unshift(newOrder);
   closeModal('order-modal');orderSourceId=null;
   renderWins();updateWinsBadge();
@@ -1768,7 +1758,7 @@ function renderTodayPanel(){
     return`<div onclick="openInstallDetail(wins.find(x=>x.id==='${w.id}'))" style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;background:rgba(0,255,179,0.08);border:1px solid rgba(0,255,179,0.25);margin-bottom:8px;flex-wrap:wrap;cursor:pointer;touch-action:manipulation">
       <div style="flex:1;min-width:0">
         <div style="font-size:14px;font-weight:800;color:var(--ink)">${esc(w.company)}</div>
-        <div style="font-size:12px;color:var(--ink3);margin-top:3px">${breakdown}${w.orderNumber?` · <span style="color:var(--green);font-weight:700">Order #${esc(w.orderNumber)}</span>`:''}${w.winNotes?' · '+esc(w.winNotes.split('\n')[0]):''}</div>
+        <div style="font-size:12px;color:var(--ink3);margin-top:3px">${breakdown}${w.orderNumber?` · <span style="color:var(--pink);font-weight:700">Order #${esc(w.orderNumber)}</span>`:''}${w.propertyPO?` · <span style="color:var(--purple3);font-weight:700">PO: ${esc(w.propertyPO)}</span>`:''}${w.winNotes?' · '+esc(w.winNotes.split('\n')[0]):''}</div>
       </div>
       <a href="${googleCalendarLink(w)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;font-family:inherit;padding:7px 13px;border-radius:8px;background:rgba(0,180,255,0.12);border:1px solid rgba(0,180,255,0.35);color:var(--cyan);text-decoration:none;flex-shrink:0;white-space:nowrap;touch-action:manipulation">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -1853,12 +1843,13 @@ function openInstallDetail(w){
       ${w.address?`<a href="https://maps.google.com/?q=${encodeURIComponent(w.address)}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);margin-bottom:10px;text-decoration:none;color:inherit;touch-action:manipulation"><span style="font-size:22px">📍</span><div><div style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Address</div><div style="font-size:14px;color:var(--ink2)">${esc(w.address)}</div></div></a>`:''}
       ${w.phone?`<a href="tel:${w.phone.replace(/\D/g,'')}" style="display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);margin-bottom:10px;text-decoration:none;color:inherit;touch-action:manipulation"><span style="font-size:22px">📞</span><div><div style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Phone</div><div style="font-size:14px;color:var(--ink2)">${esc(w.phone)}</div></div></a>`:''}
       ${w.contact?`<div style="display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);margin-bottom:10px"><span style="font-size:22px">👤</span><div><div style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Contact</div><div style="font-size:14px;color:var(--ink2)">${esc(w.contact)}</div></div></div>`:''}
-      ${w.orderNumber?`<div style="display:flex;gap:10px;margin-bottom:10px">
-        <div style="flex:1;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09)"><div style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Order #</div><div style="font-size:14px;color:var(--ink2)">${esc(w.orderNumber)}</div></div>
+      ${(w.orderNumber||w.propertyPO)?`<div style="display:flex;gap:10px;margin-bottom:10px">
+        ${w.orderNumber?`<div style="flex:1;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09)"><div style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Order #</div><div style="font-size:14px;color:var(--ink2)">${esc(w.orderNumber)}</div></div>`:''}
+        ${w.propertyPO?`<div style="flex:1;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09)"><div style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Property PO</div><div style="font-size:14px;color:var(--ink2)">${esc(w.propertyPO)}</div></div>`:''}
       </div>`:''}
       <div style="display:flex;gap:10px;margin-bottom:10px">
-        ${carpet>0?`<div style="flex:1;padding:16px;border-radius:12px;background:rgba(0,255,179,0.08);border:1px solid rgba(0,255,179,0.25);text-align:center"><div style="font-size:32px;font-weight:900;color:var(--green)">${carpet}</div><div style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.08em;margin-top:4px">Carpet</div>${w.carpetPO?`<div style="font-size:11px;font-weight:700;color:var(--pink);margin-top:6px">${esc(w.carpetPO)}</div>`:''}</div>`:''}
-        ${hard>0?`<div style="flex:1;padding:16px;border-radius:12px;background:rgba(0,180,255,0.08);border:1px solid rgba(0,180,255,0.25);text-align:center"><div style="font-size:32px;font-weight:900;color:var(--cyan)">${hard}</div><div style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.08em;margin-top:4px">Hard Surface</div>${w.hardPO?`<div style="font-size:11px;font-weight:700;color:var(--purple3);margin-top:6px">${esc(w.hardPO)}</div>`:''}</div>`:''}
+        ${carpet>0?`<div style="flex:1;padding:16px;border-radius:12px;background:rgba(0,255,179,0.08);border:1px solid rgba(0,255,179,0.25);text-align:center"><div style="font-size:32px;font-weight:900;color:var(--green)">${carpet}</div><div style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.08em;margin-top:4px">Carpet</div></div>`:''}
+        ${hard>0?`<div style="flex:1;padding:16px;border-radius:12px;background:rgba(0,180,255,0.08);border:1px solid rgba(0,180,255,0.25);text-align:center"><div style="font-size:32px;font-weight:900;color:var(--cyan)">${hard}</div><div style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.08em;margin-top:4px">Hard Surface</div></div>`:''}
         ${carpet===0&&hard===0&&(w.installs||0)>0?`<div style="flex:1;padding:16px;border-radius:12px;background:rgba(0,255,179,0.08);border:1px solid rgba(0,255,179,0.25);text-align:center"><div style="font-size:32px;font-weight:900;color:var(--green)">${w.installs}</div><div style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.08em;margin-top:4px">Installs</div></div>`:''}
       </div>
       ${w.winNotes?`<div style="padding:14px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Notes</div><div style="font-size:14px;color:var(--ink2);line-height:1.6;white-space:pre-wrap">${esc(w.winNotes)}</div></div>`:''}
@@ -1866,16 +1857,6 @@ function openInstallDetail(w){
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         Add to Google Calendar
       </a>
-      <button onclick="closeModal('install-detail-modal');openEditOrder('${w.id}')" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:12px;background:rgba(0,255,255,0.1);border:1px solid rgba(0,255,255,0.3);color:var(--cyan);font-size:13px;font-weight:700;box-sizing:border-box;touch-action:manipulation;cursor:pointer;font-family:inherit;margin-top:10px">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        Edit Order
-      </button>
-      <div id="reschedule-wrap-${w.id}" style="margin-top:10px">
-        <button onclick="showReschedule('${w.id}')" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:12px;background:rgba(255,0,110,0.1);border:1px solid rgba(255,0,110,0.3);color:var(--pink);font-size:13px;font-weight:700;box-sizing:border-box;touch-action:manipulation;cursor:pointer;font-family:inherit">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          Reschedule Install
-        </button>
-      </div>
     </div>`;
   document.getElementById('install-detail-modal').classList.add('open');
 }
@@ -1886,34 +1867,6 @@ function googleCalendarLink(w){
   const carpet=parseInt(w.carpet)||0,hard=parseInt(w.hard)||0;
   const details=[carpet>0?carpet+' carpet units':'',hard>0?hard+' hard surface units':'',w.winNotes?w.winNotes.split('\n')[0]:''].filter(Boolean).join(' · ');
   return`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Install: '+w.company)}&dates=${date}/${date}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(w.address||'')}`;
-}
-function showReschedule(id){
-  const w=wins.find(x=>x.id===id);if(!w)return;
-  const wrap=document.getElementById('reschedule-wrap-'+id);if(!wrap)return;
-  wrap.innerHTML=`<div style="display:flex;gap:8px;align-items:center;padding:12px;border-radius:12px;background:rgba(255,0,110,0.08);border:1px solid rgba(255,0,110,0.3)">
-    <input type="date" id="reschedule-date-${id}" value="${w.scheduledDate||''}" style="flex:1;font-size:14px;font-family:inherit;padding:10px 12px;border:1px solid rgba(255,0,110,0.4);border-radius:9px;background:rgba(255,255,255,0.07);color:var(--ink);outline:none">
-    <button onclick="doReschedule('${id}')" style="padding:10px 16px;border-radius:9px;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border:none;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap">Save</button>
-    <button onclick="cancelReschedule('${id}')" style="padding:10px 12px;border-radius:9px;background:rgba(255,255,255,0.07);color:var(--ink3);border:1px solid rgba(255,255,255,0.12);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer">✕</button>
-  </div>`;
-}
-
-async function doReschedule(id){
-  const w=wins.find(x=>x.id===id);if(!w)return;
-  const newDate=document.getElementById('reschedule-date-'+id).value;
-  w.scheduledDate=newDate;
-  closeModal('install-detail-modal');
-  renderCalendar();
-  updateWinsBadge();
-  isSaving=true;await saveWin_db(w);isSaving=false;
-}
-
-function cancelReschedule(id){
-  const w=wins.find(x=>x.id===id);if(!w)return;
-  const wrap=document.getElementById('reschedule-wrap-'+id);if(!wrap)return;
-  wrap.innerHTML=`<button onclick="showReschedule('${id}')" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:12px;background:rgba(255,0,110,0.1);border:1px solid rgba(255,0,110,0.3);color:var(--pink);font-size:13px;font-weight:700;box-sizing:border-box;touch-action:manipulation;cursor:pointer;font-family:inherit">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-    Reschedule Install
-  </button>`;
 }
 
 function prevMonth(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendarGrid();}
