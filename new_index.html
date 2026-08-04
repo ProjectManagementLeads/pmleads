@@ -1724,10 +1724,8 @@ async function confirmAddOrder(){
     renderWins();updateWinsBadge();
     isSaving=true;await saveWin_db(order);isSaving=false;
     return;
-  }d('order-notes').value.trim(),scheduledDate:document.getElementById('
   const src=wins.find(x=>x.id===orderSourceId);if(!src)return;
-  const newOrder={...src,id:Date.now()+'',wonDate:date,carpet,hard,installs:Math.max(carpet,hard)||carpet||hard,winNotes:document.getElementByIorder-scheduled').value,carpetOrderNumber:document.getElementById('order-carpet-number').value.trim(),hardOrderNumber:document.getElementById('order-hard-number').value.trim(),propertyPO:document.getElementById('order-property-po').value.trim(),carpetPO:document.getElementById('order-carpet-po').value.trim(),hardPO:document.getElementById('order-hard-po').value.trim()};
-  wins.unshift(newOrder);
+  const newOrder={...src,id:Date.now()+'',wonDate:date,carpet,hard,installs:Math.max(carpet,hard)||carpet||hard,winNotes:document.getElementById('order-notes').value.trim(),scheduledDate:document.getElementById('order-scheduled').value,carpetOrderNumber:document.getElementById('order-carpet-number').value.trim(),hardOrderNumber:document.getElementById('order-hard-number').value.trim(),propertyPO:document.getElementById('order-property-po').value.trim(),carpetPO:document.getElementById('order-carpet-po').value.trim(),hardPO:document.getElementById('order-hard-po').value.trim()};
   closeModal('order-modal');orderSourceId=null;
   renderWins();updateWinsBadge();
   isSaving=true;await saveWin_db(newOrder);isSaving=false;
