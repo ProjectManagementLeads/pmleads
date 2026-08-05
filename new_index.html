@@ -60,6 +60,14 @@ body{font-family:'Inter',sans-serif;background:#010209;color:var(--ink);-webkit-
 .section-btn.active-leads{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;box-shadow:0 0 16px rgba(255,0,110,0.4);}
 .section-btn.active-wins{background:linear-gradient(135deg,var(--green2),var(--green));color:#03040F;box-shadow:0 0 16px rgba(0,255,179,0.4);}
 .section-btn.active-calendar{background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#03040F;box-shadow:0 0 16px rgba(0,180,255,0.4);}
+.section-btn.active-installs{background:linear-gradient(135deg,var(--amber2),var(--amber));color:#03040F;box-shadow:0 0 16px rgba(255,215,0,0.4);}
+#installs-stats-bar::after{background:linear-gradient(90deg,var(--amber),var(--orange),var(--amber));opacity:1.0;}
+#installs-stats-bar .stat:nth-child(1)::before,#installs-stats-bar .stat:nth-child(2)::before,#installs-stats-bar .stat:nth-child(3)::before{background:linear-gradient(90deg,transparent,var(--amber),var(--amber3),transparent);box-shadow:0 2px 20px rgba(255,215,0,0.8)}
+#installs-stats-bar .stat:nth-child(4)::before{background:linear-gradient(90deg,transparent,var(--orange),#FF8844,transparent);box-shadow:0 2px 20px rgba(255,68,0,0.8)}
+#installs-stats-bar .stat-bg{background:var(--amber)!important}
+#installs-stats-bar .stat:nth-child(4) .stat-bg{background:var(--orange)!important}
+#installs-stats-bar .stat-val{background-image:linear-gradient(135deg,var(--amber),var(--amber3),#FFF0A0)!important}
+#installs-stats-bar .stat:nth-child(4) .stat-val{background-image:linear-gradient(135deg,var(--orange),#FF8844,#FFCC88)!important}
 .section-btn:hover:not(.active-leads):not(.active-wins):not(.active-calendar){color:var(--ink2);background:rgba(255,255,255,0.08);}
   
 /* ── BUTTONS ── */
@@ -364,6 +372,11 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
         Wins
         <span id="wins-badge" style="display:none;background:linear-gradient(135deg,var(--green2),var(--green));color:#03040F;font-size:10px;font-weight:800;padding:1px 6px;border-radius:20px;margin-left:4px"></span>
       </button>
+      <button class="section-btn" id="toggle-installs" onclick="setSection('installs')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        Installs
+        <span id="installs-badge" style="display:none;background:linear-gradient(135deg,var(--amber2),var(--amber));color:#03040F;font-size:10px;font-weight:800;padding:1px 6px;border-radius:20px;margin-left:4px"></span>
+      </button>
       <button class="section-btn" id="toggle-calendar" onclick="setSection('calendar')">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           Calendar
@@ -387,6 +400,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
 <div class="section-toggle-mob" style="position:relative;z-index:2;background:rgba(3,4,15,0.8);border-bottom:1px solid var(--b);">
   <button class="section-btn active-leads" id="toggle-leads-mob" onclick="setSection('leads')" style="flex:1;height:42px;border-radius:0;font-size:13px;">Pipeline</button>
   <button class="section-btn" id="toggle-wins-mob" onclick="setSection('wins')" style="flex:1;height:42px;border-radius:0;font-size:13px;">Wins</button>
+  <button class="section-btn" id="toggle-installs-mob" onclick="setSection('installs')" style="flex:1;height:42px;border-radius:0;font-size:13px;">Installs</button>
   <button class="section-btn" id="toggle-calendar-mob" onclick="setSection('calendar')" style="flex:1;height:42px;border-radius:0;font-size:13px;">Calendar</button>
 </div>
 
@@ -532,6 +546,46 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
   </div>
 </div>
   
+<!-- ═══════════ INSTALLS SECTION ═══════════ -->
+<div id="installs-section" style="display:none">
+  <div class="stats-bar" id="installs-stats-bar">
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label">Total Scheduled</div><div class="stat-val" id="si-total">0</div></div>
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label">Today</div><div class="stat-val" id="si-today">0</div></div>
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label">Next 30 Days</div><div class="stat-val" id="si-upcoming">0</div></div>
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label">Past Due</div><div class="stat-val" id="si-pastdue">0</div></div>
+  </div>
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="search-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+      <input class="search-input" id="installs-search" placeholder="Search installs…" oninput="renderInstalls()">
+    </div>
+    <select class="filter-select" id="filter-installs-when" onchange="renderInstalls()">
+      <option value="">All dates</option>
+      <option value="today">Today</option>
+      <option value="upcoming">Upcoming (30 days)</option>
+      <option value="pastdue">Past due</option>
+    </select>
+  </div>
+  <div class="table-wrap">
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Company</th>
+            <th>Scheduled</th>
+            <th style="text-align:right">Carpet</th>
+            <th style="text-align:right">Hard</th>
+            <th class="hide-mob">Carpet CG #</th>
+            <th class="hide-mob">Hard CG #</th>
+            <th class="hide-mob">Area</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="installs-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
 <!-- ═══════════ CALENDAR SECTION ═══════════ -->
 <div id="calendar-section" style="display:none">
   <!-- Today panel -->
@@ -867,18 +921,22 @@ function setSection(s){
   currentSection=s;
   document.getElementById('leads-section').style.display=s==='leads'?'':'none';
   document.getElementById('wins-section').style.display=s==='wins'?'':'none';
+  document.getElementById('installs-section').style.display=s==='installs'?'':'none';
   document.getElementById('calendar-section').style.display=s==='calendar'?'':'none';
   // Desktop toggle
   document.getElementById('toggle-leads').className='section-btn'+(s==='leads'?' active-leads':'');
   document.getElementById('toggle-wins').className='section-btn'+(s==='wins'?' active-wins':'');
+  document.getElementById('toggle-installs').className='section-btn'+(s==='installs'?' active-installs':'');
   document.getElementById('toggle-calendar').className='section-btn'+(s==='calendar'?' active-calendar':'');
   // Mobile toggle
   document.getElementById('toggle-leads-mob').className='section-btn'+(s==='leads'?' active-leads':'');
   document.getElementById('toggle-wins-mob').className='section-btn'+(s==='wins'?' active-wins':'');
+  document.getElementById('toggle-installs-mob').className='section-btn'+(s==='installs'?' active-installs':'');
   document.getElementById('toggle-calendar-mob').className='section-btn'+(s==='calendar'?' active-calendar':'');
-  // Top actions — hide Areas/Add when in wins or calendar
+  // Top actions — hide Areas/Add when not on leads
   document.getElementById('top-actions').style.display=s==='leads'?'flex':'none';
   if(s==='wins') renderWins();
+  else if(s==='installs') renderInstalls();
   else if(s==='calendar') renderCalendar();
   else render();
 }
@@ -891,6 +949,8 @@ function updateWinsBadge(){
   else badge.style.display='none';
   const cbadge=document.getElementById('calendar-badge');
   if(cbadge){const todayStr=new Date().toISOString().split('T')[0];const tc=wins.filter(w=>w.scheduledDate===todayStr).length;if(tc>0){cbadge.style.display='inline';cbadge.textContent=tc;}else cbadge.style.display='none';}
+  const ibadge=document.getElementById('installs-badge');
+  if(ibadge){const ic=wins.filter(w=>w.scheduledDate).length;if(ic>0){ibadge.style.display='inline';ibadge.textContent=ic;}else ibadge.style.display='none';}
 }
 
 // ── Move to wins ──
@@ -1750,6 +1810,52 @@ async function deleteOrder(id){
   }
 }
   
+// ── Installs ──
+function renderInstalls(){
+  const today=new Date().toISOString().split('T')[0];
+  const in30=new Date();in30.setDate(in30.getDate()+30);
+  const in30Str=in30.toISOString().split('T')[0];
+  const q=(document.getElementById('installs-search')?.value||'').toLowerCase();
+  const when=document.getElementById('filter-installs-when')?.value||'';
+  const scheduled=wins.filter(w=>w.scheduledDate).sort((a,b)=>a.scheduledDate.localeCompare(b.scheduledDate));
+  document.getElementById('si-total').textContent=scheduled.length;
+  document.getElementById('si-today').textContent=scheduled.filter(w=>w.scheduledDate===today).length;
+  document.getElementById('si-upcoming').textContent=scheduled.filter(w=>w.scheduledDate>=today&&w.scheduledDate<=in30Str).length;
+  document.getElementById('si-pastdue').textContent=scheduled.filter(w=>w.scheduledDate<today).length;
+  const rows=scheduled.filter(w=>{
+    if(q&&!(w.company+(w.winNotes||'')+(w.carpetOrderNumber||'')+(w.hardOrderNumber||'')).toLowerCase().includes(q))return false;
+    if(when==='today'&&w.scheduledDate!==today)return false;
+    if(when==='upcoming'&&!(w.scheduledDate>=today&&w.scheduledDate<=in30Str))return false;
+    if(when==='pastdue'&&w.scheduledDate>=today)return false;
+    return true;
+  });
+  const tb=document.getElementById('installs-tbody');
+  if(!rows.length){
+    tb.innerHTML=`<tr><td colspan="8"><div class="empty"><span class="empty-icon-wrap" style="font-size:52px;display:block;margin-bottom:18px">📋</span><div class="empty-title" style="background:linear-gradient(90deg,var(--amber),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent">No installs found</div><div class="empty-sub">Add a scheduled date to an install order to see it here.</div></div></td></tr>`;
+    return;
+  }
+  tb.innerHTML=rows.map(w=>{
+    const carpet=parseInt(w.carpet)||0,hard=parseInt(w.hard)||0;
+    const dateStr=w.scheduledDate?new Date(w.scheduledDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
+    const isPast=w.scheduledDate<today,isToday=w.scheduledDate===today;
+    const dc=isToday?'var(--green)':isPast?'var(--orange)':'var(--amber)';
+    const dbg=isToday?'rgba(0,255,179,0.12)':isPast?'rgba(255,68,0,0.12)':'rgba(255,215,0,0.08)';
+    const dbr=isToday?'rgba(0,255,179,0.3)':isPast?'rgba(255,68,0,0.3)':'rgba(255,215,0,0.25)';
+    return`<tr>
+      <td><div class="co-name co-name-clickable" onclick="openInstallDetail(wins.find(x=>x.id==='${w.id}'))">${esc(w.company)}</div>${w.address?'<div class="co-addr">'+esc(w.address)+'</div>':''}</td>
+      <td><span style="display:inline-block;font-size:11px;font-weight:800;padding:5px 12px;border-radius:20px;background:${dbg};color:${dc};border:1px solid ${dbr};white-space:nowrap">${isToday?'TODAY — ':isPast?'PAST — ':''}${dateStr}</span></td>
+      <td style="text-align:right;font-weight:800;color:var(--green)">${carpet||'<span class="muted" style="font-weight:400">—</span>'}</td>
+      <td style="text-align:right;font-weight:800;color:var(--cyan)">${hard||'<span class="muted" style="font-weight:400">—</span>'}</td>
+      <td class="hide-mob" style="font-size:12px;color:var(--green);font-weight:700">${esc(w.carpetOrderNumber)||'<span class="muted">—</span>'}</td>
+      <td class="hide-mob" style="font-size:12px;color:var(--cyan);font-weight:700">${esc(w.hardOrderNumber)||'<span class="muted">—</span>'}</td>
+      <td class="hide-mob"><span class="area-chip">${esc(w.area)}</span></td>
+      <td style="white-space:nowrap"><div style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-sm" onclick="openInstallDetail(wins.find(x=>x.id==='${w.id}'))" style="min-height:34px;touch-action:manipulation;background:rgba(255,215,0,0.08);border-color:rgba(255,215,0,0.3);color:var(--amber)">View</button>
+        <button class="btn btn-ghost btn-sm" onclick="openEditOrder('${w.id}')" style="min-height:34px;touch-action:manipulation">Edit</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
 // ── Calendar ──
 let calYear=new Date().getFullYear(),calMonth=new Date().getMonth();
 
