@@ -488,25 +488,6 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
   <div style="height:280px;position:relative"><canvas id="wins-chart"></canvas></div>
   <div id="chart-month-detail" style="display:none;margin-top:16px;border-top:1px solid rgba(255,255,255,0.07);padding-top:16px"></div>
   </div>
-  <!-- Property order history -->
-  <div id="wins-prop-section" style="background:rgba(3,4,15,0.7);backdrop-filter:blur(20px);border-bottom:1px solid var(--b);padding:24px 28px;position:relative;z-index:2;">
-    <div id="prop-chart-prompt" style="text-align:center;padding:16px 0 8px;color:var(--ink4);font-size:13px">
-      <div style="font-size:28px;margin-bottom:8px">🏢</div>
-      Click any property name in the table below to view its order history.
-    </div>
-    <div id="prop-chart-content" style="display:none">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <div>
-          <div style="font-size:11px;font-weight:800;letter-spacing:.13em;color:var(--ink3);text-transform:uppercase;margin-bottom:4px">Order History</div>
-          <div style="font-size:16px;font-weight:700;color:var(--ink)" id="prop-chart-company"></div>
-        </div>
-        <button class="btn btn-ghost btn-sm" onclick="clearPropertyChart()" style="min-height:28px;font-size:11px">✕ Clear</button>
-      </div>
-      <div style="height:260px;position:relative"><canvas id="wins-prop-chart"></canvas></div>
-      <div id="prop-chart-summary" style="display:flex;gap:24px;flex-wrap:wrap;margin-top:14px;font-size:12px;color:var(--ink3)"></div>
-      <div id="prop-orders-list" style="margin-top:12px"></div>
-    </div>
-  </div>
   <!-- Wins tabs -->
   <div class="tabs-wrap wins-tabs" id="wins-tabs"></div>
   <!-- Wins toolbar -->
@@ -553,6 +534,24 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
     <div class="stat"><div class="stat-bg"></div><div class="stat-label">Today</div><div class="stat-val" id="si-today">0</div></div>
     <div class="stat"><div class="stat-bg"></div><div class="stat-label">Next 30 Days</div><div class="stat-val" id="si-upcoming">0</div></div>
     <div class="stat"><div class="stat-bg"></div><div class="stat-label">Past Due</div><div class="stat-val" id="si-pastdue">0</div></div>
+  </div>
+  <div id="wins-prop-section" style="background:rgba(3,4,15,0.7);backdrop-filter:blur(20px);border-bottom:1px solid var(--b);padding:24px 28px;position:relative;z-index:2;">
+    <div id="prop-chart-prompt" style="text-align:center;padding:16px 0 8px;color:var(--ink4);font-size:13px">
+      <div style="font-size:28px;margin-bottom:8px">🏢</div>
+      Click any property name in the table below to view its order history.
+    </div>
+    <div id="prop-chart-content" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div>
+          <div style="font-size:11px;font-weight:800;letter-spacing:.13em;color:var(--ink3);text-transform:uppercase;margin-bottom:4px">Order History</div>
+          <div style="font-size:16px;font-weight:700;color:var(--ink)" id="prop-chart-company"></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="clearPropertyChart()" style="min-height:28px;font-size:11px">✕ Clear</button>
+      </div>
+      <div style="height:260px;position:relative"><canvas id="wins-prop-chart"></canvas></div>
+      <div id="prop-chart-summary" style="display:flex;gap:24px;flex-wrap:wrap;margin-top:14px;font-size:12px;color:var(--ink3)"></div>
+      <div id="prop-orders-list" style="margin-top:12px"></div>
+    </div>
   </div>
   <div class="toolbar">
     <div class="search-wrap">
@@ -1191,7 +1190,7 @@ function renderWinsStats(){
 function sortWinsBy(col){if(wSortCol===col)wSortDir*=-1;else{wSortCol=col;wSortDir=1;}renderWins();}
 
 function renderWins(){
-  renderWinsTabs();renderWinsStats();updateWinsBadge();renderWinsChart();if(selectedPropertyForChart)renderPropertyChart();
+  renderWinsTabs();renderWinsStats();updateWinsBadge();renderWinsChart();
   const q=document.getElementById('wins-search').value.toLowerCase();
   const fwm=document.getElementById('filter-wins-mgmt')?.value||'';
   const wMgmtSelect=document.getElementById('filter-wins-mgmt');
@@ -1649,8 +1648,8 @@ function selectPropertyChart(company){
   document.getElementById('prop-chart-company').textContent=company;
   document.getElementById('prop-chart-prompt').style.display='none';
   document.getElementById('prop-chart-content').style.display='block';
-  renderPropertyChart();
-  document.getElementById('wins-prop-section').scrollIntoView({behavior:'smooth',block:'start'});
+  setSection('installs');
+  setTimeout(()=>document.getElementById('wins-prop-section').scrollIntoView({behavior:'smooth',block:'start'}),80);
 }
 function renderPropertyChart(){
   if(!selectedPropertyForChart)return;
@@ -1822,6 +1821,7 @@ function renderInstalls(){
   document.getElementById('si-today').textContent=scheduled.filter(w=>w.scheduledDate===today).length;
   document.getElementById('si-upcoming').textContent=scheduled.filter(w=>w.scheduledDate>=today&&w.scheduledDate<=in30Str).length;
   document.getElementById('si-pastdue').textContent=scheduled.filter(w=>w.scheduledDate<today).length;
+  if(selectedPropertyForChart)renderPropertyChart();
   const rows=scheduled.filter(w=>{
     if(q&&!(w.company+(w.winNotes||'')+(w.carpetOrderNumber||'')+(w.hardOrderNumber||'')).toLowerCase().includes(q))return false;
     if(when==='today'&&w.scheduledDate!==today)return false;
@@ -1842,7 +1842,7 @@ function renderInstalls(){
     const dbg=isToday?'rgba(0,255,179,0.12)':isPast?'rgba(255,68,0,0.12)':'rgba(255,215,0,0.08)';
     const dbr=isToday?'rgba(0,255,179,0.3)':isPast?'rgba(255,68,0,0.3)':'rgba(255,215,0,0.25)';
     return`<tr>
-      <td><div class="co-name co-name-clickable" onclick="openInstallDetail(wins.find(x=>x.id==='${w.id}'))">${esc(w.company)}</div>${w.address?'<div class="co-addr">'+esc(w.address)+'</div>':''}</td>
+      <td><div class="co-name co-name-clickable" onclick="selectPropertyChart('${w.company.replace(/'/g,"\\'")}')">${esc(w.company)}</div>${w.address?'<div class="co-addr">'+esc(w.address)+'</div>':''}</td>
       <td><span style="display:inline-block;font-size:11px;font-weight:800;padding:5px 12px;border-radius:20px;background:${dbg};color:${dc};border:1px solid ${dbr};white-space:nowrap">${isToday?'TODAY — ':isPast?'PAST — ':''}${dateStr}</span></td>
       <td style="text-align:right;font-weight:800;color:var(--green)">${carpet||'<span class="muted" style="font-weight:400">—</span>'}</td>
       <td style="text-align:right;font-weight:800;color:var(--cyan)">${hard||'<span class="muted" style="font-weight:400">—</span>'}</td>
