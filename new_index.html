@@ -763,8 +763,8 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
       </div>
       <p class="modal-sub" id="order-modal-sub">Log a new install order for this property. It will appear in the correct month on the chart.</p>
       <div style="background:rgba(0,255,255,0.06);border:1px solid rgba(0,255,255,0.2);border-radius:12px;padding:14px 16px;margin-bottom:20px;position:relative;z-index:1">
-        <input type="text" id="order-modal-name" list="order-company-list" placeholder="Property name" style="width:100%;font-size:16px;font-weight:800;font-family:inherit;background:transparent;border:none;outline:none;color:var(--ink);padding:0">
-        <datalist id="order-company-list"></datalist>
+        <div style="font-size:16px;font-weight:800;color:var(--ink)" id="order-modal-name"></div>
+        <select id="order-company-select" style="display:none;width:100%;font-size:15px;font-weight:700;font-family:inherit;background:rgba(0,255,255,0.08);border:1px solid rgba(0,255,255,0.3);border-radius:8px;color:var(--cyan);padding:8px 12px;outline:none;cursor:pointer;margin-top:6px"></select>
       </div>
       <div class="field-row" style="position:relative;z-index:1">
         <div class="field"><label>Carpet Order #</label><input type="text" id="order-carpet-number" placeholder="e.g. 1042" onfocus="cgFocus(this)" onblur="cgBlur(this)"></div>
@@ -1729,7 +1729,7 @@ function openAddOrder(id){
   document.getElementById('order-modal-title').textContent='New Install Order';
   document.getElementById('order-modal-sub').textContent='Log a new install order for this property. It will appear in the correct month on the chart.';
   document.getElementById('order-btn-text').textContent='Add Order';
-  const _omn=document.getElementById('order-modal-name');_omn.value=w.company;_omn.readOnly=true;_omn.style.cursor='default';_omn.style.color='var(--ink)';
+  document.getElementById('order-modal-name').textContent=w.company;document.getElementById('order-modal-name').style.display='';document.getElementById('order-company-select').style.display='none';
   document.getElementById('order-date').value=new Date().toISOString().split('T')[0];
   document.getElementById('order-carpet').value='';
   document.getElementById('order-hard').value='';
@@ -1747,8 +1747,7 @@ function openEditOrder(id){
   document.getElementById('order-modal-title').textContent='Edit Install Order';
   document.getElementById('order-modal-sub').textContent='Update the details for this install order.';
   document.getElementById('order-btn-text').textContent='Save Changes';
-  const _omn=document.getElementById('order-modal-name');_omn.value=order.company;_omn.readOnly=false;_omn.style.cursor='text';_omn.style.color='var(--cyan)';
-  document.getElementById('order-company-list').innerHTML=[...new Set(wins.map(w=>w.company))].sort().map(c=>`<option value="${esc(c)}">`).join('');
+  document.getElementById('order-modal-name').style.display='none';const _sel=document.getElementById('order-company-select');_sel.innerHTML=[...new Set(wins.map(w=>w.company))].sort().map(c=>`<option value="${esc(c)}" style="background:#08081A;color:#fff"${c===order.company?' selected':''}>${esc(c)}</option>`).join('');_sel.style.display='';
   document.getElementById('order-date').value=order.wonDate||'';
   document.getElementById('order-carpet').value=order.carpet||'';
   document.getElementById('order-hard').value=order.hard||'';
@@ -1772,8 +1771,7 @@ async function confirmAddOrder(){
   if(hardNum){const dup=wins.find(w=>(w.carpetOrderNumber===hardNum||w.hardOrderNumber===hardNum)&&w.id!==(orderEditId||''));if(dup)return alert(`CG # ${hardNum} is already used on "${dup.company}". Use a different number.`);}
   if(orderEditId){
     const order=wins.find(x=>x.id===orderEditId);if(!order)return;
-    const _nc=document.getElementById('order-modal-name').value.trim();if(_nc)order.company=_nc;
-    order.wonDate=date;order.carpet=carpet;order.hard=hard;
+    const _nc=document.getElementById('order-company-select').value;if(_nc)order.company=_nc;    order.wonDate=date;order.carpet=carpet;order.hard=hard;
     order.installs=Math.max(carpet,hard)||carpet||hard;
     order.winNotes=document.getElementById('order-notes').value.trim();
     order.scheduledDate=document.getElementById('order-scheduled').value;
