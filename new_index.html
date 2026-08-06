@@ -769,15 +769,15 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
         <div class="field"><label>Carpet Order #</label><input type="text" id="order-carpet-number" placeholder="e.g. CG-1042"></div>
         <div class="field"><label>Hard Surface Order #</label><input type="text" id="order-hard-number" placeholder="e.g. CG-1043"></div>
       </div>
-      <div class="field" style="position:relative;z-index:1"><label>Property PO number</label><input type="text" id="order-property-po" placeholder="e.g. PO-2024-0088"></div>
       <div class="field" style="position:relative;z-index:1"><label>Order date</label><input type="date" id="order-date"></div>
       <div class="field-row" style="position:relative;z-index:1">
         <div class="field"><label>Carpet</label><input type="number" id="order-carpet" min="0" placeholder="e.g. 12"></div>
         <div class="field"><label>Hard Surface</label><input type="number" id="order-hard" min="0" placeholder="e.g. 12"></div>
       </div>
+      <div style="font-size:10px;font-weight:800;letter-spacing:.13em;color:var(--ink3);text-transform:uppercase;margin:4px 0 8px;position:relative;z-index:1">Property POs</div>
       <div class="field-row" style="position:relative;z-index:1">
-        <div class="field"><label>Carpet PO</label><input type="text" id="order-carpet-po" placeholder="e.g. CP-1042"></div>
-        <div class="field"><label>Hard Surface PO</label><input type="text" id="order-hard-po" placeholder="e.g. HP-1042"></div>
+        <div class="field"><label>Carpet</label><input type="text" id="order-carpet-po" placeholder="e.g. CP-1042"></div>
+        <div class="field"><label>Hard Surface</label><input type="text" id="order-hard-po" placeholder="e.g. HP-1042"></div>
       </div>
       <div class="field" style="position:relative;z-index:1"><label>Notes</label><textarea id="order-notes" placeholder="e.g. Summer turn package…" style="min-height:64px"></textarea></div>
       <div class="field" style="position:relative;z-index:1"><label>Scheduled install date</label><input type="date" id="order-scheduled"></div>
@@ -1733,7 +1733,6 @@ function openAddOrder(id){
   document.getElementById('order-scheduled').value='';
   document.getElementById('order-carpet-number').value='';
   document.getElementById('order-hard-number').value='';
-  document.getElementById('order-property-po').value='';
   document.getElementById('order-carpet-po').value='';
   document.getElementById('order-hard-po').value='';
   document.getElementById('order-modal').classList.add('open');
@@ -1751,7 +1750,6 @@ function openEditOrder(id){
   document.getElementById('order-scheduled').value=order.scheduledDate||'';
   document.getElementById('order-carpet-number').value=order.carpetOrderNumber||'';
   document.getElementById('order-hard-number').value=order.hardOrderNumber||'';
-  document.getElementById('order-property-po').value=order.propertyPO||'';
   document.getElementById('order-carpet-po').value=order.carpetPO||'';
   document.getElementById('order-hard-po').value=order.hardPO||'';
   document.getElementById('order-modal').classList.add('open');
@@ -1770,7 +1768,6 @@ async function confirmAddOrder(){
     order.scheduledDate=document.getElementById('order-scheduled').value;
     order.carpetOrderNumber=document.getElementById('order-carpet-number').value.trim();
     order.hardOrderNumber=document.getElementById('order-hard-number').value.trim();
-    order.propertyPO=document.getElementById('order-property-po').value.trim();
     order.carpetPO=document.getElementById('order-carpet-po').value.trim();
     order.hardPO=document.getElementById('order-hard-po').value.trim();
     closeModal('order-modal');orderEditId=null;orderSourceId=null;
@@ -1779,7 +1776,7 @@ async function confirmAddOrder(){
     return;
   }
   const src=wins.find(x=>x.id===orderSourceId);if(!src)return;
-  const newOrder={...src,id:Date.now()+'',wonDate:date,carpet,hard,installs:Math.max(carpet,hard)||carpet||hard,winNotes:document.getElementById('order-notes').value.trim(),scheduledDate:document.getElementById('order-scheduled').value,carpetOrderNumber:document.getElementById('order-carpet-number').value.trim(),hardOrderNumber:document.getElementById('order-hard-number').value.trim(),propertyPO:document.getElementById('order-property-po').value.trim(),carpetPO:document.getElementById('order-carpet-po').value.trim(),hardPO:document.getElementById('order-hard-po').value.trim()};
+  const newOrder={...src,id:Date.now()+'',wonDate:date,carpet,hard,installs:Math.max(carpet,hard)||carpet||hard,winNotes:document.getElementById('order-notes').value.trim(),scheduledDate:document.getElementById('order-scheduled').value,carpetOrderNumber:document.getElementById('order-carpet-number').value.trim(),hardOrderNumber:document.getElementById('order-hard-number').value.trim(),carpetPO:document.getElementById('order-carpet-po').value.trim(),hardPO:document.getElementById('order-hard-po').value.trim()};
   wins.unshift(newOrder);
   closeModal('order-modal');orderSourceId=null;
   renderWins();updateWinsBadge();
