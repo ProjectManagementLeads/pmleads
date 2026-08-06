@@ -1874,7 +1874,11 @@ function renderTodayPanel(){
     return`<div onclick="openInstallDetail(wins.find(x=>x.id==='${w.id}'))" style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;background:rgba(0,255,179,0.08);border:1px solid rgba(0,255,179,0.25);margin-bottom:8px;flex-wrap:wrap;cursor:pointer;touch-action:manipulation">
       <div style="flex:1;min-width:0">
         <div style="font-size:14px;font-weight:800;color:var(--ink)">${esc(w.company)}</div>
-        <div style="font-size:12px;color:var(--ink3);margin-top:3px">${breakdown}${w.carpetOrderNumber?` · <span style="color:var(--green);font-weight:700">C# ${esc(w.carpetOrderNumber)}</span>`:''}${w.hardOrderNumber?` · <span style="color:var(--cyan);font-weight:700">H# ${esc(w.hardOrderNumber)}</span>`:''}${w.winNotes?' · '+esc(w.winNotes.split('\n')[0]):''}</div>
+        <div style="font-size:12px;color:var(--ink3);margin-top:3px">${breakdown}${w.winNotes?' · '+esc(w.winNotes.split('\n')[0]):''}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+          <span style="font-size:11px;font-weight:800;padding:3px 10px;border-radius:6px;${w.carpetOrderNumber?'color:var(--green);background:rgba(0,255,179,0.1);border:1px solid rgba(0,255,179,0.3)':'color:var(--ink4);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08)'}">C# ${w.carpetOrderNumber?esc(w.carpetOrderNumber):'—'}</span>
+          <span style="font-size:11px;font-weight:800;padding:3px 10px;border-radius:6px;${w.hardOrderNumber?'color:var(--cyan);background:rgba(0,180,255,0.1);border:1px solid rgba(0,180,255,0.3)':'color:var(--ink4);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08)'}">H# ${w.hardOrderNumber?esc(w.hardOrderNumber):'—'}</span>
+        </div>
       </div>
       <button onclick="event.stopPropagation();openEditOrder('${w.id}')" style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;font-family:inherit;padding:7px 13px;border-radius:8px;background:rgba(0,255,179,0.1);border:1px solid rgba(0,255,179,0.3);color:var(--green);flex-shrink:0;white-space:nowrap;touch-action:manipulation;cursor:pointer">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
