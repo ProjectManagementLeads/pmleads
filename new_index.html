@@ -763,11 +763,12 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
       </div>
       <p class="modal-sub" id="order-modal-sub">Log a new install order for this property. It will appear in the correct month on the chart.</p>
       <div style="background:rgba(0,255,255,0.06);border:1px solid rgba(0,255,255,0.2);border-radius:12px;padding:14px 16px;margin-bottom:20px;position:relative;z-index:1">
-        <div style="font-size:16px;font-weight:800;color:var(--ink)" id="order-modal-name"></div>
+        <input type="text" id="order-modal-name" list="order-company-list" placeholder="Property name" style="width:100%;font-size:16px;font-weight:800;font-family:inherit;background:transparent;border:none;outline:none;color:var(--ink);padding:0">
+        <datalist id="order-company-list"></datalist>
       </div>
       <div class="field-row" style="position:relative;z-index:1">
-        <div class="field"><label>Carpet Order #</label><input type="text" id="order-carpet-number" placeholder="e.g. CG-1042"></div>
-        <div class="field"><label>Hard Surface Order #</label><input type="text" id="order-hard-number" placeholder="e.g. CG-1043"></div>
+        <div class="field"><label>Carpet Order #</label><input type="text" id="order-carpet-number" placeholder="e.g. 1042" onfocus="cgFocus(this)" onblur="cgBlur(this)"></div>
+        <div class="field"><label>Hard Surface Order #</label><input type="text" id="order-hard-number" placeholder="e.g. 1043" onfocus="cgFocus(this)" onblur="cgBlur(this)"></div>
       </div>
       <div class="field" style="position:relative;z-index:1"><label>Order date</label><input type="date" id="order-date"></div>
       <div class="field-row" style="position:relative;z-index:1">
@@ -1720,13 +1721,15 @@ function renderPropertyChart(){
     </div>`).join('');
 }
 let orderSourceId=null,orderEditId=null;
+function cgFocus(el){if(!el.value)el.value='CG';}
+function cgBlur(el){const v=el.value.trim();if(!v||v==='CG'){el.value='';return;}const num=v.replace(/^CG-?/i,'');el.value=num?'CG'+num:'';}
 function openAddOrder(id){
   const w=wins.find(x=>x.id===id);if(!w)return;
   orderSourceId=id;orderEditId=null;
   document.getElementById('order-modal-title').textContent='New Install Order';
   document.getElementById('order-modal-sub').textContent='Log a new install order for this property. It will appear in the correct month on the chart.';
   document.getElementById('order-btn-text').textContent='Add Order';
-  document.getElementById('order-modal-name').textContent=w.company;
+  const _omn=document.getElementById('order-modal-name');_omn.value=w.company;_omn.readOnly=true;_omn.style.cursor='default';_omn.style.color='var(--ink)';
   document.getElementById('order-date').value=new Date().toISOString().split('T')[0];
   document.getElementById('order-carpet').value='';
   document.getElementById('order-hard').value='';
@@ -1744,7 +1747,8 @@ function openEditOrder(id){
   document.getElementById('order-modal-title').textContent='Edit Install Order';
   document.getElementById('order-modal-sub').textContent='Update the details for this install order.';
   document.getElementById('order-btn-text').textContent='Save Changes';
-  document.getElementById('order-modal-name').textContent=order.company;
+  const _omn=document.getElementById('order-modal-name');_omn.value=order.company;_omn.readOnly=false;_omn.style.cursor='text';_omn.style.color='var(--cyan)';
+  document.getElementById('order-company-list').innerHTML=[...new Set(wins.map(w=>w.company))].sort().map(c=>`<option value="${esc(c)}">`).join('');
   document.getElementById('order-date').value=order.wonDate||'';
   document.getElementById('order-carpet').value=order.carpet||'';
   document.getElementById('order-hard').value=order.hard||'';
@@ -1762,8 +1766,13 @@ async function confirmAddOrder(){
   const date=document.getElementById('order-date').value;
   if(!date){document.getElementById('order-date').focus();return;}
   if(!carpet&&!hard){document.getElementById('order-carpet').focus();return;}
+  const carpetNum=document.getElementById('order-carpet-number').value.trim();
+  const hardNum=document.getElementById('order-hard-number').value.trim();
+  if(carpetNum){const dup=wins.find(w=>(w.carpetOrderNumber===carpetNum||w.hardOrderNumber===carpetNum)&&w.id!==(orderEditId||''));if(dup)return alert(`CG # ${carpetNum} is already used on "${dup.company}". Use a different number.`);}
+  if(hardNum){const dup=wins.find(w=>(w.carpetOrderNumber===hardNum||w.hardOrderNumber===hardNum)&&w.id!==(orderEditId||''));if(dup)return alert(`CG # ${hardNum} is already used on "${dup.company}". Use a different number.`);}
   if(orderEditId){
     const order=wins.find(x=>x.id===orderEditId);if(!order)return;
+    const _nc=document.getElementById('order-modal-name').value.trim();if(_nc)order.company=_nc;
     order.wonDate=date;order.carpet=carpet;order.hard=hard;
     order.installs=Math.max(carpet,hard)||carpet||hard;
     order.winNotes=document.getElementById('order-notes').value.trim();
