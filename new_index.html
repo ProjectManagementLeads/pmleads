@@ -761,7 +761,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
         <span id="order-modal-title" class="modal-title" style="background:linear-gradient(90deg,var(--cyan),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">New Install Order</span>
         <button class="modal-close" onclick="closeModal('order-modal')">×</button>
       </div>
-      <p class="modal-sub">Log a new install order for this property. It will appear in the correct month on the chart.</p>
+      <p class="modal-sub" id="order-modal-sub">Log a new install order for this property. It will appear in the correct month on the chart.</p>
       <div style="background:rgba(0,255,255,0.06);border:1px solid rgba(0,255,255,0.2);border-radius:12px;padding:14px 16px;margin-bottom:20px;position:relative;z-index:1">
         <div style="font-size:16px;font-weight:800;color:var(--ink)" id="order-modal-name"></div>
       </div>
@@ -1724,6 +1724,7 @@ function openAddOrder(id){
   const w=wins.find(x=>x.id===id);if(!w)return;
   orderSourceId=id;orderEditId=null;
   document.getElementById('order-modal-title').textContent='New Install Order';
+  document.getElementById('order-modal-sub').textContent='Log a new install order for this property. It will appear in the correct month on the chart.';
   document.getElementById('order-btn-text').textContent='Add Order';
   document.getElementById('order-modal-name').textContent=w.company;
   document.getElementById('order-date').value=new Date().toISOString().split('T')[0];
@@ -1741,6 +1742,7 @@ function openEditOrder(id){
   const order=wins.find(x=>x.id===id);if(!order)return;
   orderEditId=id;orderSourceId=null;
   document.getElementById('order-modal-title').textContent='Edit Install Order';
+  document.getElementById('order-modal-sub').textContent='Update the details for this install order.';
   document.getElementById('order-btn-text').textContent='Save Changes';
   document.getElementById('order-modal-name').textContent=order.company;
   document.getElementById('order-date').value=order.wonDate||'';
