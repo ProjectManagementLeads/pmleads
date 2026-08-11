@@ -1823,25 +1823,23 @@ function renderInstalls(){
   document.getElementById('si-upcoming').textContent=scheduled.filter(w=>w.scheduledDate>=today&&w.scheduledDate<=in30Str).length;
   document.getElementById('si-pastdue').textContent=scheduled.filter(w=>w.scheduledDate<today).length;
   if(selectedPropertyForChart)renderPropertyChart();
-  const rows=scheduled.filter(w=>{
-    if(q&&!(w.company+(w.winNotes||'')+(w.carpetOrderNumber||'')+(w.hardOrderNumber||'')).toLowerCase().includes(q))return false;
-    if(when==='today'&&w.scheduledDate!==today)return false;
-    if(when==='upcoming'&&!(w.scheduledDate>=today&&w.scheduledDate<=in30Str))return false;
-    if(when==='pastdue'&&w.scheduledDate>=today)return false;
-    return true;
-  });
+  const matchQ=w=>!q||(w.company+(w.winNotes||'')+(w.carpetOrderNumber||'')+(w.hardOrderNumber||'')).toLowerCase().includes(q);
+  const todayGroup=scheduled.filter(w=>w.scheduledDate===today&&matchQ(w)&&(when===''||when==='today'));
+  const upcomingGroup=scheduled.filter(w=>w.scheduledDate>today&&matchQ(w)&&(when===''||when==='upcoming')).sort((a,b)=>a.scheduledDate.localeCompare(b.scheduledDate));
+  const pastGroup=scheduled.filter(w=>w.scheduledDate<today&&matchQ(w)&&(when===''||when==='pastdue')).sort((a,b)=>b.scheduledDate.localeCompare(a.scheduledDate));
   const tb=document.getElementById('installs-tbody');
-  if(!rows.length){
+  if(!todayGroup.length&&!upcomingGroup.length&&!pastGroup.length){
     tb.innerHTML=`<tr><td colspan="8"><div class="empty"><span class="empty-icon-wrap" style="font-size:52px;display:block;margin-bottom:18px">📋</span><div class="empty-title" style="background:linear-gradient(90deg,var(--cyan),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent">No installs found</div><div class="empty-sub">Add a scheduled date to an install order to see it here.</div></div></td></tr>`;
     return;
   }
-  tb.innerHTML=rows.map(w=>{
+  const divider=(label,color,line)=>`<tr><td colspan="8" style="padding:16px 18px 4px;background:transparent;border-bottom:none"><div style="display:flex;align-items:center;gap:12px"><span style="font-size:10px;font-weight:800;letter-spacing:.13em;color:${color};text-transform:uppercase;white-space:nowrap">${label}</span><div style="flex:1;height:1px;background:${line}"></div></div></td></tr>`;
+  const rowHtml=w=>{
     const carpet=parseInt(w.carpet)||0,hard=parseInt(w.hard)||0;
     const dateStr=w.scheduledDate?new Date(w.scheduledDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
     const isPast=w.scheduledDate<today,isToday=w.scheduledDate===today;
-    const dc=isToday?'var(--green)':isPast?'var(--pink)':'var(--cyan)';
-    const dbg=isToday?'rgba(0,255,179,0.12)':isPast?'rgba(255,0,136,0.12)':'rgba(0,180,255,0.08)';
-    const dbr=isToday?'rgba(0,255,179,0.3)':isPast?'rgba(255,0,136,0.3)':'rgba(0,180,255,0.25)';
+    const dc=isToday?'var(--pink)':isPast?'var(--green2)':'var(--cyan)';
+    const dbg=isToday?'rgba(255,0,136,0.12)':isPast?'rgba(0,238,136,0.07)':'rgba(0,180,255,0.08)';
+    const dbr=isToday?'rgba(255,0,136,0.3)':isPast?'rgba(0,238,136,0.2)':'rgba(0,180,255,0.25)';
     return`<tr>
       <td><div class="co-name co-name-clickable" onclick="selectPropertyChart('${w.company.replace(/'/g,"\\'")}')">${esc(w.company)}</div>${w.address?'<div class="co-addr">'+esc(w.address)+'</div>':''}</td>
       <td><span style="display:inline-block;font-size:11px;font-weight:800;padding:5px 12px;border-radius:20px;background:${dbg};color:${dc};border:1px solid ${dbr};white-space:nowrap">${isToday?'TODAY — ':isPast?'✓ ':''}${dateStr}</span></td>
@@ -1855,7 +1853,12 @@ function renderInstalls(){
         <button class="btn btn-ghost btn-sm" onclick="openEditOrder('${w.id}')" style="min-height:34px;touch-action:manipulation">Edit</button>
       </div></td>
     </tr>`;
-  }).join('');
+  };
+  tb.innerHTML=[
+    ...(todayGroup.length?[divider('Today','var(--pink)','rgba(255,0,136,0.25)'),...todayGroup.map(rowHtml)]:[]),
+    ...(upcomingGroup.length?[divider('Coming Up','var(--cyan)','rgba(0,180,255,0.2)'),...upcomingGroup.map(rowHtml)]:[]),
+    ...(pastGroup.length?[divider('Complete','var(--green2)','rgba(0,238,136,0.15)'),...pastGroup.map(rowHtml)]:[]),
+  ].join('');
 }
 // ── Calendar ──
 let calYear=new Date().getFullYear(),calMonth=new Date().getMonth();
