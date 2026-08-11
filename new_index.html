@@ -517,7 +517,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
     <div class="stat"><div class="stat-bg"></div><div class="stat-label">Total Scheduled</div><div class="stat-val" id="si-total">0</div></div>
     <div class="stat"><div class="stat-bg"></div><div class="stat-label">Today</div><div class="stat-val" id="si-today">0</div></div>
     <div class="stat"><div class="stat-bg"></div><div class="stat-label">Next 30 Days</div><div class="stat-val" id="si-upcoming">0</div></div>
-    <div class="stat"><div class="stat-bg"></div><div class="stat-label">Past Due</div><div class="stat-val" id="si-pastdue">0</div></div>
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label">Complete</div><div class="stat-val" id="si-pastdue">0</div></div>
   </div>
   <div id="wins-chart-section" style="background:rgba(3,4,15,0.7);backdrop-filter:blur(20px);border-bottom:1px solid var(--b);padding:24px 28px;position:relative;z-index:2;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
@@ -556,7 +556,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
       <option value="">All dates</option>
       <option value="today">Today</option>
       <option value="upcoming">Upcoming (30 days)</option>
-      <option value="pastdue">Past due</option>
+      <option value="pastdue">Complete</option>
     </select>
   </div>
   <div class="table-wrap">
@@ -1844,7 +1844,7 @@ function renderInstalls(){
     const dbr=isToday?'rgba(0,255,179,0.3)':isPast?'rgba(255,0,136,0.3)':'rgba(0,180,255,0.25)';
     return`<tr>
       <td><div class="co-name co-name-clickable" onclick="selectPropertyChart('${w.company.replace(/'/g,"\\'")}')">${esc(w.company)}</div>${w.address?'<div class="co-addr">'+esc(w.address)+'</div>':''}</td>
-      <td><span style="display:inline-block;font-size:11px;font-weight:800;padding:5px 12px;border-radius:20px;background:${dbg};color:${dc};border:1px solid ${dbr};white-space:nowrap">${isToday?'TODAY — ':isPast?'PAST — ':''}${dateStr}</span></td>
+      <td><span style="display:inline-block;font-size:11px;font-weight:800;padding:5px 12px;border-radius:20px;background:${dbg};color:${dc};border:1px solid ${dbr};white-space:nowrap">${isToday?'TODAY — ':isPast?'✓ ':''}${dateStr}</span></td>
       <td style="text-align:right;font-weight:800;color:var(--green)">${carpet||'<span class="muted" style="font-weight:400">—</span>'}</td>
       <td style="text-align:right;font-weight:800;color:var(--cyan)">${hard||'<span class="muted" style="font-weight:400">—</span>'}</td>
       <td class="hide-mob" style="font-size:12px;color:var(--green);font-weight:700">${esc(w.carpetOrderNumber)||'<span class="muted">—</span>'}</td>
