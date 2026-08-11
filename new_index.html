@@ -1832,8 +1832,7 @@ function renderInstalls(){
     tb.innerHTML=`<tr><td colspan="8"><div class="empty"><span class="empty-icon-wrap" style="font-size:52px;display:block;margin-bottom:18px">📋</span><div class="empty-title" style="background:linear-gradient(90deg,var(--cyan),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent">No installs found</div><div class="empty-sub">Add a scheduled date to an install order to see it here.</div></div></td></tr>`;
     return;
   }
-  const divider=(label,color,line)=>`<tr><td colspan="8" style="padding:16px 18px 4px;background:transparent;border-bottom:none"><div style="display:flex;align-items:center;gap:12px"><span style="font-size:10px;font-weight:800;letter-spacing:.13em;color:${color};text-transform:uppercase;white-space:nowrap">${label}</span><div style="flex:1;height:1px;background:${line}"></div></div></td></tr>`;
-  const rowHtml=w=>{
+    const divider=(label,color,line)=>`<tr><td colspan="8" style="padding:16px 18px 4px;background:transparent;border-bottom:none"><div style="display:flex;align-items:center;gap:12px"><span style="font-size:13px;font-weight:800;letter-spacing:.13em;color:${color};text-transform:uppercase;white-space:nowrap">${label}</span><div style="flex:1;height:1px;background:${line}"></div></div></td></tr>`;  const rowHtml=w=>{
     const carpet=parseInt(w.carpet)||0,hard=parseInt(w.hard)||0;
     const dateStr=w.scheduledDate?new Date(w.scheduledDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
     const isPast=w.scheduledDate<today,isToday=w.scheduledDate===today;
