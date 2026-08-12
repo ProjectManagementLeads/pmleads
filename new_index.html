@@ -317,6 +317,8 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
 .section-toggle-mob{display:none;gap:0;width:100%;margin:0}
 .section-toggle-mob .section-btn{flex:1;height:38px;border-radius:0;font-size:13px;}
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
@@ -586,6 +588,22 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
     <div style="font-size:11px;font-weight:800;letter-spacing:.13em;color:var(--ink3);text-transform:uppercase;margin-bottom:4px">Today's Installs</div>
     <div id="today-date" style="font-size:13px;color:var(--ink2);margin-bottom:16px"></div>
     <div id="today-list"></div>
+  </div>
+  <!-- Install map -->
+  <div style="background:rgba(3,4,15,0.7);backdrop-filter:blur(20px);border-bottom:1px solid var(--b);padding:24px 28px;position:relative;z-index:2;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-size:11px;font-weight:800;letter-spacing:.13em;color:var(--ink3);text-transform:uppercase;margin-bottom:4px">Install Locations</div>
+        <div style="font-size:13px;color:var(--ink2)">All scheduled installs with addresses</div>
+      </div>
+      <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+        <span style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--pink)"><span style="width:9px;height:9px;border-radius:50%;background:var(--pink);display:inline-block;box-shadow:0 0 8px var(--pink)"></span>Today</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--cyan)"><span style="width:9px;height:9px;border-radius:50%;background:var(--cyan);display:inline-block;box-shadow:0 0 8px var(--cyan)"></span>Upcoming</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--green2)"><span style="width:9px;height:9px;border-radius:50%;background:var(--green2);display:inline-block;box-shadow:0 0 8px var(--green2)"></span>Complete</span>
+      </div>
+    </div>
+    <div id="install-map" style="height:400px;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,0.1)"></div>
+    <div id="map-status" style="font-size:12px;color:var(--ink4);margin-top:8px;min-height:18px;text-align:center"></div>
   </div>
   <!-- Month calendar -->
   <div style="background:rgba(3,4,15,0.7);backdrop-filter:blur(20px);padding:24px 28px;position:relative;z-index:2;">
@@ -1866,6 +1884,7 @@ function renderCalendar(){
   updateWinsBadge();
   renderTodayPanel();
   renderCalendarGrid();
+  renderInstallMap();
 }
 
 function renderTodayPanel(){
@@ -2041,6 +2060,52 @@ function cancelReschedule(id){
 
 function prevMonth(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendarGrid();}
 function nextMonth(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendarGrid();}
+// ── Install Map ──
+let installMap=null,geocodeCache={};
+async function geocodeAddress(addr){
+  if(!addr)return null;
+  if(geocodeCache[addr])return geocodeCache[addr];
+  await new Promise(r=>setTimeout(r,260));
+  try{
+    const res=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr)}&limit=1&countrycodes=us`,{headers:{'Accept-Language':'en-US'}});
+    const d=await res.json();
+    if(d&&d[0]){const out={lat:parseFloat(d[0].lat),lng:parseFloat(d[0].lon)};geocodeCache[addr]=out;return out;}
+  }catch(e){console.error('geocode',e);}
+  return null;
+}
+async function renderInstallMap(){
+  if(currentSection!=='calendar')return;
+  const mapEl=document.getElementById('install-map');if(!mapEl)return;
+  const today=new Date().toISOString().split('T')[0];
+  const installs=wins.filter(w=>w.scheduledDate&&(w.address||w.installAddress));
+  if(!installMap){
+    installMap=L.map('install-map',{zoomControl:true}).setView([40.0,-82.9],10);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',subdomains:'abcd',maxZoom:19}).addTo(installMap);
+  }else{
+    installMap.invalidateSize();
+    installMap.eachLayer(layer=>{if(layer instanceof L.CircleMarker)installMap.removeLayer(layer);});
+  }
+  const statusEl=document.getElementById('map-status');
+  if(!installs.length){if(statusEl)statusEl.textContent='No installs with addresses yet — add a property address to an install order to see it mapped.';return;}
+  if(statusEl)statusEl.textContent=`Mapping ${installs.length} install${installs.length!==1?'s':''}…`;
+  const bounds=[];let placed=0;
+  for(const w of installs){
+    const addr=w.installAddress||w.address;
+    const coords=await geocodeAddress(addr);
+    if(!coords)continue;
+    const isToday=w.scheduledDate===today,isPast=w.scheduledDate<today;
+    const color=isToday?'#FF0088':isPast?'#00EE88':'#00B4FF';
+    const carpet=parseInt(w.carpet)||0,hard=parseInt(w.hard)||0;
+    const dateStr=new Date(w.scheduledDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    L.circleMarker([coords.lat,coords.lng],{radius:isToday?13:9,fillColor:color,color:'rgba(255,255,255,0.7)',weight:isToday?2.5:1.5,opacity:1,fillOpacity:isToday?0.95:0.82})
+      .bindPopup(`<div style="font-family:Inter,sans-serif;min-width:195px;padding:4px 2px"><div style="font-size:14px;font-weight:800;color:#111;margin-bottom:5px">${esc(w.company)}</div><div style="font-size:12px;color:#555;font-weight:600;margin-bottom:6px">${dateStr}${isToday?'<span style="color:#FF0088;font-weight:900;margin-left:8px">TODAY</span>':''}</div>${carpet>0?`<div style="font-size:12px;margin-bottom:3px">🟢 Carpet: <strong>${carpet}</strong></div>`:''}${hard>0?`<div style="font-size:12px;margin-bottom:3px">🔷 Hard: <strong>${hard}</strong></div>`:''}${(w.carpetOrderNumber||w.hardOrderNumber)?`<div style="font-size:11px;color:#777;margin-top:6px;border-top:1px solid #eee;padding-top:5px">${w.carpetOrderNumber?'C# '+esc(w.carpetOrderNumber)+'&nbsp;&nbsp;':''}${w.hardOrderNumber?'H# '+esc(w.hardOrderNumber):''}</div>`:''}</div>`)
+      .addTo(installMap);
+    bounds.push([coords.lat,coords.lng]);placed++;
+  }
+  if(statusEl)statusEl.textContent=placed>0?`${placed} of ${installs.length} install${installs.length!==1?'s':''} mapped`:'Addresses not found — check that property addresses are entered on your install orders.';
+  if(bounds.length===1)installMap.setView(bounds[0],14);
+  else if(bounds.length>1)installMap.fitBounds(bounds,{padding:[40,40]});
+}
 loadAll();
 </script>
 <!-- Loading overlay -->
