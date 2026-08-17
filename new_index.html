@@ -605,7 +605,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
       <div>
         <div style="font-size:11px;font-weight:800;letter-spacing:.13em;color:var(--ink3);text-transform:uppercase;margin-bottom:4px">Install Locations</div>
-        <div style="font-size:13px;color:var(--ink2)">All scheduled installs with addresses</div>
+        <div style="font-size:13px;color:var(--ink2)">This month's installs with addresses</div>
       </div>
       <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
         <span style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--pink)"><span style="width:9px;height:9px;border-radius:50%;background:var(--pink);display:inline-block;box-shadow:0 0 8px var(--pink)"></span>Today</span>
@@ -2081,34 +2081,78 @@ async function renderInstallMap(){
   const mapEl=document.getElementById('install-map');if(!mapEl)return;
   await new Promise(r=>setTimeout(r,80));
   if(currentSection!=='calendar')return;
-  const today=new Date().toISOString().split('T')[0];
-  const installs=wins.filter(w=>w.scheduledDate&&(w.address||w.installAddress));
+  const now=new Date();
+  const today=now.toISOString().split('T')[0];
+  const monthStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const monthLabel=now.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  const installs=wins.filter(w=>w.scheduledDate&&w.scheduledDate.startsWith(monthStr)&&(w.address||w.installAddress));
   if(!installMap){
     installMap=L.map('install-map',{zoomControl:true}).setView([40.0,-82.9],10);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',subdomains:'abcd',maxZoom:19}).addTo(installMap);
     setTimeout(()=>{if(installMap)installMap.invalidateSize();},200);
   }else{
-    const toRemove=[];installMap.eachLayer(l=>{if(l instanceof L.CircleMarker)toRemove.push(l);});toRemove.forEach(l=>installMap.removeLayer(l));
+    const toRemove=[];installMap.eachLayer(l=>{if(l._pmInstall)toRemove.push(l);});toRemove.forEach(l=>installMap.removeLayer(l));
     setTimeout(()=>{if(installMap)installMap.invalidateSize();},50);
   }
   const statusEl=document.getElementById('map-status');
-  if(!installs.length){if(statusEl)statusEl.textContent='No installs with addresses yet — add a property address to an install order to see it mapped.';return;}
-  if(statusEl)statusEl.textContent=`Mapping ${installs.length} install${installs.length!==1?'s':''}…`;
+  if(!installs.length){if(statusEl)statusEl.textContent=`No installs with addresses in ${monthLabel}.`;return;}
+  if(statusEl)statusEl.textContent=`Mapping ${installs.length} install${installs.length!==1?'s':''} for ${monthLabel}…`;
+  const addrGroups={};
+  for(const w of installs){const addr=w.installAddress||w.address;if(!addrGroups[addr])addrGroups[addr]=[];addrGroups[addr].push(w);}
   const bounds=[];let placed=0;
-  for(const w of installs){
-    const addr=w.installAddress||w.address;
+  for(const [addr,group] of Object.entries(addrGroups)){
     const coords=await geocodeAddress(addr);
     if(!coords)continue;
-    const isToday=w.scheduledDate===today,isPast=w.scheduledDate<today;
-    const color=isToday?'#FF0088':isPast?'#00EE88':'#00B4FF';
-    const carpet=parseInt(w.carpet)||0,hard=parseInt(w.hard)||0;
-    const dateStr=new Date(w.scheduledDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-    L.circleMarker([coords.lat,coords.lng],{radius:isToday?13:9,fillColor:color,color:'rgba(255,255,255,0.7)',weight:isToday?2.5:1.5,opacity:1,fillOpacity:isToday?0.95:0.82})
-      .bindPopup(`<div style="font-family:Inter,sans-serif;min-width:195px;padding:4px 2px"><div style="font-size:14px;font-weight:800;color:#111;margin-bottom:5px">${esc(w.company)}</div><div style="font-size:12px;color:#555;font-weight:600;margin-bottom:6px">${dateStr}${isToday?'<span style="color:#FF0088;font-weight:900;margin-left:8px">TODAY</span>':''}</div>${carpet>0?`<div style="font-size:12px;margin-bottom:3px">🟢 Carpet: <strong>${carpet}</strong></div>`:''}${hard>0?`<div style="font-size:12px;margin-bottom:3px">🔷 Hard: <strong>${hard}</strong></div>`:''}${(w.carpetOrderNumber||w.hardOrderNumber)?`<div style="font-size:11px;color:#777;margin-top:6px;border-top:1px solid #eee;padding-top:5px">${w.carpetOrderNumber?'C# '+esc(w.carpetOrderNumber)+'&nbsp;&nbsp;':''}${w.hardOrderNumber?'H# '+esc(w.hardOrderNumber):''}</div>`:''}</div>`)
-      .addTo(installMap);
+    const hasToday=group.some(w=>w.scheduledDate===today);
+    const hasFuture=group.some(w=>w.scheduledDate>today);
+    const color=hasToday?'#FF0088':hasFuture?'#00B4FF':'#00EE88';
+    const totalCarpet=group.reduce((t,w)=>t+(parseInt(w.carpet)||0),0);
+    const totalHard=group.reduce((t,w)=>t+(parseInt(w.hard)||0),0);
+    const lbl=[totalCarpet>0?`C${totalCarpet}`:'',totalHard>0?`H${totalHard}`:''].filter(Boolean).join('/');
+    const sz=hasToday?44:group.length>1?38:32;
+    const fz=hasToday?10:9;
+    const icon=L.divIcon({
+      html:`<div style="width:${sz}px;height:${sz}px;background:${color};border:2.5px solid rgba(255,255,255,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${fz}px;font-weight:900;color:#000;line-height:1.2;text-align:center;box-shadow:0 0 14px ${color}99;cursor:pointer;white-space:nowrap">${lbl||'●'}</div>`,
+      iconSize:[sz,sz],iconAnchor:[sz/2,sz/2],className:''
+    });
+    let pop=`<div style="font-family:Inter,sans-serif;min-width:210px;padding:4px 2px">`;
+    if(group.length===1){
+      const w=group[0];const isToday=w.scheduledDate===today;
+      const ds=new Date(w.scheduledDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+      pop+=`<div style="font-size:14px;font-weight:800;color:#111;margin-bottom:4px">${esc(w.company)}</div>`;
+      pop+=`<div style="font-size:12px;color:#555;font-weight:600;margin-bottom:8px">${ds}${isToday?'<span style="color:#FF0088;font-weight:900;margin-left:8px">TODAY</span>':''}</div>`;
+      pop+=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px">`;
+      if(totalCarpet>0)pop+=`<span style="background:#e8fff5;border:1px solid #00cc88;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:800;color:#00aa66">🟢 Carpet: ${totalCarpet}</span>`;
+      if(totalHard>0)pop+=`<span style="background:#e8f5ff;border:1px solid #0099cc;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:800;color:#0077aa">🔷 Hard: ${totalHard}</span>`;
+      pop+=`</div>`;
+      if(w.carpetOrderNumber||w.hardOrderNumber)pop+=`<div style="font-size:11px;color:#888;border-top:1px solid #eee;padding-top:5px">${w.carpetOrderNumber?'C# '+esc(w.carpetOrderNumber)+'&nbsp;&nbsp;':''}${w.hardOrderNumber?'H# '+esc(w.hardOrderNumber):''}</div>`;
+    }else{
+      pop+=`<div style="font-size:13px;font-weight:900;color:#111;margin-bottom:6px">${group.length} installs at this address</div>`;
+      pop+=`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">`;
+      if(totalCarpet>0)pop+=`<span style="background:#e8fff5;border:1px solid #00cc88;border-radius:6px;padding:3px 9px;font-size:12px;font-weight:800;color:#00aa66">🟢 C total: ${totalCarpet}</span>`;
+      if(totalHard>0)pop+=`<span style="background:#e8f5ff;border:1px solid #0099cc;border-radius:6px;padding:3px 9px;font-size:12px;font-weight:800;color:#0077aa">🔷 H total: ${totalHard}</span>`;
+      pop+=`</div><div style="border-top:1px solid #eee;padding-top:6px">`;
+      for(const w of group){
+        const isToday=w.scheduledDate===today;
+        const ds=new Date(w.scheduledDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
+        const c=parseInt(w.carpet)||0,h=parseInt(w.hard)||0;
+        pop+=`<div style="padding:5px 0;border-bottom:1px solid #f5f5f5"><div style="font-size:12px;font-weight:800;color:#111">${esc(w.company)}</div>`;
+        pop+=`<div style="font-size:11px;color:#777;display:flex;gap:8px;flex-wrap:wrap;margin-top:2px"><span>${ds}${isToday?'<span style="color:#FF0088;font-weight:900"> ● TODAY</span>':''}</span>`;
+        if(c>0)pop+=`<span style="color:#00aa66;font-weight:700">C:${c}</span>`;
+        if(h>0)pop+=`<span style="color:#0077aa;font-weight:700">H:${h}</span>`;
+        pop+=`</div>`;
+        if(w.carpetOrderNumber||w.hardOrderNumber)pop+=`<div style="font-size:10px;color:#bbb;margin-top:2px">${w.carpetOrderNumber?'C#'+esc(w.carpetOrderNumber)+' ':''}${w.hardOrderNumber?'H#'+esc(w.hardOrderNumber):''}</div>`;
+        pop+=`</div>`;
+      }
+      pop+=`</div>`;
+    }
+    pop+=`</div>`;
+    const mk=L.marker([coords.lat,coords.lng],{icon});
+    mk._pmInstall=true;
+    mk.bindPopup(pop).addTo(installMap);
     bounds.push([coords.lat,coords.lng]);placed++;
   }
-  if(statusEl)statusEl.textContent=placed>0?`${placed} of ${installs.length} install${installs.length!==1?'s':''} mapped`:'Addresses not found — check that property addresses are entered on your install orders.';
+  if(statusEl)statusEl.textContent=placed>0?`${installs.length} install${installs.length!==1?'s':''} at ${placed} location${placed!==1?'s':''} — ${monthLabel}`:'Addresses not found — check property addresses on install orders.';
   if(bounds.length===1)installMap.setView(bounds[0],14);
   else if(bounds.length>1)installMap.fitBounds(bounds,{padding:[40,40]});
 }
