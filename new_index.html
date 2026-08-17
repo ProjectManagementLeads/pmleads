@@ -2098,9 +2098,9 @@ async function renderInstallMap(){
   if(!installs.length){if(statusEl)statusEl.textContent=`No installs with addresses in ${monthLabel}.`;return;}
   if(statusEl)statusEl.textContent=`Mapping ${installs.length} install${installs.length!==1?'s':''} for ${monthLabel}…`;
   const addrGroups={};
-  for(const w of installs){const addr=w.installAddress||w.address;if(!addrGroups[addr])addrGroups[addr]=[];addrGroups[addr].push(w);}
+  for(const w of installs){const addr=w.installAddress||w.address;const gk=w.company+'⌿'+addr;if(!addrGroups[gk])addrGroups[gk]={addr,group:[]};addrGroups[gk].group.push(w);}
   const bounds=[];let placed=0;
-  for(const [addr,group] of Object.entries(addrGroups)){
+  for(const {addr,group} of Object.values(addrGroups)){
     const coords=await geocodeAddress(addr);
     if(!coords)continue;
     const hasToday=group.some(w=>w.scheduledDate===today);
