@@ -800,6 +800,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
       </div>
       <div class="field" style="position:relative;z-index:1"><label>Notes</label><textarea id="order-notes" placeholder="e.g. Summer turn package…" style="min-height:64px"></textarea></div>
       <div class="field" style="position:relative;z-index:1"><label>Scheduled install date</label><input type="date" id="order-scheduled"></div>
+      <div class="field" style="position:relative;z-index:1"><label>Install address (overrides property address on map)</label><input type="text" id="order-install-address" placeholder="e.g. 123 Main St, Columbus, OH 43215"></div>
       <div class="modal-actions">
         <button class="btn btn-ghost" onclick="closeModal('order-modal')">Cancel</button>
         <button class="btn btn-green" onclick="confirmAddOrder()">
@@ -1758,6 +1759,7 @@ function openAddOrder(id){
   document.getElementById('order-hard-number').value='';
   document.getElementById('order-carpet-po').value='';
   document.getElementById('order-hard-po').value='';
+  document.getElementById('order-install-address').value='';
   document.getElementById('order-modal').classList.add('open');
 }
 function openEditOrder(id){
@@ -1776,6 +1778,7 @@ function openEditOrder(id){
   document.getElementById('order-hard-number').value=order.hardOrderNumber||'';
   document.getElementById('order-carpet-po').value=order.carpetPO||'';
   document.getElementById('order-hard-po').value=order.hardPO||'';
+  document.getElementById('order-install-address').value=order.installAddress||'';
   document.getElementById('order-modal').classList.add('open');
 }  
 async function confirmAddOrder(){
@@ -1798,13 +1801,14 @@ async function confirmAddOrder(){
     order.hardOrderNumber=document.getElementById('order-hard-number').value.trim();
     order.carpetPO=document.getElementById('order-carpet-po').value.trim();
     order.hardPO=document.getElementById('order-hard-po').value.trim();
+    order.installAddress=document.getElementById('order-install-address').value.trim();
     closeModal('order-modal');orderEditId=null;orderSourceId=null;
     renderWins();updateWinsBadge();
     isSaving=true;await saveWin_db(order);isSaving=false;
     return;
   }
   const src=wins.find(x=>x.id===orderSourceId);if(!src)return;
-  const newOrder={...src,id:Date.now()+'',wonDate:date,carpet,hard,installs:Math.max(carpet,hard)||carpet||hard,winNotes:document.getElementById('order-notes').value.trim(),scheduledDate:document.getElementById('order-scheduled').value,carpetOrderNumber:document.getElementById('order-carpet-number').value.trim(),hardOrderNumber:document.getElementById('order-hard-number').value.trim(),carpetPO:document.getElementById('order-carpet-po').value.trim(),hardPO:document.getElementById('order-hard-po').value.trim()};
+  const newOrder={...src,id:Date.now()+'',wonDate:date,carpet,hard,installs:Math.max(carpet,hard)||carpet||hard,winNotes:document.getElementById('order-notes').value.trim(),scheduledDate:document.getElementById('order-scheduled').value,carpetOrderNumber:document.getElementById('order-carpet-number').value.trim(),hardOrderNumber:document.getElementById('order-hard-number').value.trim(),carpetPO:document.getElementById('order-carpet-po').value.trim(),hardPO:document.getElementById('order-hard-po').value.trim(),installAddress:document.getElementById('order-install-address').value.trim()};
   wins.unshift(newOrder);
   closeModal('order-modal');orderSourceId=null;
   renderWins();updateWinsBadge();
@@ -2126,6 +2130,7 @@ async function renderInstallMap(){
       if(totalHard>0)pop+=`<span style="background:#e8f5ff;border:1px solid #0099cc;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:800;color:#0077aa">🔷 Hard: ${totalHard}</span>`;
       pop+=`</div>`;
       if(w.carpetOrderNumber||w.hardOrderNumber)pop+=`<div style="font-size:11px;color:#888;border-top:1px solid #eee;padding-top:5px">${w.carpetOrderNumber?'C# '+esc(w.carpetOrderNumber)+'&nbsp;&nbsp;':''}${w.hardOrderNumber?'H# '+esc(w.hardOrderNumber):''}</div>`;
+      pop+=`<div style="margin-top:10px;border-top:1px solid #eee;padding-top:8px;display:flex;gap:6px"><button onclick="openInstallDetail(wins.find(x=>x.id==='${w.id}'))" style="flex:1;padding:7px 0;border-radius:7px;background:#e8f5ff;border:1px solid #0099cc;color:#0077aa;font-size:11px;font-weight:800;font-family:inherit;cursor:pointer">View</button><button onclick="openEditOrder('${w.id}')" style="flex:1;padding:7px 0;border-radius:7px;background:#e8fff5;border:1px solid #00cc88;color:#00aa66;font-size:11px;font-weight:800;font-family:inherit;cursor:pointer">Edit</button></div>`;
     }else{
       pop+=`<div style="font-size:13px;font-weight:900;color:#111;margin-bottom:6px">${group.length} installs at this address</div>`;
       pop+=`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">`;
@@ -2142,7 +2147,7 @@ async function renderInstallMap(){
         if(h>0)pop+=`<span style="color:#0077aa;font-weight:700">H:${h}</span>`;
         pop+=`</div>`;
         if(w.carpetOrderNumber||w.hardOrderNumber)pop+=`<div style="font-size:10px;color:#bbb;margin-top:2px">${w.carpetOrderNumber?'C#'+esc(w.carpetOrderNumber)+' ':''}${w.hardOrderNumber?'H#'+esc(w.hardOrderNumber):''}</div>`;
-        pop+=`</div>`;
+        pop+=`<div style="margin-top:5px;display:flex;gap:5px"><button onclick="openInstallDetail(wins.find(x=>x.id==='${w.id}'))" style="flex:1;padding:5px 0;border-radius:6px;background:#e8f5ff;border:1px solid #0099cc;color:#0077aa;font-size:11px;font-weight:800;font-family:inherit;cursor:pointer">View</button><button onclick="openEditOrder('${w.id}')" style="flex:1;padding:5px 0;border-radius:6px;background:#e8fff5;border:1px solid #00cc88;color:#00aa66;font-size:11px;font-weight:800;font-family:inherit;cursor:pointer">Edit</button></div></div>`;
       }
       pop+=`</div>`;
     }
