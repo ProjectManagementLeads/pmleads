@@ -904,6 +904,7 @@ async function loadAll(){
   hideLoading();
   render();
   if(currentSection==='wins') renderWins();
+  if(currentSection==='calendar') renderInstallMap();
   updateWinsBadge();
 }
 
@@ -2078,14 +2079,17 @@ async function geocodeAddress(addr){
 async function renderInstallMap(){
   if(currentSection!=='calendar')return;
   const mapEl=document.getElementById('install-map');if(!mapEl)return;
+  await new Promise(r=>setTimeout(r,80));
+  if(currentSection!=='calendar')return;
   const today=new Date().toISOString().split('T')[0];
   const installs=wins.filter(w=>w.scheduledDate&&(w.address||w.installAddress));
   if(!installMap){
     installMap=L.map('install-map',{zoomControl:true}).setView([40.0,-82.9],10);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',subdomains:'abcd',maxZoom:19}).addTo(installMap);
+    setTimeout(()=>{if(installMap)installMap.invalidateSize();},200);
   }else{
-    installMap.invalidateSize();
-    installMap.eachLayer(layer=>{if(layer instanceof L.CircleMarker)installMap.removeLayer(layer);});
+    const toRemove=[];installMap.eachLayer(l=>{if(l instanceof L.CircleMarker)toRemove.push(l);});toRemove.forEach(l=>installMap.removeLayer(l));
+    setTimeout(()=>{if(installMap)installMap.invalidateSize();},50);
   }
   const statusEl=document.getElementById('map-status');
   if(!installs.length){if(statusEl)statusEl.textContent='No installs with addresses yet — add a property address to an install order to see it mapped.';return;}
