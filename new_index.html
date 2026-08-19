@@ -605,12 +605,27 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
       <div>
         <div style="font-size:11px;font-weight:800;letter-spacing:.13em;color:var(--ink3);text-transform:uppercase;margin-bottom:4px">Install Locations</div>
-        <div style="font-size:13px;color:var(--ink2)">This month's installs with addresses</div>
+        <div style="font-size:13px;color:var(--ink2)" id="map-filter-subtitle">This month's installs with addresses</div>
       </div>
       <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
         <span style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--pink)"><span style="width:9px;height:9px;border-radius:50%;background:var(--pink);display:inline-block;box-shadow:0 0 8px var(--pink)"></span>Today</span>
         <span style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--cyan)"><span style="width:9px;height:9px;border-radius:50%;background:var(--cyan);display:inline-block;box-shadow:0 0 8px var(--cyan)"></span>Upcoming</span>
         <span style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--green2)"><span style="width:9px;height:9px;border-radius:50%;background:var(--green2);display:inline-block;box-shadow:0 0 8px var(--green2)"></span>Complete</span>
+      </div>
+    </div>
+        <div id="map-filter-bar" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+      <div style="display:flex;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:10px;padding:3px;gap:3px">
+        <button id="mf-month" onclick="setMapFilter('month')" style="font-size:12px;font-weight:700;font-family:inherit;padding:0 14px;height:30px;border:none;border-radius:7px;cursor:pointer;transition:all .2s;background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#03040F;box-shadow:0 0 12px rgba(0,180,255,0.3)">This Month</button>
+        <button id="mf-range" onclick="setMapFilter('range')" style="font-size:12px;font-weight:700;font-family:inherit;padding:0 14px;height:30px;border:none;border-radius:7px;cursor:pointer;transition:all .2s;background:transparent;color:var(--ink3)">Date Range</button>
+        <button id="mf-order" onclick="setMapFilter('order')" style="font-size:12px;font-weight:700;font-family:inherit;padding:0 14px;height:30px;border:none;border-radius:7px;cursor:pointer;transition:all .2s;background:transparent;color:var(--ink3)">Order #</button>
+      </div>
+      <div id="mf-range-inputs" style="display:none;gap:8px;align-items:center">
+        <input type="date" id="mf-from" style="font-size:12px;font-family:inherit;padding:0 10px;height:36px;border:1px solid rgba(255,255,255,0.13);border-radius:9px;background:rgba(255,255,255,0.05);color:var(--ink);outline:none" oninput="renderInstallMap()">
+        <span style="color:var(--ink4);font-size:12px">to</span>
+        <input type="date" id="mf-to" style="font-size:12px;font-family:inherit;padding:0 10px;height:36px;border:1px solid rgba(255,255,255,0.13);border-radius:9px;background:rgba(255,255,255,0.05);color:var(--ink);outline:none" oninput="renderInstallMap()">
+      </div>
+      <div id="mf-order-input" style="display:none">
+        <input type="text" id="mf-order-search" placeholder="CG # (e.g. 1042)" style="font-size:12px;font-family:inherit;padding:0 12px;height:36px;border:1px solid rgba(255,255,255,0.13);border-radius:9px;background:rgba(255,255,255,0.05);color:var(--ink);outline:none;width:200px" oninput="renderInstallMap()">
       </div>
     </div>
     <div id="install-map" style="height:800px;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,0.1)"></div>
@@ -2067,6 +2082,7 @@ function prevMonth(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCale
 function nextMonth(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendarGrid();}
 // ── Install Map ──
 let installMap=null;
+let mapFilterMode='month';
 const geocodeCache=(()=>{try{return JSON.parse(localStorage.getItem('pm_gc')||'{}')}catch(e){return{};}})();
 function gcSave(){try{localStorage.setItem('pm_gc',JSON.stringify(geocodeCache));}catch(e){}}
 async function geocodeAddress(addr){
@@ -2080,6 +2096,19 @@ async function geocodeAddress(addr){
   }catch(e){console.error('geocode',e);}
   return null;
 }
+function setMapFilter(mode){
+  mapFilterMode=mode;
+  ['month','range','order'].forEach(m=>{
+    const btn=document.getElementById('mf-'+m);if(!btn)return;
+    const active=m===mode;
+    btn.style.background=active?'linear-gradient(135deg,var(--cyan),var(--cyan2))':'transparent';
+    btn.style.color=active?'#03040F':'var(--ink3)';
+    btn.style.boxShadow=active?'0 0 12px rgba(0,180,255,0.3)':'none';
+  });
+  document.getElementById('mf-range-inputs').style.display=mode==='range'?'flex':'none';
+  document.getElementById('mf-order-input').style.display=mode==='order'?'block':'none';
+  renderInstallMap();
+}
 async function renderInstallMap(){
   if(currentSection!=='calendar')return;
   const mapEl=document.getElementById('install-map');if(!mapEl)return;
@@ -2089,7 +2118,23 @@ async function renderInstallMap(){
   const today=now.toISOString().split('T')[0];
   const monthStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
   const monthLabel=now.toLocaleDateString('en-US',{month:'long',year:'numeric'});
-  const installs=wins.filter(w=>w.scheduledDate&&w.scheduledDate.startsWith(monthStr)&&(w.address||w.installAddress));
+  let installs,filterLabel;
+  if(mapFilterMode==='order'){
+    const raw=(document.getElementById('mf-order-search')?.value||'').trim();
+    const search=raw.replace(/^CG-?/i,'').toLowerCase();
+    installs=search?wins.filter(w=>(w.address||w.installAddress)&&((w.carpetOrderNumber||'').replace(/^CG-?/i,'').toLowerCase().includes(search)||(w.hardOrderNumber||'').replace(/^CG-?/i,'').toLowerCase().includes(search))):[];
+    filterLabel=raw?`Order # "${raw}"`:'Enter a CG order # to search';
+  } else if(mapFilterMode==='range'){
+    const from=document.getElementById('mf-from')?.value||'';
+    const to=document.getElementById('mf-to')?.value||'';
+    installs=wins.filter(w=>w.scheduledDate&&(w.address||w.installAddress)&&(!from||w.scheduledDate>=from)&&(!to||w.scheduledDate<=to));
+    filterLabel=from&&to?`${from} → ${to}`:from?`From ${from}`:to?`Until ${to}`:'All time';
+  } else {
+    installs=wins.filter(w=>w.scheduledDate&&w.scheduledDate.startsWith(monthStr)&&(w.address||w.installAddress));
+    filterLabel=monthLabel;
+  }
+  const subtitleEl=document.getElementById('map-filter-subtitle');
+  if(subtitleEl)subtitleEl.textContent=filterLabel;
   if(!installMap){
     installMap=L.map('install-map',{zoomControl:true}).setView([40.0,-82.9],10);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',subdomains:'abcd',maxZoom:19}).addTo(installMap);
@@ -2099,8 +2144,8 @@ async function renderInstallMap(){
     setTimeout(()=>{if(installMap)installMap.invalidateSize();},50);
   }
   const statusEl=document.getElementById('map-status');
-  if(!installs.length){if(statusEl)statusEl.textContent=`No installs with addresses in ${monthLabel}.`;return;}
-  if(statusEl)statusEl.textContent=`Mapping ${installs.length} install${installs.length!==1?'s':''} for ${monthLabel}…`;
+    if(!installs.length){if(statusEl)statusEl.textContent=mapFilterMode==='order'?'No installs found for that order #.':`No installs with addresses for ${filterLabel}.`;return;}
+  if(statusEl)statusEl.textContent=`Mapping ${installs.length} install${installs.length!==1?'s':''} for ${filterLabel}…`;
   const addrGroups={};
   for(const w of installs){const addr=w.installAddress||w.address;const gk=w.company+'⌿'+addr;if(!addrGroups[gk])addrGroups[gk]={addr,group:[]};addrGroups[gk].group.push(w);}
   const bounds=[];let placed=0;
@@ -2157,7 +2202,7 @@ async function renderInstallMap(){
     mk.bindPopup(pop).addTo(installMap);
     bounds.push([coords.lat,coords.lng]);placed++;
   }
-  if(statusEl)statusEl.textContent=placed>0?`${installs.length} install${installs.length!==1?'s':''} at ${placed} location${placed!==1?'s':''} — ${monthLabel}`:'Addresses not found — check property addresses on install orders.';
+    if(statusEl)statusEl.textContent=placed>0?`${installs.length} install${installs.length!==1?'s':''} at ${placed} location${placed!==1?'s':''} — ${filterLabel}`:'Addresses not found — check property addresses on install orders.';
   if(bounds.length===1)installMap.setView(bounds[0],14);
   else if(bounds.length>1)installMap.fitBounds(bounds,{padding:[40,40]});
 }
