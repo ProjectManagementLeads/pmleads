@@ -2154,14 +2154,17 @@ async function renderInstallMap(){
     if(!coords)continue;
     const hasToday=group.some(w=>w.scheduledDate===today);
     const hasFuture=group.some(w=>w.scheduledDate>today);
-    const color=hasToday?'#FF0088':hasFuture?'#00B4FF':'#00EE88';
+    const hasPast=group.some(w=>w.scheduledDate<today);
+    const glowColor=hasToday?'#FF0088':hasFuture?'#00B4FF':'#00EE88';
+    const colorTypes=[hasToday?'#FF0088':null,hasFuture?'#00B4FF':null,hasPast?'#00EE88':null].filter(Boolean);
+    const color=colorTypes.length===1?colorTypes[0]:colorTypes.length===2?`linear-gradient(135deg,${colorTypes[0]} 50%,${colorTypes[1]} 50%)`:`linear-gradient(135deg,#FF0088 33%,#00B4FF 33% 66%,#00EE88 66%)`;
     const totalCarpet=group.reduce((t,w)=>t+(parseInt(w.carpet)||0),0);
     const totalHard=group.reduce((t,w)=>t+(parseInt(w.hard)||0),0);
     const lbl=[totalCarpet>0?`C${totalCarpet}`:'',totalHard>0?`H${totalHard}`:''].filter(Boolean).join('/');
     const sz=hasToday?44:group.length>1?38:32;
     const fz=hasToday?10:9;
     const icon=L.divIcon({
-      html:`<div style="width:${sz}px;height:${sz}px;background:${color};border:2.5px solid rgba(255,255,255,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${fz}px;font-weight:900;color:#000;line-height:1.2;text-align:center;box-shadow:0 0 14px ${color}99;cursor:pointer;white-space:nowrap">${lbl||'●'}</div>`,
+      html:`<div style="width:${sz}px;height:${sz}px;background:${color};border:2.5px solid rgba(255,255,255,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${fz}px;font-weight:900;color:#000;line-height:1.2;text-align:center;box-shadow:0 0 14px ${glowColor}99;cursor:pointer;white-space:nowrap">${lbl||'●'}</div>`,
       iconSize:[sz,sz],iconAnchor:[sz/2,sz/2],className:''
     });
     let pop=`<div style="font-family:Inter,sans-serif;min-width:210px;padding:4px 2px">`;
