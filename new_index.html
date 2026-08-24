@@ -629,7 +629,8 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
       </div>
     </div>
     <div id="install-map" style="height:800px;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,0.1)"></div>
-    <div id="map-status" style="font-size:12px;color:var(--ink4);margin-top:8px;min-height:18px;text-align:center"></div>
+        <div id="map-status" style="font-size:12px;color:var(--ink4);margin-top:8px;min-height:18px;text-align:center"></div>
+    <div id="map-unmapped-warn" style="display:none;margin-top:10px;padding:10px 14px;border-radius:10px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.3);color:var(--amber);font-size:12px;font-weight:600;display:flex;align-items:flex-start;gap:8px;line-height:1.5"></div>
   </div>
 </div>
   
@@ -779,6 +780,10 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
       <div class="field"><label>Area</label><select id="we-area"></select></div>
       <div class="field"><label>Won date</label><input type="date" id="we-wonDate"></div>
     </div>
+        <div class="field-row">
+      <div class="field"><label>Lat <span style="font-weight:400;font-size:0.8em;opacity:0.5">(map pin fallback)</span></label><input type="number" id="we-lat" step="any" placeholder="e.g. 40.1234"></div>
+      <div class="field"><label>Lng <span style="font-weight:400;font-size:0.8em;opacity:0.5">(map pin fallback)</span></label><input type="number" id="we-lng" step="any" placeholder="e.g. -83.0123"></div>
+    </div>
     <div class="field"><label>Win notes</label><textarea id="we-winNotes" style="min-height:88px"></textarea></div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('win-edit-modal')">Cancel</button>
@@ -876,8 +881,8 @@ function hideLoading(){const el=document.getElementById('loading-overlay');if(el
 // ── DB mappers ──
 function dbToLead(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,style:r.style||'',area:r.area||'Other',status:r.status||'New',notes:r.notes||'',mgmt:r.mgmt||''};}
 function leadToDB(l){return{id:l.id,company:l.company,contact:l.contact,phone:l.phone,email:l.email,address:l.address,units:l.units||0,style:l.style,area:l.area,status:l.status,notes:l.notes,mgmt:l.mgmt||''};}
-function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,installs:r.installs||0,carpet:r.carpet||0,hard:r.hard||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||'',mgmt:r.mgmt||'',scheduledDate:r.scheduled_date||'',carpetOrderNumber:r.carpet_order_number||'',hardOrderNumber:r.hard_order_number||'',propertyPO:r.property_po||'',carpetPO:r.carpet_po||'',hardPO:r.hard_po||'',installAddress:r.install_address||''};}
-function winToDB(w){return{id:w.id,company:w.company,contact:w.contact,phone:w.phone,email:w.email,address:w.address,units:w.units||0,installs:w.installs||0,carpet:w.carpet||0,hard:w.hard||0,style:w.style,area:w.area,won_date:w.wonDate,win_notes:w.winNotes,mgmt:w.mgmt||'',scheduled_date:w.scheduledDate||null,carpet_order_number:w.carpetOrderNumber||null,hard_order_number:w.hardOrderNumber||null,property_po:w.propertyPO||null,carpet_po:w.carpetPO||null,hard_po:w.hardPO||null,install_address:w.installAddress||null};}
+function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,installs:r.installs||0,carpet:r.carpet||0,hard:r.hard||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||'',mgmt:r.mgmt||'',scheduledDate:r.scheduled_date||'',carpetOrderNumber:r.carpet_order_number||'',hardOrderNumber:r.hard_order_number||'',propertyPO:r.property_po||'',carpetPO:r.carpet_po||'',hardPO:r.hard_po||'',installAddress:r.install_address||'',lat:r.lat||null,lng:r.lng||null};}
+function winToDB(w){return{id:w.id,company:w.company,contact:w.contact,phone:w.phone,email:w.email,address:w.address,units:w.units||0,installs:w.installs||0,carpet:w.carpet||0,hard:w.hard||0,style:w.style,area:w.area,won_date:w.wonDate,win_notes:w.winNotes,mgmt:w.mgmt||'',scheduled_date:w.scheduledDate||null,carpet_order_number:w.carpetOrderNumber||null,hard_order_number:w.hardOrderNumber||null,property_po:w.propertyPO||null,carpet_po:w.carpetPO||null,hard_po:w.hardPO||null,install_address:w.installAddress||null,lat:w.lat||null,lng:w.lng||null};}
 
   // ── Supabase CRUD ──
 async function saveLead_db(obj){try{await sb.from('leads').upsert(leadToDB(obj));}catch(e){console.error('saveLead_db',e);}}
@@ -1507,6 +1512,8 @@ function openEditWin(id){
   document.getElementById('we-style').value=w.style||'';
   document.getElementById('we-area').value=w.area||areas[0];
   document.getElementById('we-wonDate').value=w.wonDate||'';
+  document.getElementById('we-lat').value=w.lat||'';
+  document.getElementById('we-lng').value=w.lng||'';
   document.getElementById('we-winNotes').value=w.winNotes||'';
   const unique=[...new Set([...leads,...wins].map(x=>x.mgmt).filter(Boolean))].sort();
   document.getElementById('we-mgmt-suggestions').innerHTML=unique.map(m=>`<option value="${esc(m)}">`).join('');
@@ -1532,6 +1539,8 @@ async function saveWinEdit(){
   w.style=document.getElementById('we-style').value.trim();
   w.area=document.getElementById('we-area').value;
   w.wonDate=document.getElementById('we-wonDate').value;
+  w.lat=parseFloat(document.getElementById('we-lat').value)||null;
+  w.lng=parseFloat(document.getElementById('we-lng').value)||null;
   w.winNotes=document.getElementById('we-winNotes').value.trim();
   closeModal('win-edit-modal');renderWins();
   isSaving=true;await saveWin_db(w);isSaving=false;
@@ -2148,10 +2157,11 @@ async function renderInstallMap(){
   if(statusEl)statusEl.textContent=`Mapping ${installs.length} install${installs.length!==1?'s':''} for ${filterLabel}…`;
   const addrGroups={};
   for(const w of installs){const addr=w.installAddress||w.address;const gk=w.company+'⌿'+addr;if(!addrGroups[gk])addrGroups[gk]={addr,group:[]};addrGroups[gk].group.push(w);}
-  const bounds=[];let placed=0;
+    const bounds=[];let placed=0;const unmapped=[];
   for(const {addr,group} of Object.values(addrGroups)){
-    const coords=await geocodeAddress(addr);
-    if(!coords)continue;
+    let coords=await geocodeAddress(addr);
+    if(!coords){const fb=group.find(w=>w.lat&&w.lng);if(fb)coords={lat:fb.lat,lng:fb.lng};}
+    if(!coords){unmapped.push(group[0].company);continue;}
     const hasToday=group.some(w=>w.scheduledDate===today);
     const hasFuture=group.some(w=>w.scheduledDate>today);
     const hasPast=group.some(w=>w.scheduledDate<today);
@@ -2205,7 +2215,9 @@ async function renderInstallMap(){
     mk.bindPopup(pop).addTo(installMap);
     bounds.push([coords.lat,coords.lng]);placed++;
   }
-    if(statusEl)statusEl.textContent=placed>0?`${installs.length} install${installs.length!==1?'s':''} at ${placed} location${placed!==1?'s':''} — ${filterLabel}`:'Addresses not found — check property addresses on install orders.';
+      if(statusEl)statusEl.textContent=placed>0?`${installs.length} install${installs.length!==1?'s':''} at ${placed} location${placed!==1?'s':''} — ${filterLabel}`:'No installs could be mapped — check addresses or add coordinates in Edit Win.';
+  const warnEl=document.getElementById('map-unmapped-warn');
+  if(warnEl){if(unmapped.length){warnEl.style.display='block';warnEl.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Couldn't map: <strong>${[...new Set(unmapped)].join(', ')}</strong> — open Edit Win and add Lat/Lng coordinates for these properties.`;}else{warnEl.style.display='none';}}
   if(bounds.length===1)installMap.setView(bounds[0],14);
   else if(bounds.length>1)installMap.fitBounds(bounds,{padding:[40,40]});
 }
