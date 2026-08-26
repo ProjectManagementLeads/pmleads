@@ -324,6 +324,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
 <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>.leaflet-popup-content{max-height:260px!important;overflow-y:auto!important;overflow-x:hidden!important;}</style>
 </head>
 <body>
 <div id="loading-overlay" style="display:none;position:fixed;inset:0;background:rgba(1,2,12,0.88);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:16px;backdrop-filter:blur(8px)">
@@ -2228,7 +2229,7 @@ async function renderInstallMap(){
     }
     pop+=`</div>`;
     const mk=L.marker([coords.lat,coords.lng],{icon});
-    mk._pmInstall=true;mk.bindPopup(pop,{maxWidth:300,maxHeight:150}).addTo(installMap);_mapMarkers.push(mk);
+    mk._pmInstall=true;mk.bindPopup(pop,{maxWidth:320}).addTo(installMap);_mapMarkers.push(mk);
     bounds.push([coords.lat,coords.lng]);placed++;
   }
   if(statusEl)statusEl.textContent=placed>0?`${installs.length} install${installs.length!==1?'s':''} at ${placed} location${placed!==1?'s':''} — ${filterLabel}`:'No installs could be mapped — check addresses or add coordinates in Edit Win.';
