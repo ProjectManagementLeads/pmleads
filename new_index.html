@@ -2228,7 +2228,7 @@ async function renderInstallMap(){
     }
     pop+=`</div>`;
     const mk=L.marker([coords.lat,coords.lng],{icon});
-    mk._pmInstall=true;mk.bindPopup(pop).addTo(installMap);_mapMarkers.push(mk);
+    mk._pmInstall=true;mk.bindPopup(pop,{maxWidth:300,maxHeight:280}).addTo(installMap);_mapMarkers.push(mk);
     bounds.push([coords.lat,coords.lng]);placed++;
   }
   if(statusEl)statusEl.textContent=placed>0?`${installs.length} install${installs.length!==1?'s':''} at ${placed} location${placed!==1?'s':''} — ${filterLabel}`:'No installs could be mapped — check addresses or add coordinates in Edit Win.';
