@@ -2092,7 +2092,7 @@ function nextMonth(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCale
 // ── Install Map ──
 let installMap=null;
 let mapFilterMode='month';
-let _mapPtsRaw=null,_mapZooming=false;
+let _mapPtsRaw=null,_mapZooming=false,_mapMarkers=[];
 const geocodeCache=(()=>{try{return JSON.parse(localStorage.getItem('pm_gc')||'{}')}catch(e){return{};}})();
 function gcSave(){try{localStorage.setItem('pm_gc',JSON.stringify(geocodeCache));}catch(e){}}
 async function geocodeAddress(addr){
@@ -2151,13 +2151,14 @@ async function renderInstallMap(){
     installMap=L.map('install-map',{zoomControl:true}).setView([40.0,-82.9],10);
     L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png?api_key=ca455d2b-9abb-4051-8df5-0614e8737635',{attribution:'',subdomains:'abcd',maxZoom:19}).addTo(installMap);
     setTimeout(()=>{if(installMap)installMap.invalidateSize();},200);
-    installMap.on('zoomend',function(){
-      if(!_mapPtsRaw||!_mapPtsRaw.length)return;
-      clearTimeout(window._jzTimer);
-      window._jzTimer=setTimeout(async()=>{_mapZooming=true;await renderInstallMap();_mapZooming=false;},120);
-    });
+    function rejitterMarkers(){if(!_mapMarkers.length||!_mapPtsRaw)return;const r=jitterRadius(installMap.getZoom());const pts=_mapPtsRaw.map(p=>({lat:p.lat,lng:p.lng,group:p.group}));jitterCoords(pts,r);_mapMarkers.forEach((mk,i)=>{if(pts[i])mk.setLatLng([pts[i].lat,pts[i].lng]);});}
+  installMap.on('zoomend',function(){
+    if(!_mapPtsRaw||!_mapPtsRaw.length)return;
+    clearTimeout(window._jzTimer);
+    window._jzTimer=setTimeout(()=>{rejitterMarkers();},60);
+  });
   }else{
-    const toRemove=[];installMap.eachLayer(l=>{if(l._pmInstall)toRemove.push(l);});toRemove.forEach(l=>installMap.removeLayer(l));
+    const toRemove=[];installMap.eachLayer(l=>{if(l._pmInstall)installMap.removeLayer(l);});_mapMarkers=[];toRemove.forEach(l=>installMap.removeLayer(l));
     setTimeout(()=>{if(installMap)installMap.invalidateSize();},50);
   }
   const statusEl=document.getElementById('map-status');
@@ -2227,7 +2228,7 @@ async function renderInstallMap(){
     }
     pop+=`</div>`;
     const mk=L.marker([coords.lat,coords.lng],{icon});
-    mk._pmInstall=true;mk.bindPopup(pop).addTo(installMap);
+    mk._pmInstall=true;mk.bindPopup(pop).addTo(installMap);_mapMarkers.push(mk);
     bounds.push([coords.lat,coords.lng]);placed++;
   }
   if(statusEl)statusEl.textContent=placed>0?`${installs.length} install${installs.length!==1?'s':''} at ${placed} location${placed!==1?'s':''} — ${filterLabel}`:'No installs could be mapped — check addresses or add coordinates in Edit Win.';
