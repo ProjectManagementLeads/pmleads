@@ -2118,6 +2118,7 @@ function setMapFilter(mode){
   document.getElementById('mf-order-input').style.display=mode==='order'?'block':'none';
   renderInstallMap();
 }
+function jitterCoords(pts){const th=0.0005,r=0.001;const done=new Set();for(let i=0;i<pts.length;i++){if(done.has(i))continue;const near=[i];for(let j=i+1;j<pts.length;j++){if(done.has(j))continue;if(Math.hypot(pts[i].lat-pts[j].lat,pts[i].lng-pts[j].lng)<th){near.push(j);done.add(j);}}done.add(i);if(near.length<2)continue;near.forEach((idx,k)=>{const a=(2*Math.PI*k)/near.length;pts[idx].lat+=r*Math.cos(a);pts[idx].lng+=r*Math.sin(a)*1.4;});}return pts;}
 async function renderInstallMap(){
   if(currentSection!=='calendar')return;
   const mapEl=document.getElementById('install-map');if(!mapEl)return;
@@ -2157,12 +2158,17 @@ async function renderInstallMap(){
   if(statusEl)statusEl.textContent=`Mapping ${installs.length} install${installs.length!==1?'s':''} for ${filterLabel}…`;
   const addrGroups={};
   for(const w of installs){const addr=w.installAddress||w.address;const gk=w.company+'⌿'+addr;if(!addrGroups[gk])addrGroups[gk]={addr,group:[]};addrGroups[gk].group.push(w);}
-    const bounds=[];let placed=0;const unmapped=[];
-  const clusterGroup=L.markerClusterGroup({maxClusterRadius:60,iconCreateFunction:function(cluster){const count=cluster.getChildCount();return L.divIcon({html:`<div style="width:38px;height:38px;background:rgba(0,180,255,0.85);border:2.5px solid rgba(255,255,255,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#000;box-shadow:0 0 14px rgba(0,180,255,0.7)">${count}</div>`,iconSize:[38,38],iconAnchor:[19,19],className:''});}});
+      const bounds=[];let placed=0;const unmapped=[];
+  const _pts=[];
   for(const {addr,group} of Object.values(addrGroups)){
     let coords=await geocodeAddress(addr);
     if(!coords){const fb=wins.find(w=>w.company===group[0].company&&w.lat&&w.lng);if(fb)coords={lat:fb.lat,lng:fb.lng};}
     if(!coords){unmapped.push(group[0].company);continue;}
+    _pts.push({lat:coords.lat,lng:coords.lng,group});
+  }
+  jitterCoords(_pts);
+  for(const {lat:_lat,lng:_lng,group} of _pts){
+    const coords={lat:_lat,lng:_lng};
     const hasToday=group.some(w=>w.scheduledDate===today);
     const hasFuture=group.some(w=>w.scheduledDate>today);
     const hasPast=group.some(w=>w.scheduledDate<today);
@@ -2212,10 +2218,9 @@ async function renderInstallMap(){
     }
     pop+=`</div>`;
     const mk=L.marker([coords.lat,coords.lng],{icon});
-    mk.bindPopup(pop);clusterGroup.addLayer(mk);
+    mk._pmInstall=true;mk.bindPopup(pop).addTo(installMap);
     bounds.push([coords.lat,coords.lng]);placed++;
   }
-  clusterGroup._pmInstall=true;installMap.addLayer(clusterGroup);
   if(statusEl)statusEl.textContent=placed>0?`${installs.length} install${installs.length!==1?'s':''} at ${placed} location${placed!==1?'s':''} — ${filterLabel}`:'No installs could be mapped — check addresses or add coordinates in Edit Win.';
   const warnEl=document.getElementById('map-unmapped-warn');
   if(warnEl){if(unmapped.length){warnEl.style.display='block';warnEl.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Couldn't map: <strong>${[...new Set(unmapped)].join(', ')}</strong> — open Edit Win and add Lat/Lng coordinates for these properties.`;}else{warnEl.style.display='none';}}
