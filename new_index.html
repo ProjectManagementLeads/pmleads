@@ -2092,6 +2092,7 @@ function nextMonth(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCale
 // ── Install Map ──
 let installMap=null;
 let mapFilterMode='month';
+let _mapPtsRaw=null,_mapZooming=false;
 const geocodeCache=(()=>{try{return JSON.parse(localStorage.getItem('pm_gc')||'{}')}catch(e){return{};}})();
 function gcSave(){try{localStorage.setItem('pm_gc',JSON.stringify(geocodeCache));}catch(e){}}
 async function geocodeAddress(addr){
@@ -2118,7 +2119,8 @@ function setMapFilter(mode){
   document.getElementById('mf-order-input').style.display=mode==='order'?'block':'none';
   renderInstallMap();
 }
-function jitterCoords(pts){const th=0.0005,r=0.001;const done=new Set();for(let i=0;i<pts.length;i++){if(done.has(i))continue;const near=[i];for(let j=i+1;j<pts.length;j++){if(done.has(j))continue;if(Math.hypot(pts[i].lat-pts[j].lat,pts[i].lng-pts[j].lng)<th){near.push(j);done.add(j);}}done.add(i);if(near.length<2)continue;near.forEach((idx,k)=>{const a=(2*Math.PI*k)/near.length;pts[idx].lat+=r*Math.cos(a);pts[idx].lng+=r*Math.sin(a)*1.4;});}return pts;}
+function jitterRadius(z){return z>=14?0:z<=10?0.015:0.015*(14-z)/4;}
+function jitterCoords(pts,r){if(!r)return pts;const th=r*1.5;const done=new Set();for(let i=0;i<pts.length;i++){if(done.has(i))continue;const near=[i];for(let j=i+1;j<pts.length;j++){if(done.has(j))continue;if(Math.hypot(pts[i].lat-pts[j].lat,pts[i].lng-pts[j].lng)<th){near.push(j);done.add(j);}}done.add(i);if(near.length<2)continue;near.forEach((idx,k)=>{const a=(2*Math.PI*k)/near.length;pts[idx].lat+=r*Math.cos(a);pts[idx].lng+=r*Math.sin(a)*1.4;});}return pts;}
 async function renderInstallMap(){
   if(currentSection!=='calendar')return;
   const mapEl=document.getElementById('install-map');if(!mapEl)return;
@@ -2149,6 +2151,11 @@ async function renderInstallMap(){
     installMap=L.map('install-map',{zoomControl:true}).setView([40.0,-82.9],10);
     L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png?api_key=ca455d2b-9abb-4051-8df5-0614e8737635',{attribution:'',subdomains:'abcd',maxZoom:19}).addTo(installMap);
     setTimeout(()=>{if(installMap)installMap.invalidateSize();},200);
+    installMap.on('zoomend',function(){
+      if(!_mapPtsRaw||!_mapPtsRaw.length)return;
+      clearTimeout(window._jzTimer);
+      window._jzTimer=setTimeout(async()=>{_mapZooming=true;await renderInstallMap();_mapZooming=false;},120);
+    });
   }else{
     const toRemove=[];installMap.eachLayer(l=>{if(l._pmInstall)toRemove.push(l);});toRemove.forEach(l=>installMap.removeLayer(l));
     setTimeout(()=>{if(installMap)installMap.invalidateSize();},50);
@@ -2166,7 +2173,9 @@ async function renderInstallMap(){
     if(!coords){unmapped.push(group[0].company);continue;}
     _pts.push({lat:coords.lat,lng:coords.lng,group});
   }
-  jitterCoords(_pts);
+  _mapPtsRaw=_pts.map(p=>({lat:p.lat,lng:p.lng,group:p.group}));
+  const _r=jitterRadius(installMap.getZoom());
+  jitterCoords(_pts,_r);
   for(const {lat:_lat,lng:_lng,group} of _pts){
     const coords={lat:_lat,lng:_lng};
     const hasToday=group.some(w=>w.scheduledDate===today);
@@ -2224,9 +2233,7 @@ async function renderInstallMap(){
   if(statusEl)statusEl.textContent=placed>0?`${installs.length} install${installs.length!==1?'s':''} at ${placed} location${placed!==1?'s':''} — ${filterLabel}`:'No installs could be mapped — check addresses or add coordinates in Edit Win.';
   const warnEl=document.getElementById('map-unmapped-warn');
   if(warnEl){if(unmapped.length){warnEl.style.display='block';warnEl.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Couldn't map: <strong>${[...new Set(unmapped)].join(', ')}</strong> — open Edit Win and add Lat/Lng coordinates for these properties.`;}else{warnEl.style.display='none';}}
-  if(bounds.length===1)installMap.setView(bounds[0],14);
-  else if(bounds.length>1)installMap.fitBounds(bounds,{padding:[40,40]});
-}
+    if(!_mapZooming){if(bounds.length===1)installMap.setView(bounds[0],14);else if(bounds.length>1)installMap.fitBounds(bounds,{padding:[40,40]});}
 loadAll();
 </script>
 <!-- Loading overlay -->
