@@ -2143,7 +2143,7 @@ async function renderInstallMap(){
   if(subtitleEl)subtitleEl.textContent=filterLabel;
   if(!installMap){
     installMap=L.map('install-map',{zoomControl:true}).setView([40.0,-82.9],10);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',subdomains:'abcd',maxZoom:19}).addTo(installMap);
+    L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',{attribution:'&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',subdomains:'abcd',maxZoom:19}).addTo(installMap);
     setTimeout(()=>{if(installMap)installMap.invalidateSize();},200);
   }else{
     const toRemove=[];installMap.eachLayer(l=>{if(l._pmInstall)toRemove.push(l);});toRemove.forEach(l=>installMap.removeLayer(l));
@@ -2157,7 +2157,7 @@ async function renderInstallMap(){
     const bounds=[];let placed=0;const unmapped=[];
   for(const {addr,group} of Object.values(addrGroups)){
     let coords=await geocodeAddress(addr);
-    if(!coords){const fb=group.find(w=>w.lat&&w.lng);if(fb)coords={lat:fb.lat,lng:fb.lng};}
+    if(!coords){const fb=wins.find(w=>w.company===group[0].company&&w.lat&&w.lng);if(fb)coords={lat:fb.lat,lng:fb.lng};}
     if(!coords){unmapped.push(group[0].company);continue;}
     const hasToday=group.some(w=>w.scheduledDate===today);
     const hasFuture=group.some(w=>w.scheduledDate>today);
