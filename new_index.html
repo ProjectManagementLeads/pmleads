@@ -1030,10 +1030,15 @@ function getOverdueClients(){
   groups.forEach(({primary,records})=>{
     const dates=records.filter(r=>r.wonDate).map(r=>new Date(r.wonDate+'T12:00:00')).sort((a,b)=>a-b);
     if(!dates.length)return;
+    const firstOrder=dates[0];
     const lastOrder=dates[dates.length-1];
+    // Skip clients whose first order is less than 90 days old
+    if(Math.floor((today-firstOrder)/(1000*60*60*24))<90)return;
     const daysSince=Math.floor((today-lastOrder)/(1000*60*60*24));
     let threshold=120;
     if(dates.length>=2){let total=0;for(let i=1;i<dates.length;i++)total+=(dates[i]-dates[i-1])/(1000*60*60*24);threshold=Math.round((total/(dates.length-1))*1.5);}
+    // Never flag more aggressively than every 90 days
+    threshold=Math.max(threshold,90);
     if(daysSince>threshold)overdue.push({primary,records,daysSince,lastOrder,threshold});
   });
   return overdue.sort((a,b)=>b.daysSince-a.daysSince);
