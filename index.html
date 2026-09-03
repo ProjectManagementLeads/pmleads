@@ -324,9 +324,19 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
 <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<style>.leaflet-popup-content{max-height:800px!important;overflow-y:auto!important;overflow-x:hidden!important;}</style>
+<style>.leaflet-popup-content{max-height:260px!important;overflow-y:auto!important;overflow-x:hidden!important;}</style>
 </head>
 <body>
+<div id="auth-overlay" style="position:fixed;inset:0;background:#0d1117;z-index:9999;display:flex;align-items:center;justify-content:center;">
+  <div style="background:#1a2233;border:1px solid #2d3a4f;border-radius:14px;padding:44px 40px;width:340px;text-align:center;box-shadow:0 25px 60px #000a;">
+    <div style="font-size:26px;font-weight:700;color:#fff;margin-bottom:2px;">PM Leads</div>
+    <div style="color:#6b7fa3;font-size:12px;letter-spacing:1px;text-transform:uppercase;margin-bottom:32px;">Central Ohio</div>
+    <input id="auth-email" type="email" placeholder="Email" style="width:100%;box-sizing:border-box;background:#0d1117;border:1px solid #2d3a4f;border-radius:8px;padding:11px 14px;color:#fff;font-size:14px;margin-bottom:10px;outline:none;display:block;">
+    <input id="auth-pass" type="password" placeholder="Password" style="width:100%;box-sizing:border-box;background:#0d1117;border:1px solid #2d3a4f;border-radius:8px;padding:11px 14px;color:#fff;font-size:14px;margin-bottom:18px;outline:none;display:block;">
+    <button id="auth-btn" onclick="doLogin()" style="width:100%;background:#7c3aed;border:none;border-radius:8px;padding:12px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;">Sign In</button>
+    <div id="auth-err" style="color:#f87171;font-size:12px;margin-top:12px;display:none;"></div>
+  </div>
+</div>
 <div id="loading-overlay" style="display:none;position:fixed;inset:0;background:rgba(1,2,12,0.88);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:16px;backdrop-filter:blur(8px)">
   <div style="width:48px;height:48px;border:3px solid rgba(255,0,110,0.3);border-top-color:#FF006E;border-radius:50%;animation:spin 0.8s linear infinite"></div>
   <div style="font-size:14px;font-weight:600;color:#C8D8F0;letter-spacing:0.05em">Loading your leads...</div>
@@ -375,7 +385,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
       <button class="section-btn" id="toggle-wins" onclick="setSection('wins')">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/></svg>
         Wins
-        <span id="wins-badge" style="display:none;background:linear-gradient(135deg,var(--green2),var(--green));color:#03040F;font-size:10px;font-weight:800;padding:1px 6px;border-radius:20px;margin-left:4px"></span>
+                <span id="wins-badge" style="display:none;background:linear-gradient(135deg,var(--green2),var(--green));color:#03040F;font-size:10px;font-weight:800;padding:1px 6px;border-radius:20px;margin-left:4px"></span><span id="wins-overdue-badge" style="display:none;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:20px;margin-left:4px;box-shadow:0 0 10px rgba(255,0,136,0.5)"></span>
       </button>
       <button class="section-btn" id="toggle-installs" onclick="setSection('installs')">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
@@ -397,10 +407,10 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Add lead
       </button>
-    </div>
+        </div>
+    <button id="signout-btn" onclick="sbSignOut()" style="display:none;align-items:center;background:transparent;border:1px solid #4b5563;border-radius:6px;color:#9ca3af;font-size:11px;padding:5px 12px;cursor:pointer;" onmouseenter="this.style.color='#f87171';this.style.borderColor='#f87171'" onmouseleave="this.style.color='#9ca3af';this.style.borderColor='#4b5563'">↪ Sign Out</button>
   </div>
 </div>
-
 <!-- Mobile section toggle -->
 <div class="section-toggle-mob" style="position:relative;z-index:2;background:rgba(3,4,15,0.8);border-bottom:1px solid var(--b);">
   <button class="section-btn active-leads" id="toggle-leads-mob" onclick="setSection('leads')" style="flex:1;height:42px;border-radius:0;font-size:13px;">Pipeline</button>
@@ -463,6 +473,19 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
 
 <!-- ═══════════ WINS SECTION ═══════════ -->
 <div id="wins-section" style="display:none">
+  <div id="followup-panel" style="display:none;position:relative;z-index:2;background:linear-gradient(135deg,rgba(255,0,136,0.12),rgba(153,0,255,0.08));border-bottom:2px solid rgba(255,0,136,0.4);padding:20px 28px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:22px">🚨</span>
+        <div>
+          <div style="font-size:13px;font-weight:900;letter-spacing:.05em;background:linear-gradient(90deg,var(--pink),var(--purple3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-transform:uppercase">Follow-Up Needed</div>
+          <div style="font-size:12px;color:var(--ink3);margin-top:1px" id="followup-subtitle"></div>
+        </div>
+      </div>
+      <button id="followup-toggle" onclick="const c=document.getElementById('followup-cards');const hidden=c.style.display==='none';c.style.display=hidden?'grid':'none';this.textContent=hidden?'Hide ▲':'Show ▼'" style="font-size:11px;font-weight:700;font-family:inherit;padding:5px 12px;border-radius:7px;background:rgba(255,0,136,0.12);border:1px solid rgba(255,0,136,0.3);color:var(--pink);cursor:pointer">Hide ▲</button>
+    </div>
+    <div id="followup-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px"></div>
+  </div>
   <!-- Wins hero banner -->
   <div class="wins-banner">
     <div class="wins-trophy">🏆</div>
@@ -857,6 +880,30 @@ const SUPA_URL = 'https://syakuvxmqqwougouudnw.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5YWt1dnhtcXF3b3Vnb3V1ZG53Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MDI2NTYsImV4cCI6MjA5MzQ3ODY1Nn0.JdevRGo00E24jb4Df5Fj5Qc6_laOuEkmMoPgA36DOhc';
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 
+async function doLogin(){
+  const email=document.getElementById('auth-email').value.trim();
+  const pass=document.getElementById('auth-pass').value;
+  const btn=document.getElementById('auth-btn');
+  const err=document.getElementById('auth-err');
+  btn.textContent='Signing in…';btn.disabled=true;err.style.display='none';
+  const {error}=await sb.auth.signInWithPassword({email,password:pass});
+  if(error){err.textContent=error.message;err.style.display='block';btn.textContent='Sign In';btn.disabled=false;}
+}
+async function sbSignOut(){await sb.auth.signOut();}
+function _showApp(){
+  document.getElementById('auth-overlay').style.display='none';
+  const b=document.getElementById('signout-btn');if(b)b.style.display='inline-flex';
+}
+function _hideApp(){
+  document.getElementById('auth-overlay').style.display='flex';
+  const b=document.getElementById('signout-btn');if(b)b.style.display='none';
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('auth-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+  sb.auth.getSession().then(({data:{session}})=>{session?_showApp():_hideApp();});
+  sb.auth.onAuthStateChange((_,session)=>{session?_showApp():_hideApp();});
+});
+
 const DEFAULT_AREAS = ["Bexley","Clintonville","Dublin","Grove City","Hilliard","Marysville","New Albany","Plain City","Upper Arlington","Westerville","West Jefferson","Worthington","Other"];
 
 const STATUS_CFG={
@@ -975,6 +1022,49 @@ function setSection(s){
   else if(s==='installs') renderInstalls();
   else if(s==='calendar') renderCalendar();
   else render();
+}
+
+// ── Order alert ──
+function getOverdueClients(){
+  const groups=getWinGroups(wins);const today=new Date();const overdue=[];
+  groups.forEach(({primary,records})=>{
+    const dates=records.filter(r=>r.wonDate).map(r=>new Date(r.wonDate+'T12:00:00')).sort((a,b)=>a-b);
+    if(!dates.length)return;
+    const firstOrder=dates[0];
+    const lastOrder=dates[dates.length-1];
+    // Skip clients whose first order is less than 90 days old
+    if(Math.floor((today-firstOrder)/(1000*60*60*24))<90)return;
+    const daysSince=Math.floor((today-lastOrder)/(1000*60*60*24));
+    let threshold=120;
+    if(dates.length>=2){let total=0;for(let i=1;i<dates.length;i++)total+=(dates[i]-dates[i-1])/(1000*60*60*24);threshold=Math.round((total/(dates.length-1))*1.5);}
+    // Never flag more aggressively than every 90 days
+    threshold=Math.max(threshold,90);
+    if(daysSince>threshold)overdue.push({primary,records,daysSince,lastOrder,threshold});
+  });
+  return overdue.sort((a,b)=>b.daysSince-a.daysSince);
+}
+function renderFollowUpPanel(){
+  const overdue=getOverdueClients();
+  const panel=document.getElementById('followup-panel');
+  const cards=document.getElementById('followup-cards');
+  const sub=document.getElementById('followup-subtitle');
+  const obadge=document.getElementById('wins-overdue-badge');
+  if(!overdue.length){if(panel)panel.style.display='none';if(obadge)obadge.style.display='none';return;}
+  if(panel)panel.style.display='block';
+  if(obadge){obadge.style.display='inline';obadge.textContent='⚠ '+overdue.length;}
+  if(sub)sub.textContent=`${overdue.length} client${overdue.length!==1?'s':''} haven\'t ordered in a while`;
+  if(cards)cards.innerHTML=overdue.map(({primary:w,daysSince,lastOrder,threshold})=>{
+    const months=Math.round(daysSince/30);
+    const lastStr=lastOrder.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const urgent=daysSince>threshold*2;
+    return`<div style="background:rgba(255,0,136,0.08);border:1px solid ${urgent?'rgba(255,0,136,0.5)':'rgba(255,0,136,0.2)'};border-radius:12px;padding:14px">
+      <div style="font-size:14px;font-weight:800;color:var(--ink);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(w.company)}</div>
+      <div style="font-size:11px;color:var(--ink3);margin-bottom:8px">Last order: ${lastStr}</div>
+      <div style="font-size:28px;font-weight:900;color:${urgent?'var(--pink)':'var(--pink3)'};line-height:1;margin-bottom:1px">${months} mo</div>
+      <div style="font-size:10px;color:var(--ink4);margin-bottom:10px">since last order</div>
+      <button onclick="openQuickNote('${w.id}',{clientX:0,clientY:0,stopPropagation:()=>{}},true)" style="width:100%;padding:8px;border-radius:8px;background:linear-gradient(135deg,var(--pink),var(--purple));border:none;color:#fff;font-size:11px;font-weight:800;font-family:inherit;cursor:pointer">📞 Follow Up</button>
+    </div>`;
+  }).join('');
 }
 
 // ── Wins badge count ──
@@ -1227,7 +1317,7 @@ function renderWinsStats(){
 function sortWinsBy(col){if(wSortCol===col)wSortDir*=-1;else{wSortCol=col;wSortDir=1;}renderWins();}
 
 function renderWins(){
-  renderWinsTabs();renderWinsStats();updateWinsBadge();
+  renderWinsTabs();renderWinsStats();updateWinsBadge();renderFollowUpPanel();
   const q=document.getElementById('wins-search').value.toLowerCase();
   const fwm=document.getElementById('filter-wins-mgmt')?.value||'';
   const wMgmtSelect=document.getElementById('filter-wins-mgmt');
