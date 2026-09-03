@@ -327,6 +327,16 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
 <style>.leaflet-popup-content{max-height:800px!important;overflow-y:auto!important;overflow-x:hidden!important;}</style>
 </head>
 <body>
+<div id="auth-overlay" style="position:fixed;inset:0;background:#0d1117;z-index:9999;display:flex;align-items:center;justify-content:center;">
+  <div style="background:#1a2233;border:1px solid #2d3a4f;border-radius:14px;padding:44px 40px;width:340px;text-align:center;box-shadow:0 25px 60px #000a;">
+    <div style="font-size:26px;font-weight:700;color:#fff;margin-bottom:2px;">PM Leads</div>
+    <div style="color:#6b7fa3;font-size:12px;letter-spacing:1px;text-transform:uppercase;margin-bottom:32px;">Central Ohio</div>
+    <input id="auth-email" type="email" placeholder="Email" style="width:100%;box-sizing:border-box;background:#0d1117;border:1px solid #2d3a4f;border-radius:8px;padding:11px 14px;color:#fff;font-size:14px;margin-bottom:10px;outline:none;display:block;">
+    <input id="auth-pass" type="password" placeholder="Password" style="width:100%;box-sizing:border-box;background:#0d1117;border:1px solid #2d3a4f;border-radius:8px;padding:11px 14px;color:#fff;font-size:14px;margin-bottom:18px;outline:none;display:block;">
+    <button id="auth-btn" onclick="doLogin()" style="width:100%;background:#7c3aed;border:none;border-radius:8px;padding:12px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;">Sign In</button>
+    <div id="auth-err" style="color:#f87171;font-size:12px;margin-top:12px;display:none;"></div>
+  </div>
+</div>
 <div id="loading-overlay" style="display:none;position:fixed;inset:0;background:rgba(1,2,12,0.88);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:16px;backdrop-filter:blur(8px)">
   <div style="width:48px;height:48px;border:3px solid rgba(255,0,110,0.3);border-top-color:#FF006E;border-radius:50%;animation:spin 0.8s linear infinite"></div>
   <div style="font-size:14px;font-weight:600;color:#C8D8F0;letter-spacing:0.05em">Loading your leads...</div>
@@ -856,6 +866,36 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
 const SUPA_URL = 'https://syakuvxmqqwougouudnw.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5YWt1dnhtcXF3b3Vnb3V1ZG53Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MDI2NTYsImV4cCI6MjA5MzQ3ODY1Nn0.JdevRGo00E24jb4Df5Fj5Qc6_laOuEkmMoPgA36DOhc';
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+async function doLogin(){
+  const email=document.getElementById('auth-email').value.trim();
+  const pass=document.getElementById('auth-pass').value;
+  const btn=document.getElementById('auth-btn');
+  const err=document.getElementById('auth-err');
+  btn.textContent='Signing in…';btn.disabled=true;err.style.display='none';
+  const {error}=await sb.auth.signInWithPassword({email,password:pass});
+  if(error){err.textContent=error.message;err.style.display='block';btn.textContent='Sign In';btn.disabled=false;}
+}
+function _showApp(){
+  document.getElementById('auth-overlay').style.display='none';
+  if(!document.getElementById('signout-btn')){
+    const b=document.createElement('button');
+    b.id='signout-btn';b.textContent='Sign Out';
+    b.style.cssText='position:fixed;top:10px;right:18px;z-index:800;background:transparent;border:1px solid #374151;border-radius:6px;color:#6b7280;font-size:11px;padding:4px 10px;cursor:pointer;';
+    b.onmouseenter=()=>b.style.color='#e5e7eb';b.onmouseleave=()=>b.style.color='#6b7280';
+    b.onclick=async()=>{await sb.auth.signOut();};
+    document.body.appendChild(b);
+  }
+}
+function _hideApp(){
+  document.getElementById('auth-overlay').style.display='flex';
+  const b=document.getElementById('signout-btn');if(b)b.remove();
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('auth-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+  sb.auth.getSession().then(({data:{session}})=>{session?_showApp():_hideApp();});
+  sb.auth.onAuthStateChange((_,session)=>{session?_showApp():_hideApp();});
+});
 
 const DEFAULT_AREAS = ["Bexley","Clintonville","Dublin","Grove City","Hilliard","Marysville","New Albany","Plain City","Upper Arlington","Westerville","West Jefferson","Worthington","Other"];
 
