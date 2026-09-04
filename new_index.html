@@ -2517,13 +2517,13 @@ function openAddContactFromRecord(cid,name,phone,email){
   contactForCompanyId=cid;
   editContactId=null;
   document.getElementById('contact-modal').style.display='flex';
-  document.getElementById('cm-name').value=name||'';
-  document.getElementById('cm-title').value='';
-  document.getElementById('cm-phone').value=phone||'';
-  document.getElementById('cm-email').value=email||'';
-  document.getElementById('cm-reports').value='';
-  document.getElementById('cm-prev').value='';
-  document.getElementById('cm-notes').value='';
+  document.getElementById('ct-name').value=name||'';
+  document.getElementById('ct-title').value='';
+  document.getElementById('ct-phone').value=phone||'';
+  document.getElementById('ct-email').value=email||'';
+  document.getElementById('ct-reports-to').value='';
+  document.getElementById('ct-prev').value='';
+  document.getElementById('ct-notes').value='';
   populateContactReportsTo();
 }
 function closeCompanyDetail(){activeCompanyId=null;renderCompanies();}
