@@ -61,6 +61,10 @@ body{font-family:'Inter',sans-serif;background:#010209;color:var(--ink);-webkit-
 .section-btn.active-wins{background:linear-gradient(135deg,var(--green2),var(--green));color:#03040F;box-shadow:0 0 16px rgba(0,255,179,0.4);}
 .section-btn.active-calendar{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;box-shadow:0 0 16px rgba(153,0,255,0.4);}
 .section-btn.active-installs{background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#03040F;box-shadow:0 0 16px rgba(0,180,255,0.4);}
+.section-btn.active-companies{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;box-shadow:0 0 16px rgba(153,0,255,0.4);}
+#companies-stats-bar .stat:nth-child(4)::before{background:linear-gradient(90deg,transparent,var(--pink),var(--pink3),transparent);box-shadow:0 2px 20px rgba(255,0,136,0.8)}
+#companies-stats-bar .stat:nth-child(4) .stat-bg{background:var(--pink)!important}
+#companies-stats-bar .stat:nth-child(4) .stat-val{background-image:linear-gradient(135deg,var(--pink),var(--pink3),#FFAAC8)!important}
 #installs-stats-bar::after{background:linear-gradient(90deg,var(--cyan),var(--green),var(--cyan));opacity:1.0;}
 #installs-stats-bar .stat:nth-child(1)::before,#installs-stats-bar .stat:nth-child(2)::before,#installs-stats-bar .stat:nth-child(3)::before{background:linear-gradient(90deg,transparent,var(--cyan),var(--cyan3),transparent);box-shadow:0 2px 20px rgba(0,180,255,0.8)}#installs-stats-bar .stat:nth-child(4)::before{background:linear-gradient(90deg,transparent,var(--pink),var(--pink3),transparent);box-shadow:0 2px 20px rgba(255,0,136,0.8)}
 #installs-stats-bar .stat-bg{background:var(--cyan)!important}
@@ -397,6 +401,11 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
           Calendar
           <span id="calendar-badge" style="display:none;background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:20px;margin-left:4px"></span>
       </button>
+      <button class="section-btn" id="toggle-companies" onclick="setSection('companies')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        Companies
+        <span id="companies-badge" style="display:none;background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:20px;margin-left:4px"></span>
+      </button>
     </div>
     <div class="top-actions" id="top-actions">
       <button class="btn btn-ghost-top" onclick="openAreas()">
@@ -417,6 +426,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
   <button class="section-btn" id="toggle-wins-mob" onclick="setSection('wins')" style="flex:1;height:42px;border-radius:0;font-size:13px;">Wins</button>
   <button class="section-btn" id="toggle-installs-mob" onclick="setSection('installs')" style="flex:1;height:42px;border-radius:0;font-size:13px;">Installs</button>
   <button class="section-btn" id="toggle-calendar-mob" onclick="setSection('calendar')" style="flex:1;height:42px;border-radius:0;font-size:13px;">Calendar</button>
+  <button class="section-btn" id="toggle-companies-mob" onclick="setSection('companies')" style="flex:1;height:42px;border-radius:0;font-size:13px;">Companies</button>
 </div>
 
 <!-- ═══════════ LEADS SECTION ═══════════ -->
@@ -662,6 +672,30 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
   </div>
 </div>
   
+<!-- ═══════════ COMPANIES SECTION ═══════════ -->
+<div id="companies-section" style="display:none">
+  <div class="stats-bar" id="companies-stats-bar">
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label">Companies</div><div class="stat-val" id="sc-total">0</div></div>
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label">Contacts</div><div class="stat-val" id="sc-contacts">0</div></div>
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label">Won Properties</div><div class="stat-val" id="sc-won">0</div></div>
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label">In Pipeline</div><div class="stat-val" id="sc-pipeline">0</div></div>
+  </div>
+  <div class="toolbar" style="justify-content:space-between">
+    <div class="search-wrap" style="max-width:360px">
+      <span class="search-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+      <input class="search-input" id="companies-search" placeholder="Search companies…" oninput="renderCompanies()">
+    </div>
+    <button class="btn btn-glow" onclick="openAddCompany()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Company
+    </button>
+  </div>
+  <div id="companies-detail-view" style="display:none;padding:22px 28px 80px;position:relative;z-index:2"></div>
+  <div id="companies-grid-view" style="padding:22px 28px 80px;position:relative;z-index:2">
+    <div id="companies-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px"></div>
+  </div>
+</div>
+  
 <!-- ADD/EDIT LEAD MODAL -->
 <div class="overlay" id="lead-modal">
   <div class="modal">
@@ -863,6 +897,53 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
     </div>
   </div>
   
+<!-- ADD/EDIT COMPANY MODAL -->
+<div class="overlay" id="company-modal" onclick="bgClose(event,'company-modal')">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <span class="modal-title" id="company-modal-title">Add Company</span>
+      <button class="modal-close" onclick="closeModal('company-modal')">×</button>
+    </div>
+    <p class="modal-sub">Track a management company's portfolio and build your org chart.</p>
+    <div class="field"><label>Company name *</label><input id="cm-name" placeholder="e.g. Woda Cooper"></div>
+    <div class="field">
+      <label>Parent company <span style="font-weight:400;opacity:.5">(optional — for subsidiaries)</span></label>
+      <select id="cm-parent"><option value="">— None (top level) —</option></select>
+    </div>
+    <div class="field"><label>Notes</label><textarea id="cm-notes" placeholder="e.g. Affordable housing portfolio across Ohio, central purchasing…" style="min-height:80px"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('company-modal')">Cancel</button>
+      <button class="btn btn-glow" onclick="saveCompany()">Save company</button>
+    </div>
+  </div>
+</div>
+  
+<!-- ADD/EDIT CONTACT MODAL -->
+<div class="overlay" id="contact-modal" onclick="bgClose(event,'contact-modal')">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <span class="modal-title" id="contact-modal-title">Add Person</span>
+      <button class="modal-close" onclick="closeModal('contact-modal')">×</button>
+    </div>
+    <div class="field"><label>Name *</label><input id="ct-name" placeholder="e.g. Linda Chen"></div>
+    <div class="field"><label>Title</label><input id="ct-title" placeholder="e.g. Regional Vice President"></div>
+    <div class="field-row">
+      <div class="field"><label>Phone</label><input id="ct-phone" type="tel" placeholder="(614) 555-0100" oninput="this.value=formatPhone(this.value)"></div>
+      <div class="field"><label>Email</label><input id="ct-email" type="email" placeholder="linda@company.com"></div>
+    </div>
+    <div class="field">
+      <label>Reports to <span style="font-weight:400;opacity:.5">(optional)</span></label>
+      <select id="ct-reports-to"><option value="">— Top level (no manager) —</option></select>
+    </div>
+    <div class="field"><label>Previous employers <span style="font-weight:400;opacity:.5">(optional)</span></label><input id="ct-prev" placeholder="e.g. Oakwood Management 2019–2022"></div>
+    <div class="field"><label>Notes</label><textarea id="ct-notes" placeholder="e.g. Key decision maker for all Columbus properties…" style="min-height:64px"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('contact-modal')">Cancel</button>
+      <button class="btn btn-glow" onclick="saveContact()">Save person</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── Stars ──
 (function(){
@@ -922,18 +1003,29 @@ let wSortCol="wonDate",wSortDir=-1;
 let dragSrcIdx=null;
 let currentSection="leads";
 let isSaving=false;
-
+let companies=[], company_contacts=[];
+let editCompanyId=null, editContactId=null, contactForCompanyId=null;
+let activeCompanyId=null;
+  
 // ── Loading overlay ──
 function showLoading(){const el=document.getElementById('loading-overlay');if(el)el.style.display='flex';}
 function hideLoading(){const el=document.getElementById('loading-overlay');if(el)el.style.display='none';}
 
 // ── DB mappers ──
+function dbToCompany(r){return{id:r.id,name:r.name||'',parent_id:r.parent_id||null,notes:r.notes||''};}
+function companyToDB(c){return{id:c.id,name:c.name,parent_id:c.parent_id||null,notes:c.notes||null};}
+function dbToContact(r){return{id:r.id,company_id:r.company_id,name:r.name||'',title:r.title||'',phone:r.phone||'',email:r.email||'',reports_to:r.reports_to||null,previous_employers:r.previous_employers||'',notes:r.notes||''};}
+function contactToDB(c){return{id:c.id,company_id:c.company_id,name:c.name,title:c.title||null,phone:c.phone||null,email:c.email||null,reports_to:c.reports_to||null,previous_employers:c.previous_employers||null,notes:c.notes||null};}
 function dbToLead(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,style:r.style||'',area:r.area||'Other',status:r.status||'New',notes:r.notes||'',mgmt:r.mgmt||''};}
 function leadToDB(l){return{id:l.id,company:l.company,contact:l.contact,phone:l.phone,email:l.email,address:l.address,units:l.units||0,style:l.style,area:l.area,status:l.status,notes:l.notes,mgmt:l.mgmt||''};}
 function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,installs:r.installs||0,carpet:r.carpet||0,hard:r.hard||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||'',mgmt:r.mgmt||'',scheduledDate:r.scheduled_date||'',carpetOrderNumber:r.carpet_order_number||'',hardOrderNumber:r.hard_order_number||'',propertyPO:r.property_po||'',carpetPO:r.carpet_po||'',hardPO:r.hard_po||'',installAddress:r.install_address||'',lat:r.lat||null,lng:r.lng||null};}
 function winToDB(w){return{id:w.id,company:w.company,contact:w.contact,phone:w.phone,email:w.email,address:w.address,units:w.units||0,installs:w.installs||0,carpet:w.carpet||0,hard:w.hard||0,style:w.style,area:w.area,won_date:w.wonDate,win_notes:w.winNotes,mgmt:w.mgmt||'',scheduled_date:w.scheduledDate||null,carpet_order_number:w.carpetOrderNumber||null,hard_order_number:w.hardOrderNumber||null,property_po:w.propertyPO||null,carpet_po:w.carpetPO||null,hard_po:w.hardPO||null,install_address:w.installAddress||null,lat:w.lat||null,lng:w.lng||null};}
 
   // ── Supabase CRUD ──
+async function saveCompany_db(obj){try{await sb.from('companies').upsert(companyToDB(obj));}catch(e){console.error('saveCompany_db',e);}}
+async function deleteCompany_db(id){try{await sb.from('companies').delete().eq('id',id);}catch(e){console.error('deleteCompany_db',e);}}
+async function saveContact_db(obj){try{await sb.from('company_contacts').upsert(contactToDB(obj));}catch(e){console.error('saveContact_db',e);}}
+async function deleteContact_db(id){try{await sb.from('company_contacts').delete().eq('id',id);}catch(e){console.error('deleteContact_db',e);}}
 async function saveLead_db(obj){try{await sb.from('leads').upsert(leadToDB(obj));}catch(e){console.error('saveLead_db',e);}}
 async function deleteLead_db(id){try{await sb.from('leads').delete().eq('id',id);}catch(e){console.error('deleteLead_db',e);}}
 async function saveWin_db(obj){try{await sb.from('wins').upsert(winToDB(obj));}catch(e){console.error('saveWin_db',e);}}
@@ -959,7 +1051,7 @@ async function loadAll(){
     // Load areas
     const areasRes = await sb.from('areas').select('list').eq('id',1).maybeSingle();
     console.log('areas result:', areasRes.error, areasRes.data);
-    if(areasRes.data && Array.isArray(areasRes.data.list) && areasRes.data.list.length > 0){
+        if(areasRes.data && Array.isArray(areasRes.data.list) && areasRes.data.list.length > 0){
       areas = areasRes.data.list;
       console.log('areas loaded:', areas.length, 'areas');
     } else {
@@ -967,6 +1059,10 @@ async function loadAll(){
       areas = [...DEFAULT_AREAS];
       await saveAreas_db(areas);
     }
+    const companiesRes = await sb.from('companies').select('*').order('name');
+    const contactsRes = await sb.from('company_contacts').select('*').order('name');
+    if(companiesRes.data) companies = companiesRes.data.map(dbToCompany);
+    if(contactsRes.data) company_contacts = contactsRes.data.map(dbToContact);
   } catch(e){
     console.error('loadAll error:', e);
     if(!areas.length) areas = [...DEFAULT_AREAS];
@@ -975,6 +1071,7 @@ async function loadAll(){
   render();
   if(currentSection==='wins') renderWins();
   if(currentSection==='calendar') renderInstallMap();
+  if(currentSection==='companies') renderCompanies();
   updateWinsBadge();
 }
 
@@ -995,6 +1092,12 @@ sb.channel(channelId)
   .on('postgres_changes',{event:'DELETE',schema:'public',table:'wins'},scheduleReload)
   .on('postgres_changes',{event:'INSERT',schema:'public',table:'areas'},scheduleReload)
   .on('postgres_changes',{event:'UPDATE',schema:'public',table:'areas'},scheduleReload)
+  .on('postgres_changes',{event:'INSERT',schema:'public',table:'companies'},scheduleReload)
+  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'companies'},scheduleReload)
+  .on('postgres_changes',{event:'DELETE',schema:'public',table:'companies'},scheduleReload)
+  .on('postgres_changes',{event:'INSERT',schema:'public',table:'company_contacts'},scheduleReload)
+  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'company_contacts'},scheduleReload)
+  .on('postgres_changes',{event:'DELETE',schema:'public',table:'company_contacts'},scheduleReload)
   .subscribe((status)=>{ console.log('Realtime status:', status); });
 
 function save(){} // no-op — all saves go direct to Supabase now
@@ -1006,21 +1109,25 @@ function setSection(s){
   document.getElementById('wins-section').style.display=s==='wins'?'':'none';
   document.getElementById('installs-section').style.display=s==='installs'?'':'none';
   document.getElementById('calendar-section').style.display=s==='calendar'?'':'none';
+  document.getElementById('companies-section').style.display=s==='companies'?'':'none';
   // Desktop toggle
   document.getElementById('toggle-leads').className='section-btn'+(s==='leads'?' active-leads':'');
   document.getElementById('toggle-wins').className='section-btn'+(s==='wins'?' active-wins':'');
   document.getElementById('toggle-installs').className='section-btn'+(s==='installs'?' active-installs':'');
   document.getElementById('toggle-calendar').className='section-btn'+(s==='calendar'?' active-calendar':'');
+  document.getElementById('toggle-companies').className='section-btn'+(s==='companies'?' active-companies':'');
   // Mobile toggle
   document.getElementById('toggle-leads-mob').className='section-btn'+(s==='leads'?' active-leads':'');
   document.getElementById('toggle-wins-mob').className='section-btn'+(s==='wins'?' active-wins':'');
   document.getElementById('toggle-installs-mob').className='section-btn'+(s==='installs'?' active-installs':'');
   document.getElementById('toggle-calendar-mob').className='section-btn'+(s==='calendar'?' active-calendar':'');
+  document.getElementById('toggle-companies-mob').className='section-btn'+(s==='companies'?' active-companies':'');
   // Top actions — hide Areas/Add when not on leads
   document.getElementById('top-actions').style.display=s==='leads'?'flex':'none';
   if(s==='wins') renderWins();
   else if(s==='installs') renderInstalls();
   else if(s==='calendar') renderCalendar();
+  else if(s==='companies') renderCompanies();
   else render();
 }
 
@@ -2327,6 +2434,219 @@ async function renderInstallMap(){
   if(warnEl){if(unmapped.length){warnEl.style.display='block';warnEl.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Couldn't map: <strong>${[...new Set(unmapped)].join(', ')}</strong> — open Edit Win and add Lat/Lng coordinates for these properties.`;}else{warnEl.style.display='none';}}
     if(!_mapZooming){if(bounds.length===1)installMap.setView(bounds[0],14);else if(bounds.length>1)installMap.fitBounds(bounds,{padding:[40,40]});}
   }
+// ── Companies ──
+function getCompanyPortfolio(name){
+  const n=name.toLowerCase();
+  const won=[...new Set(wins.filter(w=>w.mgmt&&w.mgmt.toLowerCase()===n).map(w=>w.company))];
+  const pipeline=[...new Set(leads.filter(l=>l.mgmt&&l.mgmt.toLowerCase()===n).map(l=>l.company))].filter(p=>!won.map(x=>x.toLowerCase()).includes(p.toLowerCase()));
+  return{won,pipeline};
+}
+function getLastActivity(name){
+  const n=name.toLowerCase();
+  const cw=wins.filter(w=>w.mgmt&&w.mgmt.toLowerCase()===n&&w.wonDate);
+  if(!cw.length)return null;
+  return cw.sort((a,b)=>b.wonDate.localeCompare(a.wonDate))[0].wonDate;
+}
+function renderCompaniesStats(){
+  let tw=0,tp=0;
+  companies.forEach(c=>{const p=getCompanyPortfolio(c.name);tw+=p.won.length;tp+=p.pipeline.length;});
+  document.getElementById('sc-total').textContent=companies.length;
+  document.getElementById('sc-contacts').textContent=company_contacts.length;
+  document.getElementById('sc-won').textContent=tw;
+  document.getElementById('sc-pipeline').textContent=tp;
+  const b=document.getElementById('companies-badge');
+  if(b){b.style.display=companies.length?'inline':'none';b.textContent=companies.length;}
+}
+function renderCompanies(){
+  renderCompaniesStats();
+  if(activeCompanyId){showCompanyDetail(activeCompanyId);return;}
+  document.getElementById('companies-detail-view').style.display='none';
+  document.getElementById('companies-grid-view').style.display='block';
+  const q=(document.getElementById('companies-search')?.value||'').toLowerCase();
+  const filtered=companies.filter(c=>!q||c.name.toLowerCase().includes(q));
+  const grid=document.getElementById('companies-grid');
+  const knownNames=new Set(companies.map(c=>c.name.toLowerCase()));
+  const implied=[...new Set([...leads,...wins].map(x=>x.mgmt).filter(m=>m&&!knownNames.has(m.toLowerCase())))].sort();
+  if(!filtered.length&&!implied.length){
+    grid.innerHTML=`<div style="grid-column:1/-1"><div class="empty"><span class="empty-icon-wrap" style="font-size:52px;display:block;margin-bottom:18px">🏢</span><div class="empty-title">${companies.length?'No matches':'No companies yet'}</div><div class="empty-sub">${companies.length?'Try adjusting your search.':'Hit "Add Company" to start building your regional intel.'}</div></div></div>`;
+    return;
+  }
+  grid.innerHTML=filtered.map(c=>{
+    const pf=getCompanyPortfolio(c.name);
+    const total=pf.won.length+pf.pipeline.length;
+    const ld=getLastActivity(c.name);
+    const ls=ld?new Date(ld+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):null;
+    const cts=company_contacts.filter(ct=>ct.company_id===c.id);
+    const par=c.parent_id?companies.find(x=>x.id===c.parent_id):null;
+    const kids=companies.filter(x=>x.parent_id===c.id);
+    return`<div onclick="openCompanyDetail('${c.id}')" style="background:rgba(8,10,24,0.88);border:1px solid rgba(255,255,255,0.12);border-radius:18px;padding:22px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden" onmouseover="this.style.borderColor='rgba(153,0,255,0.5)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'">
+      <div style="position:absolute;top:-40px;right:-30px;width:120px;height:120px;background:radial-gradient(circle,rgba(153,0,255,0.1),transparent 70%);pointer-events:none"></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:17px;font-weight:900;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px">${esc(c.name)}</div>
+          ${par?`<div style="font-size:11px;color:var(--purple3);font-weight:700">↑ ${esc(par.name)}</div>`:''}
+          ${kids.length?`<div style="font-size:11px;color:var(--ink4)">${kids.length} subsidiary${kids.length>1?'s':''}</div>`:''}
+        </div>
+        <button onclick="event.stopPropagation();openEditCompany('${c.id}')" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:var(--ink3);font-size:11px;font-weight:700;font-family:inherit;padding:5px 10px;border-radius:7px;cursor:pointer;flex-shrink:0;margin-left:10px">Edit</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">
+        <div style="text-align:center;padding:10px 6px;border-radius:10px;background:rgba(0,255,179,0.08);border:1px solid rgba(0,255,179,0.2)"><div style="font-size:24px;font-weight:900;color:var(--green)">${pf.won.length}</div><div style="font-size:9px;font-weight:800;color:var(--green);opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Won</div></div>
+        <div style="text-align:center;padding:10px 6px;border-radius:10px;background:rgba(255,0,136,0.08);border:1px solid rgba(255,0,136,0.2)"><div style="font-size:24px;font-weight:900;color:var(--pink)">${pf.pipeline.length}</div><div style="font-size:9px;font-weight:800;color:var(--pink);opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Pipeline</div></div>
+        <div style="text-align:center;padding:10px 6px;border-radius:10px;background:rgba(0,180,255,0.08);border:1px solid rgba(0,180,255,0.2)"><div style="font-size:24px;font-weight:900;color:var(--cyan)">${total}</div><div style="font-size:9px;font-weight:800;color:var(--cyan);opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Total</div></div>
+      </div>
+      ${cts.length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">${cts.slice(0,3).map(ct=>`<span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:rgba(153,0,255,0.12);color:var(--purple3);border:1px solid rgba(153,0,255,0.25)">${esc(ct.name)}${ct.title?' · '+esc(ct.title):''}</span>`).join('')}${cts.length>3?`<span style="font-size:11px;color:var(--ink4);padding:4px 6px">+${cts.length-3} more</span>`:''}</div>`:`<div style="font-size:12px;color:var(--ink4);margin-bottom:10px">No contacts — click to build org chart</div>`}
+      <div style="font-size:11px;color:var(--ink4);border-top:1px solid rgba(255,255,255,0.06);padding-top:8px">${ls?`Last order: <span style="color:var(--green);font-weight:700">${ls}</span>`:'No activity yet'}</div>
+    </div>`;
+  }).join('')+(implied.length?`<div style="grid-column:1/-1;margin-top:4px"><div style="font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--ink4);text-transform:uppercase;margin-bottom:10px">From your leads/wins — not yet added as companies</div><div style="display:flex;flex-wrap:wrap;gap:8px">${implied.map(m=>`<button onclick="quickAddCompany('${m.replace(/'/g,"\\'")}')" style="font-size:12px;font-weight:700;font-family:inherit;padding:7px 14px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.2);color:var(--ink3);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(153,0,255,0.5)';this.style.color='var(--purple3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='var(--ink3)'">+ ${esc(m)}</button>`).join('')}</div></div>`:'');
+}
+function openCompanyDetail(id){activeCompanyId=id;renderCompanies();}
+function closeCompanyDetail(){activeCompanyId=null;renderCompanies();}
+function showCompanyDetail(id){
+  const c=companies.find(x=>x.id===id);if(!c)return;
+  document.getElementById('companies-grid-view').style.display='none';
+  const dv=document.getElementById('companies-detail-view');dv.style.display='block';
+  const pf=getCompanyPortfolio(c.name);
+  const cts=company_contacts.filter(ct=>ct.company_id===id);
+  const par=c.parent_id?companies.find(x=>x.id===c.parent_id):null;
+  const kids=companies.filter(x=>x.parent_id===id);
+  const ld=getLastActivity(c.name);
+  const ls=ld?new Date(ld+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):null;
+  dv.innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px">
+      <button onclick="closeCompanyDetail()" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;font-family:inherit;padding:8px 14px;border-radius:9px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:var(--ink3);cursor:pointer">← All Companies</button>
+      <div style="font-size:22px;font-weight:900;color:var(--ink);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.name)}</div>
+      <button onclick="openEditCompany('${id}')" style="font-size:12px;font-weight:700;font-family:inherit;padding:8px 14px;border-radius:9px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:var(--ink3);cursor:pointer">Edit</button>
+      <button onclick="deleteCompany('${id}')" style="font-size:12px;font-weight:700;font-family:inherit;padding:8px 14px;border-radius:9px;background:rgba(255,68,102,0.1);border:1px solid rgba(255,68,102,0.3);color:var(--pink);cursor:pointer">Delete</button>
+    </div>
+    ${par||kids.length||c.notes?`<div style="background:rgba(153,0,255,0.06);border:1px solid rgba(153,0,255,0.25);border-radius:14px;padding:16px 20px;margin-bottom:20px">${par?`<div style="font-size:12px;color:var(--purple3);margin-bottom:6px">↑ Part of <strong style="cursor:pointer;text-decoration:underline" onclick="openCompanyDetail('${par.id}')">${esc(par.name)}</strong></div>`:''} ${kids.length?`<div style="font-size:12px;color:var(--ink3);margin-bottom:${c.notes?6:0}px">Subsidiaries: ${kids.map(k=>`<span onclick="openCompanyDetail('${k.id}')" style="cursor:pointer;color:var(--purple3);font-weight:700">${esc(k.name)}</span>`).join(', ')}</div>`:''} ${c.notes?`<div style="font-size:13px;color:var(--ink2);line-height:1.6;white-space:pre-wrap">${esc(c.notes)}</div>`:''}</div>`:''}
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
+      <div style="padding:16px;border-radius:12px;background:rgba(0,255,179,0.08);border:1px solid rgba(0,255,179,0.2);text-align:center"><div style="font-size:36px;font-weight:900;color:var(--green)">${pf.won.length}</div><div style="font-size:10px;font-weight:800;color:var(--green);opacity:.7;text-transform:uppercase;letter-spacing:.1em;margin-top:4px">Won</div></div>
+      <div style="padding:16px;border-radius:12px;background:rgba(255,0,136,0.08);border:1px solid rgba(255,0,136,0.2);text-align:center"><div style="font-size:36px;font-weight:900;color:var(--pink)">${pf.pipeline.length}</div><div style="font-size:10px;font-weight:800;color:var(--pink);opacity:.7;text-transform:uppercase;letter-spacing:.1em;margin-top:4px">Pipeline</div></div>
+      <div style="padding:16px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);text-align:center"><div style="font-size:14px;font-weight:800;color:var(--ink);padding-top:8px">${ls||'—'}</div><div style="font-size:10px;font-weight:800;color:var(--ink4);text-transform:uppercase;letter-spacing:.1em;margin-top:4px">Last Order</div></div>
+    </div>
+    <div style="margin-bottom:28px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-size:12px;font-weight:800;letter-spacing:.1em;color:var(--purple3);text-transform:uppercase">Org Chart</div>
+        <button onclick="openAddContact('${id}')" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;font-family:inherit;padding:8px 14px;border-radius:9px;background:linear-gradient(135deg,var(--pink),var(--purple));border:none;color:#fff;cursor:pointer;box-shadow:0 0 20px rgba(255,0,110,0.3)">+ Add Person</button>
+      </div>
+      ${cts.length?renderOrgChart(cts,id):`<div style="text-align:center;padding:32px;border:1px dashed rgba(153,0,255,0.25);border-radius:14px;color:var(--ink4);font-size:13px">No contacts yet.<br><br><button onclick="openAddContact('${id}')" style="margin-top:8px;font-size:13px;font-weight:700;font-family:inherit;padding:10px 20px;border-radius:9px;background:linear-gradient(135deg,var(--pink),var(--purple));border:none;color:#fff;cursor:pointer">+ Add First Person</button></div>`}
+    </div>
+    <div>
+      <div style="font-size:12px;font-weight:800;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:14px">Portfolio</div>
+      ${pf.won.length?`<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--green);text-transform:uppercase;margin-bottom:8px">Won (${pf.won.length})</div>${pf.won.map(co=>`<div onclick="setSection('wins')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;background:rgba(0,255,179,0.06);border:1px solid rgba(0,255,179,0.2);margin-bottom:6px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(0,255,179,0.1)'" onmouseout="this.style.background='rgba(0,255,179,0.06)'"><span style="flex:1;font-size:13px;font-weight:700;color:var(--ink)">${esc(co)}</span><span class="win-badge" style="font-size:10px">🏆 Won</span></div>`).join('')}</div>`:''}
+      ${pf.pipeline.length?`<div><div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--pink);text-transform:uppercase;margin-bottom:8px">In Pipeline (${pf.pipeline.length})</div>${pf.pipeline.map(co=>`<div onclick="setSection('leads')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;background:rgba(255,0,136,0.06);border:1px solid rgba(255,0,136,0.2);margin-bottom:6px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(255,0,136,0.1)'" onmouseout="this.style.background='rgba(255,0,136,0.06)'"><span style="flex:1;font-size:13px;font-weight:700;color:var(--ink)">${esc(co)}</span><span style="font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px;background:rgba(255,0,136,0.15);color:var(--pink)">Pipeline</span></div>`).join('')}</div>`:''}
+      ${!pf.won.length&&!pf.pipeline.length?`<div style="color:var(--ink4);font-size:13px;padding:16px;border:1px dashed rgba(255,255,255,0.1);border-radius:10px">No properties linked yet. Add this company's name to the "Management Company" field on leads and wins to see them here.</div>`:''}
+    </div>`;
+}
+function renderOrgChart(contacts,companyId){
+  const ids=new Set(contacts.map(c=>c.id));
+  const roots=contacts.filter(c=>!c.reports_to||!ids.has(c.reports_to));
+  function node(ct,depth){
+    const kids=contacts.filter(c=>c.reports_to===ct.id);
+    return`<div style="margin-left:${depth*32}px;position:relative;margin-bottom:10px">
+      ${depth>0?`<div style="position:absolute;left:-18px;top:22px;width:16px;height:1px;background:rgba(153,0,255,0.25)"></div><div style="position:absolute;left:-18px;top:0;bottom:50%;width:1px;background:rgba(153,0,255,0.15)"></div>`:''}
+      <div style="background:rgba(153,0,255,0.08);border:1px solid rgba(153,0,255,${depth===0?'0.45':'0.22'});border-radius:13px;padding:14px 16px;display:flex;align-items:center;gap:12px">
+        <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,rgba(153,0,255,0.4),rgba(255,0,136,0.2));display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;color:var(--purple3);flex-shrink:0">${esc(ct.name.charAt(0).toUpperCase())}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:800;color:var(--ink)">${esc(ct.name)}</div>
+          ${ct.title?`<div style="font-size:12px;color:var(--purple3);font-weight:600;margin-top:1px">${esc(ct.title)}</div>`:''}
+          <div style="display:flex;gap:12px;margin-top:5px;flex-wrap:wrap">
+            ${ct.phone?`<a href="tel:${ct.phone.replace(/\D/g,'')}" onclick="event.stopPropagation()" style="font-size:11px;color:var(--cyan);text-decoration:none;font-weight:600">${esc(ct.phone)}</a>`:''}
+            ${ct.email?`<a href="mailto:${ct.email}" onclick="event.stopPropagation()" style="font-size:11px;color:var(--cyan);text-decoration:none;font-weight:600">${esc(ct.email)}</a>`:''}
+          </div>
+          ${ct.previous_employers?`<div style="font-size:10px;color:var(--ink4);margin-top:3px">Previously: ${esc(ct.previous_employers)}</div>`:''}
+          ${ct.notes?`<div style="font-size:11px;color:var(--ink3);margin-top:3px;line-height:1.5">${esc(ct.notes)}</div>`:''}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
+          <button onclick="openAddContact('${companyId}','${ct.id}')" style="background:rgba(0,255,179,0.1);border:1px solid rgba(0,255,179,0.25);color:var(--green);font-size:10px;font-weight:700;font-family:inherit;padding:5px 9px;border-radius:7px;cursor:pointer" title="Add direct report">+</button>
+          <button onclick="openEditContact('${ct.id}')" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:var(--ink3);font-size:10px;font-weight:700;font-family:inherit;padding:5px 9px;border-radius:7px;cursor:pointer">Edit</button>
+          <button onclick="deleteContact('${ct.id}')" style="background:rgba(255,68,102,0.08);border:1px solid rgba(255,68,102,0.2);color:var(--pink);font-size:10px;font-weight:700;font-family:inherit;padding:5px 9px;border-radius:7px;cursor:pointer">✕</button>
+        </div>
+      </div>
+      ${kids.map(k=>node(k,depth+1)).join('')}
+    </div>`;
+  }
+  return roots.map(r=>node(r,0)).join('');
+}
+// ── Companies CRUD ──
+function openAddCompany(){
+  editCompanyId=null;
+  document.getElementById('company-modal-title').textContent='Add Company';
+  document.getElementById('cm-name').value='';
+  document.getElementById('cm-notes').value='';
+  document.getElementById('cm-parent').innerHTML='<option value="">— None (top level) —</option>'+companies.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  document.getElementById('company-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('cm-name').focus(),60);
+}
+function openEditCompany(id){
+  const c=companies.find(x=>x.id===id);if(!c)return;
+  editCompanyId=id;
+  document.getElementById('company-modal-title').textContent='Edit Company';
+  document.getElementById('cm-name').value=c.name;
+  document.getElementById('cm-notes').value=c.notes||'';
+  document.getElementById('cm-parent').innerHTML='<option value="">— None (top level) —</option>'+companies.filter(x=>x.id!==id).map(x=>`<option value="${x.id}"${x.id===c.parent_id?' selected':''}>${esc(x.name)}</option>`).join('');
+  document.getElementById('company-modal').classList.add('open');
+}
+async function saveCompany(){
+  const name=document.getElementById('cm-name').value.trim();if(!name)return;
+  const obj={id:editCompanyId||crypto.randomUUID(),name,parent_id:document.getElementById('cm-parent').value||null,notes:document.getElementById('cm-notes').value.trim()};
+  if(editCompanyId){const i=companies.findIndex(x=>x.id===editCompanyId);if(i>-1)companies[i]=obj;}else companies.push(obj);
+  closeModal('company-modal');renderCompanies();
+  isSaving=true;await saveCompany_db(obj);isSaving=false;
+}
+async function deleteCompany(id){
+  const c=companies.find(x=>x.id===id);if(!c)return;
+  if(!confirm(`Delete "${c.name}" and all its contacts?`))return;
+  companies=companies.filter(x=>x.id!==id);
+  company_contacts=company_contacts.filter(x=>x.company_id!==id);
+  activeCompanyId=null;renderCompanies();
+  isSaving=true;await deleteCompany_db(id);isSaving=false;
+}
+async function quickAddCompany(name){
+  if(companies.find(c=>c.name.toLowerCase()===name.toLowerCase()))return;
+  const obj={id:crypto.randomUUID(),name,parent_id:null,notes:''};
+  companies.push(obj);renderCompanies();
+  isSaving=true;await saveCompany_db(obj);isSaving=false;
+}
+function openAddContact(companyId,reportsTo){
+  editContactId=null;contactForCompanyId=companyId;
+  document.getElementById('contact-modal-title').textContent='Add Person';
+  ['ct-name','ct-title','ct-phone','ct-email','ct-prev','ct-notes'].forEach(i=>document.getElementById(i).value='');
+  const cts=company_contacts.filter(c=>c.company_id===companyId);
+  document.getElementById('ct-reports-to').innerHTML='<option value="">— Top level (no manager) —</option>'+cts.map(c=>`<option value="${c.id}"${c.id===reportsTo?' selected':''}>${esc(c.name)}${c.title?' — '+esc(c.title):''}</option>`).join('');
+  document.getElementById('contact-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('ct-name').focus(),60);
+}
+function openEditContact(id){
+  const ct=company_contacts.find(x=>x.id===id);if(!ct)return;
+  editContactId=id;contactForCompanyId=ct.company_id;
+  document.getElementById('contact-modal-title').textContent='Edit Person';
+  document.getElementById('ct-name').value=ct.name||'';
+  document.getElementById('ct-title').value=ct.title||'';
+  document.getElementById('ct-phone').value=ct.phone||'';
+  document.getElementById('ct-email').value=ct.email||'';
+  document.getElementById('ct-prev').value=ct.previous_employers||'';
+  document.getElementById('ct-notes').value=ct.notes||'';
+  const cts=company_contacts.filter(c=>c.company_id===ct.company_id&&c.id!==id);
+  document.getElementById('ct-reports-to').innerHTML='<option value="">— Top level (no manager) —</option>'+cts.map(c=>`<option value="${c.id}"${c.id===ct.reports_to?' selected':''}>${esc(c.name)}${c.title?' — '+esc(c.title):''}</option>`).join('');
+  document.getElementById('contact-modal').classList.add('open');
+}
+async function saveContact(){
+  const name=document.getElementById('ct-name').value.trim();if(!name)return;
+  const obj={id:editContactId||crypto.randomUUID(),company_id:contactForCompanyId,name,title:document.getElementById('ct-title').value.trim(),phone:formatPhone(document.getElementById('ct-phone').value.trim()),email:document.getElementById('ct-email').value.trim(),reports_to:document.getElementById('ct-reports-to').value||null,previous_employers:document.getElementById('ct-prev').value.trim(),notes:document.getElementById('ct-notes').value.trim()};
+  if(editContactId){const i=company_contacts.findIndex(x=>x.id===editContactId);if(i>-1)company_contacts[i]=obj;}else company_contacts.push(obj);
+  closeModal('contact-modal');
+  if(activeCompanyId)showCompanyDetail(activeCompanyId);
+  isSaving=true;await saveContact_db(obj);isSaving=false;
+}
+async function deleteContact(id){
+  const ct=company_contacts.find(x=>x.id===id);if(!ct)return;
+  if(!confirm(`Remove "${ct.name}"?`))return;
+  company_contacts.forEach(c=>{if(c.reports_to===id)c.reports_to=null;});
+  company_contacts=company_contacts.filter(x=>x.id!==id);
+  if(activeCompanyId)showCompanyDetail(activeCompanyId);
+  isSaving=true;await deleteContact_db(id);isSaving=false;
+}
 loadAll();
 </script>
 <!-- Loading overlay -->
