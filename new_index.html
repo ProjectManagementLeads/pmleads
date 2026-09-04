@@ -2500,6 +2500,32 @@ function renderCompanies(){
   }).join('')+(implied.length?`<div style="grid-column:1/-1;margin-top:4px"><div style="font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--ink4);text-transform:uppercase;margin-bottom:10px">From your leads/wins — not yet added as companies</div><div style="display:flex;flex-wrap:wrap;gap:8px">${implied.map(m=>`<button onclick="quickAddCompany('${m.replace(/'/g,"\\'")}')" style="font-size:12px;font-weight:700;font-family:inherit;padding:7px 14px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.2);color:var(--ink3);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(153,0,255,0.5)';this.style.color='var(--purple3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='var(--ink3)'">+ ${esc(m)}</button>`).join('')}</div></div>`:'');
 }
 function openCompanyDetail(id){activeCompanyId=id;renderCompanies();}
+function openAddContactFromRecord(cid,name,phone,email){
+  contactForCompanyId=cid;
+  editContactId=null;
+  document.getElementById('contact-modal').style.display='flex';
+  document.getElementById('cm-name').value=name||'';
+  document.getElementById('cm-title').value='';
+  document.getElementById('cm-phone').value=phone||'';
+  document.getElementById('cm-email').value=email||'';
+  document.getElementById('cm-reports').value='';
+  document.getElementById('cm-prev').value='';
+  document.getElementById('cm-notes').value='';
+  populateContactReportsTo();
+}
+function openAddContactFromRecord(cid,name,phone,email){
+  contactForCompanyId=cid;
+  editContactId=null;
+  document.getElementById('contact-modal').style.display='flex';
+  document.getElementById('cm-name').value=name||'';
+  document.getElementById('cm-title').value='';
+  document.getElementById('cm-phone').value=phone||'';
+  document.getElementById('cm-email').value=email||'';
+  document.getElementById('cm-reports').value='';
+  document.getElementById('cm-prev').value='';
+  document.getElementById('cm-notes').value='';
+  populateContactReportsTo();
+}
 function closeCompanyDetail(){activeCompanyId=null;renderCompanies();}
 function showCompanyDetail(id){
   const c=companies.find(x=>x.id===id);if(!c)return;
@@ -2511,6 +2537,11 @@ function showCompanyDetail(id){
   const kids=companies.filter(x=>x.parent_id===id);
   const ld=getLastActivity(c.name);
   const ls=ld?new Date(ld+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):null;
+  const _pmRecs=[...leads,...wins].filter(r=>r.mgmt&&r.mgmt.toLowerCase()===c.name.toLowerCase()&&r.contact&&r.contact.trim());
+  const _pmMap=new Map();
+  _pmRecs.forEach(r=>{const k=r.contact.toLowerCase().trim();if(!_pmMap.has(k))_pmMap.set(k,{name:r.contact,phone:r.phone||'',email:r.email||'',props:[]});const prop=r.address||'';if(prop&&!_pmMap.get(k).props.includes(prop))_pmMap.get(k).props.push(prop);});
+  const pmList=[..._pmMap.values()];
+  window._coPMs=pmList;
   dv.innerHTML=`
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px">
       <button onclick="closeCompanyDetail()" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;font-family:inherit;padding:8px 14px;border-radius:9px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:var(--ink3);cursor:pointer">← All Companies</button>
@@ -2536,7 +2567,22 @@ function showCompanyDetail(id){
       ${pf.won.length?`<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--green);text-transform:uppercase;margin-bottom:8px">Won (${pf.won.length})</div>${pf.won.map(co=>`<div onclick="setSection('wins')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;background:rgba(0,255,179,0.06);border:1px solid rgba(0,255,179,0.2);margin-bottom:6px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(0,255,179,0.1)'" onmouseout="this.style.background='rgba(0,255,179,0.06)'"><span style="flex:1;font-size:13px;font-weight:700;color:var(--ink)">${esc(co)}</span><span class="win-badge" style="font-size:10px">🏆 Won</span></div>`).join('')}</div>`:''}
       ${pf.pipeline.length?`<div><div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--pink);text-transform:uppercase;margin-bottom:8px">In Pipeline (${pf.pipeline.length})</div>${pf.pipeline.map(co=>`<div onclick="setSection('leads')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;background:rgba(255,0,136,0.06);border:1px solid rgba(255,0,136,0.2);margin-bottom:6px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(255,0,136,0.1)'" onmouseout="this.style.background='rgba(255,0,136,0.06)'"><span style="flex:1;font-size:13px;font-weight:700;color:var(--ink)">${esc(co)}</span><span style="font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px;background:rgba(255,0,136,0.15);color:var(--pink)">Pipeline</span></div>`).join('')}</div>`:''}
       ${!pf.won.length&&!pf.pipeline.length?`<div style="color:var(--ink4);font-size:13px;padding:16px;border:1px dashed rgba(255,255,255,0.1);border-radius:10px">No properties linked yet. Add this company's name to the "Management Company" field on leads and wins to see them here.</div>`:''}
-    </div>`;
+    </div>
+    ${pmList.length?`<div style="margin-top:28px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="font-size:12px;font-weight:800;letter-spacing:.1em;color:var(--cyan);text-transform:uppercase">Property Contacts from Records</div>
+        <span style="font-size:11px;color:var(--ink4)">${pmList.length} PM${pmList.length!==1?'s':''}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px">
+        ${pmList.map((pm,i)=>`<div style="background:rgba(0,180,255,0.06);border:1px solid rgba(0,180,255,0.18);border-radius:10px;padding:14px">
+          <div style="font-weight:700;color:var(--ink);margin-bottom:5px">${esc(pm.name)}</div>
+          ${pm.phone?`<div style="font-size:12px;color:var(--ink3);margin-bottom:3px">📞 ${esc(pm.phone)}</div>`:''}
+          ${pm.email?`<div style="font-size:12px;color:var(--ink3);margin-bottom:6px">✉️ ${esc(pm.email)}</div>`:''}
+          <div style="font-size:11px;color:var(--cyan);opacity:.65;margin-bottom:10px">${pm.props.slice(0,3).map(p=>esc(p)).join(' · ')}${pm.props.length>3?' +more':''}</div>
+          <button onclick="openAddContactFromRecord('${id}',window._coPMs[${i}].name,window._coPMs[${i}].phone,window._coPMs[${i}].email)" style="font-size:11px;font-weight:700;font-family:inherit;padding:5px 12px;border-radius:7px;background:rgba(153,0,255,0.25);border:1px solid var(--purple);color:var(--purple2);cursor:pointer;width:100%">+ Add to Org Chart</button>
+        </div>`).join('')}
+      </div>
+    </div>`:''}`;
 }
 function renderOrgChart(contacts,companyId){
   const ids=new Set(contacts.map(c=>c.id));
