@@ -1016,9 +1016,9 @@ function dbToCompany(r){return{id:r.id,name:r.name||'',parent_id:r.parent_id||nu
 function companyToDB(c){return{id:c.id,name:c.name,parent_id:c.parent_id||null,notes:c.notes||null};}
 function dbToContact(r){return{id:r.id,company_id:r.company_id,name:r.name||'',title:r.title||'',phone:r.phone||'',email:r.email||'',reports_to:r.reports_to||null,previous_employers:r.previous_employers||'',notes:r.notes||''};}
 function contactToDB(c){return{id:c.id,company_id:c.company_id,name:c.name,title:c.title||null,phone:c.phone||null,email:c.email||null,reports_to:c.reports_to||null,previous_employers:c.previous_employers||null,notes:c.notes||null};}
-function dbToLead(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,style:r.style||'',area:r.area||'Other',status:r.status||'New',notes:r.notes||'',mgmt:r.mgmt||''};}
+function dbToLead(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,style:r.style||'',area:r.area||'Other',status:r.status||'New',notes:r.notes||'',mgmt:r.company||''};}
 function leadToDB(l){return{id:l.id,company:l.company,contact:l.contact,phone:l.phone,email:l.email,address:l.address,units:l.units||0,style:l.style,area:l.area,status:l.status,notes:l.notes,mgmt:l.mgmt||''};}
-function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,installs:r.installs||0,carpet:r.carpet||0,hard:r.hard||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||'',mgmt:r.mgmt||'',scheduledDate:r.scheduled_date||'',carpetOrderNumber:r.carpet_order_number||'',hardOrderNumber:r.hard_order_number||'',propertyPO:r.property_po||'',carpetPO:r.carpet_po||'',hardPO:r.hard_po||'',installAddress:r.install_address||'',lat:r.lat||null,lng:r.lng||null};}
+function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,installs:r.installs||0,carpet:r.carpet||0,hard:r.hard||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||'',mgmt:r.company||'',scheduledDate:r.scheduled_date||'',carpetOrderNumber:r.carpet_order_number||'',hardOrderNumber:r.hard_order_number||'',propertyPO:r.property_po||'',carpetPO:r.carpet_po||'',hardPO:r.hard_po||'',installAddress:r.install_address||'',lat:r.lat||null,lng:r.lng||null};}
 function winToDB(w){return{id:w.id,company:w.company,contact:w.contact,phone:w.phone,email:w.email,address:w.address,units:w.units||0,installs:w.installs||0,carpet:w.carpet||0,hard:w.hard||0,style:w.style,area:w.area,won_date:w.wonDate,win_notes:w.winNotes,mgmt:w.mgmt||'',scheduled_date:w.scheduledDate||null,carpet_order_number:w.carpetOrderNumber||null,hard_order_number:w.hardOrderNumber||null,property_po:w.propertyPO||null,carpet_po:w.carpetPO||null,hard_po:w.hardPO||null,install_address:w.installAddress||null,lat:w.lat||null,lng:w.lng||null};}
 
   // ── Supabase CRUD ──
@@ -2437,13 +2437,13 @@ async function renderInstallMap(){
 // ── Companies ──
 function getCompanyPortfolio(name){
   const n=name.toLowerCase();
-  const won=[...new Set(wins.filter(w=>w.mgmt&&w.mgmt.toLowerCase()===n).map(w=>w.company))];
-  const pipeline=[...new Set(leads.filter(l=>l.mgmt&&l.mgmt.toLowerCase()===n).map(l=>l.company))].filter(p=>!won.map(x=>x.toLowerCase()).includes(p.toLowerCase()));
+  const won=[...new Set(wins.filter(w=>w.company&&w.company.toLowerCase()===n).map(w=>w.address))];
+  const pipeline=[...new Set(leads.filter(l=>l.company&&l.company.toLowerCase()===n).map(l=>l.address))].filter(p=>!won.map(x=>x.toLowerCase()).includes(p.toLowerCase()));
   return{won,pipeline};
 }
 function getLastActivity(name){
   const n=name.toLowerCase();
-  const cw=wins.filter(w=>w.mgmt&&w.mgmt.toLowerCase()===n&&w.wonDate);
+  const cw=wins.filter(w=>w.company&&w.company.toLowerCase()===n&&w.wonDate);
   if(!cw.length)return null;
   return cw.sort((a,b)=>b.wonDate.localeCompare(a.wonDate))[0].wonDate;
 }
@@ -2537,7 +2537,7 @@ function showCompanyDetail(id){
   const kids=companies.filter(x=>x.parent_id===id);
   const ld=getLastActivity(c.name);
   const ls=ld?new Date(ld+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):null;
-  const _pmRecs=[...leads,...wins].filter(r=>r.mgmt&&r.mgmt.toLowerCase()===c.name.toLowerCase()&&r.contact&&r.contact.trim());
+  const _pmRecs=[...leads,...wins].filter(r=>r.company&&r.company.toLowerCase()===c.name.toLowerCase()&&r.contact&&r.contact.trim());
   const _pmMap=new Map();
   _pmRecs.forEach(r=>{const k=r.contact.toLowerCase().trim();if(!_pmMap.has(k))_pmMap.set(k,{name:r.contact,phone:r.phone||'',email:r.email||'',props:[]});const prop=r.address||'';if(prop&&!_pmMap.get(k).props.includes(prop))_pmMap.get(k).props.push(prop);});
   const pmList=[..._pmMap.values()];
