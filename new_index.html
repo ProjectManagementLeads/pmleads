@@ -2690,11 +2690,13 @@ function openEditCompany(id){
   document.getElementById('company-modal').classList.add('open');
 }
 async function saveCompany(){
+  if(isSaving)return;
   const name=document.getElementById('cm-name').value.trim();if(!name)return;
   const obj={id:editCompanyId||crypto.randomUUID(),name,parent_id:document.getElementById('cm-parent').value||null,notes:document.getElementById('cm-notes').value.trim()};
   if(editCompanyId){const i=companies.findIndex(x=>x.id===editCompanyId);if(i>-1)companies[i]=obj;}else companies.push(obj);
   closeModal('company-modal');renderCompanies();
   isSaving=true;await saveCompany_db(obj);isSaving=false;
+  companies=[...new Map(companies.map(c=>[c.id,c])).values()];renderCompanies();
 }
 async function deleteCompany(id){
   const c=companies.find(x=>x.id===id);if(!c)return;
