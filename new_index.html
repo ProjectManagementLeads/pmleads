@@ -1016,9 +1016,9 @@ function dbToCompany(r){return{id:r.id,name:r.name||'',parent_id:r.parent_id||nu
 function companyToDB(c){return{id:c.id,name:c.name,parent_id:c.parent_id||null,notes:c.notes||null};}
 function dbToContact(r){return{id:r.id,company_id:r.company_id,name:r.name||'',title:r.title||'',phone:r.phone||'',email:r.email||'',reports_to:r.reports_to||null,previous_employers:r.previous_employers||'',notes:r.notes||''};}
 function contactToDB(c){return{id:c.id,company_id:c.company_id,name:c.name,title:c.title||null,phone:c.phone||null,email:c.email||null,reports_to:c.reports_to||null,previous_employers:c.previous_employers||null,notes:c.notes||null};}
-function dbToLead(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,style:r.style||'',area:r.area||'Other',status:r.status||'New',notes:r.notes||'',mgmt:r.company||''};}
+function dbToLead(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,style:r.style||'',area:r.area||'Other',status:r.status||'New',notes:r.notes||'',mgmt:r.mgmt||''};}
 function leadToDB(l){return{id:l.id,company:l.company,contact:l.contact,phone:l.phone,email:l.email,address:l.address,units:l.units||0,style:l.style,area:l.area,status:l.status,notes:l.notes,mgmt:l.mgmt||''};}
-function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,installs:r.installs||0,carpet:r.carpet||0,hard:r.hard||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||'',mgmt:r.company||'',scheduledDate:r.scheduled_date||'',carpetOrderNumber:r.carpet_order_number||'',hardOrderNumber:r.hard_order_number||'',propertyPO:r.property_po||'',carpetPO:r.carpet_po||'',hardPO:r.hard_po||'',installAddress:r.install_address||'',lat:r.lat||null,lng:r.lng||null};}
+function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,installs:r.installs||0,carpet:r.carpet||0,hard:r.hard||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||'',mgmt:r.mgmt||'',scheduledDate:r.scheduled_date||'',carpetOrderNumber:r.carpet_order_number||'',hardOrderNumber:r.hard_order_number||'',propertyPO:r.property_po||'',carpetPO:r.carpet_po||'',hardPO:r.hard_po||'',installAddress:r.install_address||'',lat:r.lat||null,lng:r.lng||null};}
 function winToDB(w){return{id:w.id,company:w.company,contact:w.contact,phone:w.phone,email:w.email,address:w.address,units:w.units||0,installs:w.installs||0,carpet:w.carpet||0,hard:w.hard||0,style:w.style,area:w.area,won_date:w.wonDate,win_notes:w.winNotes,mgmt:w.mgmt||'',scheduled_date:w.scheduledDate||null,carpet_order_number:w.carpetOrderNumber||null,hard_order_number:w.hardOrderNumber||null,property_po:w.propertyPO||null,carpet_po:w.carpetPO||null,hard_po:w.hardPO||null,install_address:w.installAddress||null,lat:w.lat||null,lng:w.lng||null};}
 
   // ── Supabase CRUD ──
@@ -2458,44 +2458,44 @@ function renderCompaniesStats(){
   if(b){b.style.display=companies.length?'inline':'none';b.textContent=companies.length;}
 }
 function renderCompanies(){
+  companies=[...new Map(companies.map(c=>[c.id,c])).values()];
   renderCompaniesStats();
   if(activeCompanyId){showCompanyDetail(activeCompanyId);return;}
   document.getElementById('companies-detail-view').style.display='none';
   document.getElementById('companies-grid-view').style.display='block';
   const q=(document.getElementById('companies-search')?.value||'').toLowerCase();
-  const filtered=companies.filter(c=>!q||c.name.toLowerCase().includes(q));
+  const filtered=companies.filter(c=>!c.parent_id&&(!q||c.name.toLowerCase().includes(q)));
   const grid=document.getElementById('companies-grid');
   const knownNames=new Set(companies.map(c=>c.name.toLowerCase()));
   const implied=[...new Set([...leads,...wins].map(x=>x.mgmt).filter(m=>m&&!knownNames.has(m.toLowerCase())))].sort();
   if(!filtered.length&&!implied.length){
-    grid.innerHTML=`<div style="grid-column:1/-1"><div class="empty"><span class="empty-icon-wrap" style="font-size:52px;display:block;margin-bottom:18px">🏢</span><div class="empty-title">${companies.length?'No matches':'No companies yet'}</div><div class="empty-sub">${companies.length?'Try adjusting your search.':'Hit "Add Company" to start building your regional intel.'}</div></div></div>`;
+    grid.innerHTML=`<div style="grid-column:1/-1"><div class="empty"><span class="empty-icon-wrap" style="font-size:52px;display:block;margin-bottom:18px">🏢</span><div class="empty-title">${companies.length?'No matches':'No companies yet'}</div><div class="empty-sub">${companies.length?'Try adjusting your search.':'Hit "Add Company" to start.'}</div></div></div>`;
     return;
   }
   grid.innerHTML=filtered.map(c=>{
     const pf=getCompanyPortfolio(c.name);
-    const total=pf.won.length+pf.pipeline.length;
+    const cts=company_contacts.filter(ct=>ct.company_id===c.id);
+    const kids=companies.filter(x=>x.parent_id===c.id);
     const ld=getLastActivity(c.name);
     const ls=ld?new Date(ld+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):null;
-    const cts=company_contacts.filter(ct=>ct.company_id===c.id);
-    const par=c.parent_id?companies.find(x=>x.id===c.parent_id):null;
-    const kids=companies.filter(x=>x.parent_id===c.id);
-    return`<div onclick="openCompanyDetail('${c.id}')" style="background:rgba(8,10,24,0.88);border:1px solid rgba(255,255,255,0.12);border-radius:18px;padding:22px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden" onmouseover="this.style.borderColor='rgba(153,0,255,0.5)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'">
-      <div style="position:absolute;top:-40px;right:-30px;width:120px;height:120px;background:radial-gradient(circle,rgba(153,0,255,0.1),transparent 70%);pointer-events:none"></div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+    return`<div onclick="openCompanyDetail('${c.id}')" style="background:rgba(8,10,24,0.88);border:1px solid rgba(255,255,255,0.12);border-radius:18px;padding:20px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='rgba(153,0,255,0.5)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
         <div style="flex:1;min-width:0">
-          <div style="font-size:17px;font-weight:900;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px">${esc(c.name)}</div>
-          ${par?`<div style="font-size:11px;color:var(--purple3);font-weight:700">↑ ${esc(par.name)}</div>`:''}
-          ${kids.length?`<div style="font-size:11px;color:var(--ink4)">${kids.length} subsidiary${kids.length>1?'s':''}</div>`:''}
+          <div style="font-size:16px;font-weight:900;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.name)}</div>
+          ${kids.length?`<div style="font-size:11px;color:var(--purple3);margin-top:2px">${kids.map(k=>`<span onclick="event.stopPropagation();openCompanyDetail('${k.id}')" style="cursor:pointer;font-weight:700;text-decoration:underline">${esc(k.name)}</span>`).join(', ')}</div>`:''}
         </div>
         <button onclick="event.stopPropagation();openEditCompany('${c.id}')" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:var(--ink3);font-size:11px;font-weight:700;font-family:inherit;padding:5px 10px;border-radius:7px;cursor:pointer;flex-shrink:0;margin-left:10px">Edit</button>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">
-        <div style="text-align:center;padding:10px 6px;border-radius:10px;background:rgba(0,255,179,0.08);border:1px solid rgba(0,255,179,0.2)"><div style="font-size:24px;font-weight:900;color:var(--green)">${pf.won.length}</div><div style="font-size:9px;font-weight:800;color:var(--green);opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Won</div></div>
-        <div style="text-align:center;padding:10px 6px;border-radius:10px;background:rgba(255,0,136,0.08);border:1px solid rgba(255,0,136,0.2)"><div style="font-size:24px;font-weight:900;color:var(--pink)">${pf.pipeline.length}</div><div style="font-size:9px;font-weight:800;color:var(--pink);opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Pipeline</div></div>
-        <div style="text-align:center;padding:10px 6px;border-radius:10px;background:rgba(0,180,255,0.08);border:1px solid rgba(0,180,255,0.2)"><div style="font-size:24px;font-weight:900;color:var(--cyan)">${total}</div><div style="font-size:9px;font-weight:800;color:var(--cyan);opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Total</div></div>
+      <div style="display:flex;gap:6px;margin-bottom:12px">
+        <div style="flex:1;text-align:center;padding:8px 4px;border-radius:9px;background:rgba(0,255,179,0.08);border:1px solid rgba(0,255,179,0.2)"><div style="font-size:20px;font-weight:900;color:var(--green)">${pf.won.length}</div><div style="font-size:9px;font-weight:800;color:var(--green);opacity:.7;text-transform:uppercase;letter-spacing:.08em">Won</div></div>
+        <div style="flex:1;text-align:center;padding:8px 4px;border-radius:9px;background:rgba(255,0,136,0.08);border:1px solid rgba(255,0,136,0.2)"><div style="font-size:20px;font-weight:900;color:var(--pink)">${pf.pipeline.length}</div><div style="font-size:9px;font-weight:800;color:var(--pink);opacity:.7;text-transform:uppercase;letter-spacing:.08em">Pipeline</div></div>
+        <div style="flex:1;text-align:center;padding:8px 4px;border-radius:9px;background:rgba(0,180,255,0.08);border:1px solid rgba(0,180,255,0.2)"><div style="font-size:20px;font-weight:900;color:var(--cyan)">${cts.length}</div><div style="font-size:9px;font-weight:800;color:var(--cyan);opacity:.7;text-transform:uppercase;letter-spacing:.08em">PMs</div></div>
       </div>
-      ${cts.length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">${cts.slice(0,3).map(ct=>`<span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:rgba(153,0,255,0.12);color:var(--purple3);border:1px solid rgba(153,0,255,0.25)">${esc(ct.name)}${ct.title?' · '+esc(ct.title):''}</span>`).join('')}${cts.length>3?`<span style="font-size:11px;color:var(--ink4);padding:4px 6px">+${cts.length-3} more</span>`:''}</div>`:`<div style="font-size:12px;color:var(--ink4);margin-bottom:10px">No contacts — click to build org chart</div>`}
-      <div style="font-size:11px;color:var(--ink4);border-top:1px solid rgba(255,255,255,0.06);padding-top:8px">${ls?`Last order: <span style="color:var(--green);font-weight:700">${ls}</span>`:'No activity yet'}</div>
+      ${pf.won.length?`<div style="margin-bottom:8px"><div style="font-size:9px;font-weight:800;letter-spacing:.1em;color:var(--green);text-transform:uppercase;margin-bottom:4px">Won Properties</div>${pf.won.slice(0,4).map(co=>`<div style="font-size:12px;color:var(--ink2);padding:2px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">🟢 ${esc(co)}</div>`).join('')}${pf.won.length>4?`<div style="font-size:11px;color:var(--ink4)">+${pf.won.length-4} more</div>`:''}</div>`:''}
+      ${pf.pipeline.length?`<div style="margin-bottom:8px"><div style="font-size:9px;font-weight:800;letter-spacing:.1em;color:var(--pink);text-transform:uppercase;margin-bottom:4px">Pipeline</div>${pf.pipeline.slice(0,3).map(co=>`<div style="font-size:12px;color:var(--ink2);padding:2px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">◎ ${esc(co)}</div>`).join('')}${pf.pipeline.length>3?`<div style="font-size:11px;color:var(--ink4)">+${pf.pipeline.length-3} more</div>`:''}</div>`:''}
+      ${!pf.won.length&&!pf.pipeline.length?`<div style="font-size:12px;color:var(--ink4);margin-bottom:8px;font-style:italic">No properties linked yet — set this company's name in the Management Company field on your wins/leads.</div>`:''}
+      ${cts.length?`<div style="display:flex;gap:5px;flex-wrap:wrap;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06);margin-bottom:8px">${cts.slice(0,2).map(ct=>`<span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:rgba(153,0,255,0.12);color:var(--purple3);border:1px solid rgba(153,0,255,0.25)">${esc(ct.name)}${ct.title?' · '+esc(ct.title):''}</span>`).join('')}${cts.length>2?`<span style="font-size:11px;color:var(--ink4);padding:3px 6px">+${cts.length-2} more</span>`:''}</div>`:''}
+      <div style="font-size:11px;color:var(--ink4);border-top:1px solid rgba(255,255,255,0.06);padding-top:8px">${ls?`Last order: <span style="color:var(--green);font-weight:700">${ls}</span>`:'No orders yet'}</div>
     </div>`;
   }).join('')+(implied.length?`<div style="grid-column:1/-1;margin-top:4px"><div style="font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--ink4);text-transform:uppercase;margin-bottom:10px">From your leads/wins — not yet added as companies</div><div style="display:flex;flex-wrap:wrap;gap:8px">${implied.map(m=>`<button onclick="quickAddCompany('${m.replace(/'/g,"\\'")}')" style="font-size:12px;font-weight:700;font-family:inherit;padding:7px 14px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.2);color:var(--ink3);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(153,0,255,0.5)';this.style.color='var(--purple3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='var(--ink3)'">+ ${esc(m)}</button>`).join('')}</div></div>`:'');
 }
