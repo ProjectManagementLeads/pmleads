@@ -1153,10 +1153,6 @@ async function loadAll(){
     const assignmentsRes=await sb.from('people_assignments').select('*');
     if(peopleRes.data) people=peopleRes.data.map(dbToPerson);
     if(assignmentsRes.data) people_assignments=assignmentsRes.data.map(dbToAssignment);
-    const peopleRes=await sb.from('people').select('*').order('name');
-    const assignmentsRes=await sb.from('people_assignments').select('*');
-    if(peopleRes.data) people=peopleRes.data.map(dbToPerson);
-    if(assignmentsRes.data) people_assignments=assignmentsRes.data.map(dbToAssignment);
   } catch(e){
     console.error('loadAll error:', e);
     if(!areas.length) areas = [...DEFAULT_AREAS];
