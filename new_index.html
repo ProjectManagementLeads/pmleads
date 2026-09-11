@@ -222,6 +222,9 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
 .modal-close:hover{background:rgba(255,0,110,0.18);border-color:rgba(255,0,110,0.5);color:var(--pink);box-shadow:0 0 16px rgba(255,0,110,0.3);transform:rotate(90deg);}
 .modal-sub{font-size:13px;color:var(--ink3);margin-bottom:26px;line-height:1.65;margin-top:6px;position:relative;z-index:1}
 .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:26px;padding-top:22px;border-top:1px solid var(--b);position:relative;z-index:1;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(1,2,12,0.92);backdrop-filter:blur(20px);z-index:100;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;cursor:default;}
+.modal-overlay.open{display:flex}
+.modal-box{margin:auto;}
 
 /* ── FORM FIELDS ── */
 .field{margin-bottom:16px;position:relative;z-index:1}
@@ -404,8 +407,9 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
       <button class="section-btn" id="toggle-companies" onclick="setSection('companies')">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
         Companies
-        <span id="companies-badge" style="display:none;background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:20px;margin-left:4px"></span>
+      <span id="companies-badge" style="display:none;background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:20px;margin-left:4px"></span>
       </button>
+      <button class="section-btn" id="toggle-tree" onclick="setSection('tree')" style="position:relative;padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;background:#1a1a2e;color:#aaa;">Tree <span id="tree-badge" style="position:absolute;top:-4px;right:-4px;background:#CC00FF;color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;display:flex;align-items:center;justify-content:center;"></span></button>
     </div>
     <div class="top-actions" id="top-actions">
       <button class="btn btn-ghost-top" onclick="openAreas()">
@@ -427,6 +431,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
   <button class="section-btn" id="toggle-installs-mob" onclick="setSection('installs')" style="flex:1;height:42px;border-radius:0;font-size:13px;">Installs</button>
   <button class="section-btn" id="toggle-calendar-mob" onclick="setSection('calendar')" style="flex:1;height:42px;border-radius:0;font-size:13px;">Calendar</button>
   <button class="section-btn" id="toggle-companies-mob" onclick="setSection('companies')" style="flex:1;height:42px;border-radius:0;font-size:13px;">Companies</button>
+  <button class="section-btn" id="toggle-tree-mob" onclick="setSection('tree')" style="flex:1;height:42px;border-radius:0;font-size:13px;">Tree</button>
 </div>
 
 <!-- ═══════════ LEADS SECTION ═══════════ -->
@@ -696,6 +701,21 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
   </div>
 </div>
   
+<!-- TREE SECTION -->
+<div id="tree-section" style="display:none;padding:16px;max-width:1200px;margin:0 auto;">
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+    <div class="stat-card"><div class="stat-value" id="st-total">0</div><div class="stat-label">Total People</div></div>
+    <div class="stat-card"><div class="stat-value" id="st-companies">0</div><div class="stat-label">Companies</div></div>
+    <div class="stat-card"><div class="stat-value" id="st-pms">0</div><div class="stat-label">PMs</div></div>
+    <div class="stat-card"><div class="stat-value" id="st-linked">0</div><div class="stat-label">Linked</div></div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+    <input id="tree-search" type="text" placeholder="Search people or company..." oninput="renderTree()" style="flex:1;min-width:200px;padding:8px 12px;border-radius:8px;border:1px solid #333;background:#1a1a2e;color:#e0e0e0;font-size:14px;">
+    <button onclick="openAddPerson()" style="padding:8px 16px;border-radius:8px;background:linear-gradient(135deg,#CC00FF,#9900EE);color:#fff;border:none;cursor:pointer;font-size:14px;font-weight:600;">+ Add Person</button>
+  </div>
+  <div id="tree-container"></div>
+</div>
+
 <!-- ADD/EDIT LEAD MODAL -->
 <div class="overlay" id="lead-modal">
   <div class="modal">
@@ -897,6 +917,62 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
     </div>
   </div>
   
+<!-- ADD/EDIT PERSON MODAL -->
+<div id="person-modal" class="modal-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal-box" style="max-width:540px;background:rgba(8,10,26,0.97);border:1px solid rgba(255,255,255,0.1);border-radius:22px;padding:32px;width:calc(100%-40px);margin:20px auto;position:relative;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <h2 id="person-modal-title" style="margin:0;font-size:18px;font-weight:800;color:#fff;">Add Person</h2>
+      <button onclick="document.getElementById('person-modal').classList.remove('open')" style="background:none;border:none;color:#aaa;font-size:22px;cursor:pointer;">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <label style="font-size:12px;font-weight:700;letter-spacing:.1em;color:#8AAACE;text-transform:uppercase;">Name *</label>
+      <input id="pm-name" type="text" placeholder="Full name" style="padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.13);background:rgba(255,255,255,0.05);color:#fff;font-size:14px;font-family:inherit;outline:none;">
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;">
+          <label style="font-size:12px;font-weight:700;letter-spacing:.1em;color:#8AAACE;text-transform:uppercase;display:block;margin-bottom:6px;">Phone</label>
+          <input id="pm-phone" type="text" placeholder="Phone" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.13);background:rgba(255,255,255,0.05);color:#fff;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+        </div>
+        <div style="flex:1;">
+          <label style="font-size:12px;font-weight:700;letter-spacing:.1em;color:#8AAACE;text-transform:uppercase;display:block;margin-bottom:6px;">Email</label>
+          <input id="pm-email" type="text" placeholder="Email" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.13);background:rgba(255,255,255,0.05);color:#fff;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+        </div>
+      </div>
+      <label style="font-size:12px;font-weight:700;letter-spacing:.1em;color:#8AAACE;text-transform:uppercase;">Notes</label>
+      <textarea id="pm-notes" rows="2" placeholder="Any notes..." style="padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.13);background:rgba(255,255,255,0.05);color:#fff;font-size:14px;font-family:inherit;outline:none;resize:vertical;"></textarea>
+      <hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:4px 0;">
+      <div style="font-size:13px;font-weight:700;color:#CC00FF;letter-spacing:.05em;">ASSIGNMENT</div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;">
+          <label style="font-size:12px;font-weight:700;letter-spacing:.1em;color:#8AAACE;text-transform:uppercase;display:block;margin-bottom:6px;">Company</label>
+          <select id="pm-company" onchange="populateReportsToSelect(this.value,document.getElementById('pm-reports-to'),null)" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.13);background:rgba(8,10,26,0.97);color:#fff;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+            <option value="">— None —</option>
+          </select>
+        </div>
+        <div style="flex:1;">
+          <label style="font-size:12px;font-weight:700;letter-spacing:.1em;color:#8AAACE;text-transform:uppercase;display:block;margin-bottom:6px;">Role</label>
+          <select id="pm-role" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.13);background:rgba(8,10,26,0.97);color:#fff;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+            <option value="National Lead">National Lead</option>
+            <option value="Regional Manager">Regional Manager</option>
+            <option value="PM" selected>PM</option>
+            <option value="Maintenance">Maintenance</option>
+            <option value="Contact">Contact</option>
+          </select>
+        </div>
+      </div>
+      <label style="font-size:12px;font-weight:700;letter-spacing:.1em;color:#8AAACE;text-transform:uppercase;">Property (optional)</label>
+      <input id="pm-property" type="text" placeholder="e.g. The Anna" style="padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.13);background:rgba(255,255,255,0.05);color:#fff;font-size:14px;font-family:inherit;outline:none;">
+      <label style="font-size:12px;font-weight:700;letter-spacing:.1em;color:#8AAACE;text-transform:uppercase;">Reports To <span style="color:rgba(255,255,255,0.3);font-weight:400;text-transform:none;letter-spacing:0;">(optional — link later)</span></label>
+      <select id="pm-reports-to" style="padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.13);background:rgba(8,10,26,0.97);color:#fff;font-size:14px;font-family:inherit;outline:none;">
+        <option value="">— None / Link Later —</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08);">
+      <button onclick="document.getElementById('person-modal').classList.remove('open')" style="padding:10px 20px;border-radius:10px;background:rgba(255,255,255,0.07);color:#aaa;border:1px solid rgba(255,255,255,0.13);cursor:pointer;font-family:inherit;font-size:14px;">Cancel</button>
+      <button onclick="savePerson()" style="padding:10px 20px;border-radius:10px;background:linear-gradient(135deg,#CC00FF,#9900EE);color:#fff;border:none;cursor:pointer;font-weight:700;font-size:14px;font-family:inherit;">Save</button>
+    </div>
+  </div>
+</div>
+
 <!-- ADD/EDIT COMPANY MODAL -->
 <div class="overlay" id="company-modal" onclick="bgClose(event,'company-modal')">
   <div class="modal" style="max-width:480px">
@@ -1006,12 +1082,18 @@ let isSaving=false;
 let companies=[], company_contacts=[];
 let editCompanyId=null, editContactId=null, contactForCompanyId=null;
 let activeCompanyId=null;
+let people=[], people_assignments=[];
+let editPersonId=null;
   
 // ── Loading overlay ──
 function showLoading(){const el=document.getElementById('loading-overlay');if(el)el.style.display='flex';}
 function hideLoading(){const el=document.getElementById('loading-overlay');if(el)el.style.display='none';}
 
 // ── DB mappers ──
+function dbToPerson(r){return{id:r.id,name:r.name||'',email:r.email||'',phone:r.phone||'',notes:r.notes||''};}
+function personToDB(p){return{id:p.id,name:p.name,email:p.email||null,phone:p.phone||null,notes:p.notes||null};}
+function dbToAssignment(r){return{id:r.id,person_id:r.person_id,company_id:r.company_id||null,property_name:r.property_name||'',role:r.role||'Contact',active:r.active!==false,reports_to:r.reports_to||null};}
+function assignmentToDB(a){return{id:a.id,person_id:a.person_id,company_id:a.company_id||null,property_name:a.property_name||null,role:a.role||'Contact',active:a.active!==false,reports_to:a.reports_to||null};}
 function dbToCompany(r){return{id:r.id,name:r.name||'',parent_id:r.parent_id||null,notes:r.notes||''};}
 function companyToDB(c){return{id:c.id,name:c.name,parent_id:c.parent_id||null,notes:c.notes||null};}
 function dbToContact(r){return{id:r.id,company_id:r.company_id,name:r.name||'',title:r.title||'',phone:r.phone||'',email:r.email||'',reports_to:r.reports_to||null,previous_employers:r.previous_employers||'',notes:r.notes||''};}
@@ -1022,6 +1104,10 @@ function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',p
 function winToDB(w){return{id:w.id,company:w.company,contact:w.contact,phone:w.phone,email:w.email,address:w.address,units:w.units||0,installs:w.installs||0,carpet:w.carpet||0,hard:w.hard||0,style:w.style,area:w.area,won_date:w.wonDate,win_notes:w.winNotes,mgmt:w.mgmt||'',scheduled_date:w.scheduledDate||null,carpet_order_number:w.carpetOrderNumber||null,hard_order_number:w.hardOrderNumber||null,property_po:w.propertyPO||null,carpet_po:w.carpetPO||null,hard_po:w.hardPO||null,install_address:w.installAddress||null,lat:w.lat||null,lng:w.lng||null};}
 
   // ── Supabase CRUD ──
+async function savePerson_db(obj){try{await sb.from('people').upsert(personToDB(obj));}catch(e){console.error('savePerson_db',e);}}
+async function deletePerson_db(id){try{await sb.from('people').delete().eq('id',id);}catch(e){console.error('deletePerson_db',e);}}
+async function saveAssignment_db(obj){try{await sb.from('people_assignments').upsert(assignmentToDB(obj));}catch(e){console.error('saveAssignment_db',e);}}
+async function deleteAssignment_db(id){try{await sb.from('people_assignments').delete().eq('id',id);}catch(e){console.error('deleteAssignment_db',e);}}
 async function saveCompany_db(obj){try{await sb.from('companies').upsert(companyToDB(obj));}catch(e){console.error('saveCompany_db',e);}}
 async function deleteCompany_db(id){try{await sb.from('companies').delete().eq('id',id);}catch(e){console.error('deleteCompany_db',e);}}
 async function saveContact_db(obj){try{await sb.from('company_contacts').upsert(contactToDB(obj));}catch(e){console.error('saveContact_db',e);}}
@@ -1063,6 +1149,14 @@ async function loadAll(){
     const contactsRes = await sb.from('company_contacts').select('*').order('name');
     if(companiesRes.data) companies = companiesRes.data.map(dbToCompany);
     if(contactsRes.data) company_contacts = contactsRes.data.map(dbToContact);
+    const peopleRes=await sb.from('people').select('*').order('name');
+    const assignmentsRes=await sb.from('people_assignments').select('*');
+    if(peopleRes.data) people=peopleRes.data.map(dbToPerson);
+    if(assignmentsRes.data) people_assignments=assignmentsRes.data.map(dbToAssignment);
+    const peopleRes=await sb.from('people').select('*').order('name');
+    const assignmentsRes=await sb.from('people_assignments').select('*');
+    if(peopleRes.data) people=peopleRes.data.map(dbToPerson);
+    if(assignmentsRes.data) people_assignments=assignmentsRes.data.map(dbToAssignment);
   } catch(e){
     console.error('loadAll error:', e);
     if(!areas.length) areas = [...DEFAULT_AREAS];
@@ -1072,6 +1166,8 @@ async function loadAll(){
   if(currentSection==='wins') renderWins();
   if(currentSection==='calendar') renderInstallMap();
   if(currentSection==='companies') renderCompanies();
+  if(currentSection==='tree') renderTree();
+  updateWinsBadge();
   updateWinsBadge();
 }
 
@@ -1098,6 +1194,12 @@ sb.channel(channelId)
   .on('postgres_changes',{event:'INSERT',schema:'public',table:'company_contacts'},scheduleReload)
   .on('postgres_changes',{event:'UPDATE',schema:'public',table:'company_contacts'},scheduleReload)
   .on('postgres_changes',{event:'DELETE',schema:'public',table:'company_contacts'},scheduleReload)
+  .on('postgres_changes',{event:'INSERT',schema:'public',table:'people'},scheduleReload)
+  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'people'},scheduleReload)
+  .on('postgres_changes',{event:'DELETE',schema:'public',table:'people'},scheduleReload)
+  .on('postgres_changes',{event:'INSERT',schema:'public',table:'people_assignments'},scheduleReload)
+  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'people_assignments'},scheduleReload)
+  .on('postgres_changes',{event:'DELETE',schema:'public',table:'people_assignments'},scheduleReload)
   .subscribe((status)=>{ console.log('Realtime status:', status); });
 
 function save(){} // no-op — all saves go direct to Supabase now
@@ -1110,24 +1212,26 @@ function setSection(s){
   document.getElementById('installs-section').style.display=s==='installs'?'':'none';
   document.getElementById('calendar-section').style.display=s==='calendar'?'':'none';
   document.getElementById('companies-section').style.display=s==='companies'?'':'none';
-  // Desktop toggle
+  document.getElementById('tree-section').style.display=s==='tree'?'':'none';
   document.getElementById('toggle-leads').className='section-btn'+(s==='leads'?' active-leads':'');
   document.getElementById('toggle-wins').className='section-btn'+(s==='wins'?' active-wins':'');
   document.getElementById('toggle-installs').className='section-btn'+(s==='installs'?' active-installs':'');
   document.getElementById('toggle-calendar').className='section-btn'+(s==='calendar'?' active-calendar':'');
   document.getElementById('toggle-companies').className='section-btn'+(s==='companies'?' active-companies':'');
-  // Mobile toggle
+  document.getElementById('toggle-tree').className='section-btn'+(s==='tree'?' active-installs':'');
   document.getElementById('toggle-leads-mob').className='section-btn'+(s==='leads'?' active-leads':'');
   document.getElementById('toggle-wins-mob').className='section-btn'+(s==='wins'?' active-wins':'');
   document.getElementById('toggle-installs-mob').className='section-btn'+(s==='installs'?' active-installs':'');
   document.getElementById('toggle-calendar-mob').className='section-btn'+(s==='calendar'?' active-calendar':'');
   document.getElementById('toggle-companies-mob').className='section-btn'+(s==='companies'?' active-companies':'');
-  // Top actions — hide Areas/Add when not on leads
+  const toggleTreeMob=document.getElementById('toggle-tree-mob');
+  if(toggleTreeMob) toggleTreeMob.className='section-btn'+(s==='tree'?' active-installs':'');
   document.getElementById('top-actions').style.display=s==='leads'?'flex':'none';
   if(s==='wins') renderWins();
   else if(s==='installs') renderInstalls();
   else if(s==='calendar') renderCalendar();
   else if(s==='companies') renderCompanies();
+  else if(s==='tree') renderTree();
   else render();
 }
 
@@ -2751,6 +2855,185 @@ async function deleteContact(id){
   if(activeCompanyId)showCompanyDetail(activeCompanyId);
   isSaving=true;await deleteContact_db(id);isSaving=false;
 }
+// ── TREE (ORG CHART) ──────────────────────────────────────
+const ROLE_ORDER=['National Lead','Regional Manager','PM','Maintenance','Contact'];
+function getRoleColor(role){
+  return{'National Lead':'#FF0088','Regional Manager':'#CC00FF','PM':'#00B4FF','Maintenance':'#00FFB3','Contact':'#888888'}[role]||'#888888';
+}
+
+function renderTreeStats(){
+  const active=people_assignments.filter(a=>a.active);
+  const coIds=new Set(active.map(a=>a.company_id).filter(Boolean));
+  const pms=active.filter(a=>a.role==='PM').length;
+  const linked=active.filter(a=>a.reports_to).length;
+  const t=document.getElementById('st-total');if(t)t.textContent=people.length;
+  const c=document.getElementById('st-companies');if(c)c.textContent=coIds.size;
+  const p=document.getElementById('st-pms');if(p)p.textContent=pms;
+  const l=document.getElementById('st-linked');if(l)l.textContent=linked;
+  const badge=document.getElementById('tree-badge');
+  if(badge) badge.textContent=people.length||'';
+}
+
+function renderPersonNode(personId,companyId,depth,renderedIds){
+  if(renderedIds.has(personId)) return '';
+  renderedIds.add(personId);
+  const p=people.find(x=>x.id===personId);
+  const a=people_assignments.find(x=>x.person_id===personId&&x.company_id===companyId&&x.active);
+  if(!p||!a) return '';
+  const directReports=people_assignments.filter(x=>x.reports_to===personId&&x.company_id===companyId&&x.active);
+  const roleColor=getRoleColor(a.role);
+  const initials=p.name.split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2);
+  const childrenHTML=directReports.map(child=>renderPersonNode(child.person_id,companyId,depth+1,renderedIds)).join('');
+  return `<div style="padding-left:${depth*28}px;margin-bottom:6px;">
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(8,10,26,0.88);border-left:3px solid ${roleColor};border-radius:0 8px 8px 0;">
+      <div style="width:34px;height:34px;border-radius:50%;background:${roleColor}22;border:2px solid ${roleColor};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:${roleColor};flex-shrink:0;">${initials}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;">${esc(p.name)}</div>
+        <div style="font-size:11px;color:${roleColor};margin-top:1px;">${esc(a.role)}${a.property_name?' — '+esc(a.property_name):''}</div>
+        ${p.phone||p.email?`<div style="font-size:11px;color:#555;margin-top:1px;">${[p.phone,p.email].filter(Boolean).map(v=>esc(v)).join(' · ')}</div>`:''}
+      </div>
+      <div style="display:flex;gap:4px;flex-shrink:0;">
+        <button onclick="openEditPerson('${p.id}')" style="padding:3px 8px;border-radius:5px;background:rgba(204,0,255,0.1);color:#CC00FF;border:1px solid #CC00FF;cursor:pointer;font-size:11px;font-family:inherit;">Edit</button>
+        <button onclick="deletePerson('${p.id}')" style="padding:3px 8px;border-radius:5px;background:rgba(255,0,136,0.1);color:#FF0088;border:1px solid #FF0088;cursor:pointer;font-size:11px;font-family:inherit;">✕</button>
+      </div>
+    </div>
+    ${childrenHTML}
+  </div>`;
+}
+
+function renderTree(){
+  renderTreeStats();
+  const q=(document.getElementById('tree-search')||{}).value?.toLowerCase()||'';
+  const container=document.getElementById('tree-container');
+  if(!container) return;
+  const activeA=people_assignments.filter(a=>a.active);
+  const coIds=[...new Set(activeA.map(a=>a.company_id).filter(Boolean))];
+  const matchesPerson=p=>!q||p.name.toLowerCase().includes(q)||(p.email||'').toLowerCase().includes(q)||(p.phone||'').includes(q);
+  const sortedCoIds=coIds.slice().sort((a,b)=>{
+    const ca=companies.find(c=>c.id===a);const cb=companies.find(c=>c.id===b);
+    return(ca?.name||'').localeCompare(cb?.name||'');
+  });
+  let html='';
+  sortedCoIds.forEach(companyId=>{
+    const co=companies.find(c=>c.id===companyId);if(!co)return;
+    const compA=activeA.filter(a=>a.company_id===companyId);
+    const compPeople=compA.map(a=>people.find(p=>p.id===a.person_id)).filter(Boolean);
+    if(q&&!compPeople.some(matchesPerson)&&!co.name.toLowerCase().includes(q))return;
+    const compPersonIds=new Set(compA.map(a=>a.person_id));
+    const roots=compA.filter(a=>!a.reports_to||!compPersonIds.has(a.reports_to));
+    roots.sort((a,b)=>ROLE_ORDER.indexOf(a.role)-ROLE_ORDER.indexOf(b.role));
+    const renderedIds=new Set();
+    const nodesHTML=roots.map(a=>renderPersonNode(a.person_id,companyId,0,renderedIds)).join('');
+    const orphans=compA.filter(a=>!renderedIds.has(a.person_id));
+    const orphansHTML=orphans.length?`<div style="margin-top:8px;padding:8px 12px;font-size:12px;color:#555;border:1px dashed #333;border-radius:8px;">⚠ Unlinked: ${orphans.map(a=>{const p=people.find(x=>x.id===a.person_id);return`<span style="cursor:pointer;color:#aaa;" onclick="openEditPerson('${a.person_id}')">${p?esc(p.name):'?'}</span>`;}).join(', ')}</div>`:'';
+    html+=`<div style="background:rgba(8,10,26,0.88);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div>
+          <div style="font-size:16px;font-weight:800;color:#CC00FF;">${esc(co.name)}</div>
+          <div style="font-size:12px;color:#555;margin-top:2px;">${compPeople.length} ${compPeople.length===1?'person':'people'}</div>
+        </div>
+        <button onclick="openAddPersonForCompany('${companyId}')" style="padding:6px 14px;border-radius:8px;background:linear-gradient(135deg,#CC00FF,#9900EE);color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;">+ Add</button>
+      </div>
+      ${nodesHTML||'<div style="color:#555;font-size:13px;padding:8px 0;">No people yet.</div>'}
+      ${orphansHTML}
+    </div>`;
+  });
+  const noCoA=activeA.filter(a=>!a.company_id);
+  if(noCoA.length){
+    const renderedIds=new Set();
+    const ncHTML=noCoA.map(a=>renderPersonNode(a.person_id,null,0,renderedIds)).join('');
+    html+=`<div style="background:rgba(8,10,26,0.88);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px;margin-bottom:16px;"><div style="font-size:15px;font-weight:700;color:#555;margin-bottom:12px;">No Company Assigned</div>${ncHTML}</div>`;
+  }
+  if(!html) html='<div style="color:#555;text-align:center;padding:48px;">No people yet — click "+ Add Person" to get started.</div>';
+  container.innerHTML=html;
+}
+
+function populateCompanySelect(selectId,selectedId){
+  const sel=document.getElementById(selectId);if(!sel)return;
+  const opts=companies.filter(c=>!c.parent_id).sort((a,b)=>a.name.localeCompare(b.name));
+  sel.innerHTML='<option value="">— None —</option>'+opts.map(c=>`<option value="${c.id}"${c.id===selectedId?' selected':''}>${esc(c.name)}</option>`).join('');
+}
+
+function populateReportsToSelect(companyId,sel,selectedId){
+  if(!sel)return;
+  sel.innerHTML='<option value="">— None / Link Later —</option>';
+  if(!companyId)return;
+  const compA=people_assignments.filter(a=>a.company_id===companyId&&a.active);
+  const compPeople=compA.map(a=>people.find(p=>p.id===a.person_id)).filter(p=>p&&p.id!==editPersonId);
+  compPeople.sort((a,b)=>a.name.localeCompare(b.name));
+  compPeople.forEach(p=>{
+    const role=compA.find(a=>a.person_id===p.id)?.role||'';
+    const opt=document.createElement('option');
+    opt.value=p.id;opt.textContent=`${p.name}${role?' ('+role+')':''}`;
+    if(p.id===selectedId)opt.selected=true;
+    sel.appendChild(opt);
+  });
+}
+
+function openAddPerson(){
+  editPersonId=null;
+  document.getElementById('person-modal-title').textContent='Add Person';
+  document.getElementById('pm-name').value='';document.getElementById('pm-phone').value='';
+  document.getElementById('pm-email').value='';document.getElementById('pm-notes').value='';
+  document.getElementById('pm-role').value='PM';document.getElementById('pm-property').value='';
+  populateCompanySelect('pm-company',null);
+  populateReportsToSelect('',document.getElementById('pm-reports-to'),null);
+  document.getElementById('person-modal').classList.add('open');
+}
+
+function openAddPersonForCompany(companyId){
+  editPersonId=null;
+  document.getElementById('person-modal-title').textContent='Add Person';
+  document.getElementById('pm-name').value='';document.getElementById('pm-phone').value='';
+  document.getElementById('pm-email').value='';document.getElementById('pm-notes').value='';
+  document.getElementById('pm-role').value='PM';document.getElementById('pm-property').value='';
+  populateCompanySelect('pm-company',companyId);
+  populateReportsToSelect(companyId,document.getElementById('pm-reports-to'),null);
+  document.getElementById('person-modal').classList.add('open');
+}
+
+function openEditPerson(id){
+  const p=people.find(x=>x.id===id);if(!p)return;
+  editPersonId=id;
+  document.getElementById('person-modal-title').textContent='Edit Person';
+  document.getElementById('pm-name').value=p.name;document.getElementById('pm-phone').value=p.phone||'';
+  document.getElementById('pm-email').value=p.email||'';document.getElementById('pm-notes').value=p.notes||'';
+  const active=people_assignments.find(a=>a.person_id===id&&a.active);
+  populateCompanySelect('pm-company',active?.company_id||null);
+  document.getElementById('pm-role').value=active?.role||'PM';
+  document.getElementById('pm-property').value=active?.property_name||'';
+  populateReportsToSelect(active?.company_id||'',document.getElementById('pm-reports-to'),active?.reports_to||null);
+  document.getElementById('person-modal').classList.add('open');
+}
+
+async function savePerson(){
+  if(isSaving)return;
+  const name=document.getElementById('pm-name').value.trim();
+  if(!name){alert('Name is required.');return;}
+  isSaving=true;
+  const id=editPersonId||crypto.randomUUID();
+  const personObj={id,name,phone:document.getElementById('pm-phone').value.trim(),email:document.getElementById('pm-email').value.trim(),notes:document.getElementById('pm-notes').value.trim()};
+  await savePerson_db(personObj);
+  const companyId=document.getElementById('pm-company').value||null;
+  const role=document.getElementById('pm-role').value||'PM';
+  const propertyName=document.getElementById('pm-property').value.trim()||null;
+  const reportsTo=document.getElementById('pm-reports-to').value||null;
+  const existingActive=people_assignments.filter(a=>a.person_id===id&&a.active);
+  for(const a of existingActive) await saveAssignment_db({...a,active:false});
+  if(companyId||propertyName||role){
+    await saveAssignment_db({id:crypto.randomUUID(),person_id:id,company_id:companyId,property_name:propertyName,role,active:true,reports_to:reportsTo});
+  }
+  isSaving=false;
+  document.getElementById('person-modal').classList.remove('open');
+  await loadAll();
+}
+
+async function deletePerson(id){
+  if(!confirm('Delete this person and all their assignments?'))return;
+  await deletePerson_db(id);
+  await loadAll();
+}
+
 loadAll();
 </script>
 <!-- Loading overlay -->
