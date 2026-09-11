@@ -1070,6 +1070,7 @@ function _hideApp(){
 }
 document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('auth-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+  document.getElementById('pm-phone').addEventListener('input',function(){this.value=formatPhone(this.value);});
   sb.auth.getSession().then(({data:{session}})=>{session?_showApp():_hideApp();});
   sb.auth.onAuthStateChange((_,session)=>{session?_showApp():_hideApp();});
 });
