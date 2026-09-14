@@ -2925,7 +2925,7 @@ function renderPersonNode(personId,companyId,depth,renderedIds){
   const p=people.find(x=>x.id===personId);
   const a=people_assignments.find(x=>x.person_id===personId&&x.company_id===companyId&&x.active);
   if(!p||!a) return '';
-    const directReports=people_assignments.filter(x=>x.reports_to===personId&&x.company_id===companyId&&x.active);
+  const directReports=people_assignments.filter(x=>x.reports_to===personId&&x.company_id===companyId&&x.active);
   const roleColor=getRoleColor(a.role);
   const initials=p.name.split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2);
   const childrenHTML=directReports.map(child=>renderPersonNode(child.person_id,companyId,depth+1,renderedIds)).join('');
