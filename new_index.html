@@ -1061,6 +1061,7 @@ async function sbSignOut(){await sb.auth.signOut();}
 function _showApp(){
   document.getElementById('auth-overlay').style.display='none';
   const b=document.getElementById('signout-btn');if(b)b.style.display='inline-flex';
+  loadAll();
 }
 function _hideApp(){
   document.getElementById('auth-overlay').style.display='flex';
