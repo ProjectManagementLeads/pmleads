@@ -1096,6 +1096,7 @@ let editCompanyId=null, editContactId=null, contactForCompanyId=null;
 let activeCompanyId=null;
 let people=[], people_assignments=[];
 let editPersonId=null;
+let activeTreeCompanyId=null;
   
 // ── Loading overlay ──
 function showLoading(){const el=document.getElementById('loading-overlay');if(el)el.style.display='flex';}
@@ -2951,9 +2952,10 @@ function renderPersonNode(personId,companyId,depth,renderedIds){
 
 function renderTree(){
   renderTreeStats();
-  const q=(document.getElementById('tree-search')||{}).value?.toLowerCase()||'';
   const container=document.getElementById('tree-container');
   if(!container) return;
+  if(activeTreeCompanyId){renderTreeZoom(activeTreeCompanyId);return;}
+  const q=(document.getElementById('tree-search')||{}).value?.toLowerCase()||'';
   const activeA=people_assignments.filter(a=>a.active);
   const coIds=[...new Set(activeA.map(a=>a.company_id).filter(Boolean))];
   const matchesPerson=p=>!q||p.name.toLowerCase().includes(q)||(p.email||'').toLowerCase().includes(q)||(p.phone||'').includes(q);
@@ -2974,13 +2976,13 @@ function renderTree(){
     const nodesHTML=roots.map(a=>renderPersonNode(a.person_id,companyId,0,renderedIds)).join('');
     const orphans=compA.filter(a=>!renderedIds.has(a.person_id));
     const orphansHTML=orphans.length?`<div style="margin-top:8px;padding:8px 12px;font-size:12px;color:#555;border:1px dashed #333;border-radius:8px;">⚠ Unlinked: ${orphans.map(a=>{const p=people.find(x=>x.id===a.person_id);return`<span style="cursor:pointer;color:#aaa;" onclick="openEditPerson('${a.person_id}')">${p?esc(p.name):'?'}</span>`;}).join(', ')}</div>`:'';
-    html+=`<div style="background:rgba(8,10,26,0.88);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px;margin-bottom:16px;">
+    html+=`<div style="background:rgba(8,10,24,0.88);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px;margin-bottom:16px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <div>
-          <div style="font-size:16px;font-weight:800;color:#CC00FF;">${esc(co.name)}</div>
+        <div style="cursor:pointer;" onclick="zoomToTreeCompany('${companyId}')">
+          <div style="font-size:16px;font-weight:800;color:#CC00FF;">${esc(co.name)} <span style="font-size:11px;opacity:.45;">↗ zoom</span></div>
           <div style="font-size:12px;color:#555;margin-top:2px;">${compPeople.length} ${compPeople.length===1?'person':'people'}</div>
         </div>
-        <button onclick="openAddPersonForCompany('${companyId}')" style="padding:6px 14px;border-radius:8px;background:linear-gradient(135deg,#CC00FF,#9900EE);color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;">+ Add</button>
+        <button onclick="event.stopPropagation();openAddPersonForCompany('${companyId}')" style="padding:6px 14px;border-radius:8px;background:linear-gradient(135deg,#CC00FF,#9900EE);color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;">+ Add</button>
       </div>
       ${nodesHTML||'<div style="color:#555;font-size:13px;padding:8px 0;">No people yet.</div>'}
       ${orphansHTML}
@@ -3079,6 +3081,64 @@ async function deletePerson(id){
   if(!confirm('Delete this person and all their assignments?'))return;
   await deletePerson_db(id);
   await loadAll();
+}
+
+function zoomToTreeCompany(id){activeTreeCompanyId=id;renderTree();}
+
+function renderTreeZoom(companyId){
+  const co=companies.find(c=>c.id===companyId);
+  const container=document.getElementById('tree-container');
+  if(!co||!container)return;
+  const activeA=people_assignments.filter(a=>a.company_id===companyId&&a.active);
+  const roleColors={'National Lead':'#FF0088','Regional Manager':'#CC00FF','PM':'#00B4FF','Maintenance':'#00FFB3','Contact':'#888888'};
+  const byRole={};
+  ROLE_ORDER.forEach(r=>{byRole[r]=[];});
+  activeA.forEach(a=>{
+    const p=people.find(x=>x.id===a.person_id);if(!p)return;
+    const r=ROLE_ORDER.includes(a.role)?a.role:'Contact';
+    byRole[r].push({p,a});
+  });
+  const usedRoles=ROLE_ORDER.filter(r=>byRole[r].length>0);
+  function personCard(p,a){
+    const color=roleColors[a.role]||'#888';
+    const initials=p.name.split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2);
+    const pName=p.name.toLowerCase().trim();
+    const wonSet=new Set(wins.filter(w=>w.contact&&w.contact.toLowerCase().trim()===pName).map(w=>w.company));
+    const pipeArr=leads.filter(l=>l.contact&&l.contact.toLowerCase().trim()===pName&&!wonSet.has(l.company)).map(l=>l.company);
+    const chipsHTML=(wonSet.size||pipeArr.length)?`<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:6px;justify-content:center;">${[...wonSet].slice(0,3).map(c=>`<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(0,255,179,0.1);color:var(--green);border:1px solid rgba(0,255,179,0.25);">🟢 ${esc(c)}</span>`).join('')}${pipeArr.slice(0,1).map(c=>`<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(255,0,136,0.08);color:var(--pink);border:1px solid rgba(255,0,136,0.2);">◎ ${esc(c)}</span>`).join('')}</div>`:'';
+    return `<div style="background:rgba(8,10,26,0.95);border:1px solid ${color}55;border-top:3px solid ${color};border-radius:12px;padding:14px 12px;min-width:150px;max-width:200px;text-align:center;flex-shrink:0;">
+      <div style="width:44px;height:44px;border-radius:50%;background:${color}22;border:2px solid ${color};display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:${color};margin:0 auto 8px;">${initials}</div>
+      <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:3px;">${esc(p.name)}</div>
+      ${a.property_name?`<div style="font-size:10px;color:${color};margin-bottom:3px;">${esc(a.property_name)}</div>`:''}
+      ${p.phone?`<div style="font-size:10px;color:#666;">${esc(p.phone)}</div>`:''}
+      ${chipsHTML}
+      <div style="display:flex;gap:4px;justify-content:center;margin-top:9px;">
+        <button onclick="openEditPerson('${p.id}')" style="padding:3px 9px;border-radius:6px;background:rgba(204,0,255,0.1);color:#CC00FF;border:1px solid #CC00FF;cursor:pointer;font-size:10px;font-family:inherit;">Edit</button>
+        <button onclick="deletePerson('${p.id}')" style="padding:3px 9px;border-radius:6px;background:rgba(255,0,136,0.1);color:#FF0088;border:1px solid #FF0088;cursor:pointer;font-size:10px;font-family:inherit;">✕</button>
+      </div>
+    </div>`;
+  }
+  let html=`<div style="max-width:960px;margin:0 auto;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px;flex-wrap:wrap;">
+      <button onclick="activeTreeCompanyId=null;renderTree()" style="padding:7px 16px;border-radius:9px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:#aaa;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;">← Back</button>
+      <div style="font-size:22px;font-weight:900;color:#CC00FF;">${esc(co.name)}</div>
+      <button onclick="openAddPersonForCompany('${companyId}')" style="margin-left:auto;padding:7px 16px;border-radius:9px;background:linear-gradient(135deg,#CC00FF,#9900EE);color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;">+ Add Person</button>
+    </div>`;
+  usedRoles.forEach((role,idx)=>{
+    const color=roleColors[role]||'#888';
+    const members=byRole[role];
+    if(idx>0){
+      const prevColor=roleColors[usedRoles[idx-1]]||'#888';
+      html+=`<div style="display:flex;justify-content:center;"><div style="width:2px;height:36px;background:linear-gradient(180deg,${prevColor}88,${color}88);"></div></div>`;
+    }
+    html+=`<div style="display:flex;flex-direction:column;align-items:center;margin-bottom:4px;">
+      <div style="font-size:10px;font-weight:900;letter-spacing:.15em;color:${color};text-transform:uppercase;margin-bottom:14px;padding:5px 18px;border-radius:20px;background:${color}18;border:1px solid ${color}44;">${role}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;">${members.map(({p,a})=>personCard(p,a)).join('')}</div>
+    </div>`;
+  });
+  if(!usedRoles.length)html+=`<div style="color:#555;text-align:center;padding:48px;font-size:14px;">No people assigned yet.</div>`;
+  html+=`</div>`;
+  container.innerHTML=html;
 }
 
 loadAll();
