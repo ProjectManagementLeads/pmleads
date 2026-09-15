@@ -3105,16 +3105,18 @@ function renderTreeZoom(companyId){
     const pName=p.name.toLowerCase().trim();
     const wonSet=new Set(wins.filter(w=>w.contact&&w.contact.toLowerCase().trim()===pName).map(w=>w.company));
     const pipeArr=leads.filter(l=>l.contact&&l.contact.toLowerCase().trim()===pName&&!wonSet.has(l.company)).map(l=>l.company);
-    const chipsHTML=(wonSet.size||pipeArr.length)?`<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:6px;justify-content:center;">${[...wonSet].slice(0,3).map(c=>`<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(0,255,179,0.1);color:var(--green);border:1px solid rgba(0,255,179,0.25);">🟢 ${esc(c)}</span>`).join('')}${pipeArr.slice(0,1).map(c=>`<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(255,0,136,0.08);color:var(--pink);border:1px solid rgba(255,0,136,0.2);">◎ ${esc(c)}</span>`).join('')}</div>`:'';
-    return `<div style="background:rgba(8,10,26,0.95);border:1px solid ${color}55;border-top:3px solid ${color};border-radius:12px;padding:14px 12px;min-width:150px;max-width:200px;text-align:center;flex-shrink:0;">
-      <div style="width:44px;height:44px;border-radius:50%;background:${color}22;border:2px solid ${color};display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:${color};margin:0 auto 8px;">${initials}</div>
-      <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:3px;">${esc(p.name)}</div>
-      ${a.property_name?`<div style="font-size:10px;color:${color};margin-bottom:3px;">${esc(a.property_name)}</div>`:''}
-      ${p.phone?`<div style="font-size:10px;color:#666;">${esc(p.phone)}</div>`:''}
+    const chipsHTML=(wonSet.size||pipeArr.length)?`<div style="display:flex;flex-wrap:wrap;gap:3px;justify-content:center;margin-bottom:6px;max-width:200px;">${[...wonSet].map(c=>`<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(0,255,179,0.1);color:var(--green);border:1px solid rgba(0,255,179,0.25);">🟢 ${esc(c)}</span>`).join('')}${pipeArr.map(c=>`<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(255,0,136,0.08);color:var(--pink);border:1px solid rgba(255,0,136,0.2);">◎ ${esc(c)}</span>`).join('')}</div>`:'';
+    return `<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;max-width:200px;">
       ${chipsHTML}
-      <div style="display:flex;gap:4px;justify-content:center;margin-top:9px;">
-        <button onclick="openEditPerson('${p.id}')" style="padding:3px 9px;border-radius:6px;background:rgba(204,0,255,0.1);color:#CC00FF;border:1px solid #CC00FF;cursor:pointer;font-size:10px;font-family:inherit;">Edit</button>
-        <button onclick="deletePerson('${p.id}')" style="padding:3px 9px;border-radius:6px;background:rgba(255,0,136,0.1);color:#FF0088;border:1px solid #FF0088;cursor:pointer;font-size:10px;font-family:inherit;">✕</button>
+      <div style="background:rgba(8,10,26,0.95);border:1px solid ${color}55;border-top:3px solid ${color};border-radius:12px;padding:14px 12px;min-width:150px;width:100%;text-align:center;">
+        <div style="width:44px;height:44px;border-radius:50%;background:${color}22;border:2px solid ${color};display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:${color};margin:0 auto 8px;">${initials}</div>
+        <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:3px;">${esc(p.name)}</div>
+        ${a.property_name?`<div style="font-size:10px;color:${color};margin-bottom:3px;">${esc(a.property_name)}</div>`:''}
+        ${p.phone?`<div style="font-size:10px;color:#666;">${esc(p.phone)}</div>`:''}
+        <div style="display:flex;gap:4px;justify-content:center;margin-top:9px;">
+          <button onclick="openEditPerson('${p.id}')" style="padding:3px 9px;border-radius:6px;background:rgba(204,0,255,0.1);color:#CC00FF;border:1px solid #CC00FF;cursor:pointer;font-size:10px;font-family:inherit;">Edit</button>
+          <button onclick="deletePerson('${p.id}')" style="padding:3px 9px;border-radius:6px;background:rgba(255,0,136,0.1);color:#FF0088;border:1px solid #FF0088;cursor:pointer;font-size:10px;font-family:inherit;">✕</button>
+        </div>
       </div>
     </div>`;
   }
