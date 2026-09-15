@@ -3023,7 +3023,7 @@ function openAddPerson(){
   document.getElementById('person-modal-title').textContent='Add Person';
   document.getElementById('pm-name').value='';document.getElementById('pm-phone').value='';
   document.getElementById('pm-email').value='';document.getElementById('pm-notes').value='';
-  document.getElementById('pm-role').value='PM';document.getElementById('pm-property').value='';
+  document.getElementById('pm-role').value='PM';
   populateCompanySelect('pm-company',null);
   populateReportsToSelect('',document.getElementById('pm-reports-to'),null);
   document.getElementById('person-modal').classList.add('open');
@@ -3034,7 +3034,7 @@ function openAddPersonForCompany(companyId){
   document.getElementById('person-modal-title').textContent='Add Person';
   document.getElementById('pm-name').value='';document.getElementById('pm-phone').value='';
   document.getElementById('pm-email').value='';document.getElementById('pm-notes').value='';
-  document.getElementById('pm-role').value='PM';document.getElementById('pm-property').value='';
+  document.getElementById('pm-role').value='PM';
   populateCompanySelect('pm-company',companyId);
   populateReportsToSelect(companyId,document.getElementById('pm-reports-to'),null);
   document.getElementById('person-modal').classList.add('open');
@@ -3049,7 +3049,6 @@ function openEditPerson(id){
   const active=people_assignments.find(a=>a.person_id===id&&a.active);
   populateCompanySelect('pm-company',active?.company_id||null);
   document.getElementById('pm-role').value=active?.role||'PM';
-  document.getElementById('pm-property').value=active?.property_name||'';
   populateReportsToSelect(active?.company_id||'',document.getElementById('pm-reports-to'),active?.reports_to||null);
   document.getElementById('person-modal').classList.add('open');
 }
@@ -3064,7 +3063,7 @@ async function savePerson(){
   await savePerson_db(personObj);
   const companyId=document.getElementById('pm-company').value||null;
   const role=document.getElementById('pm-role').value||'PM';
-  const propertyName=document.getElementById('pm-property').value.trim()||null;
+  const propertyName=null;
   const reportsTo=document.getElementById('pm-reports-to').value||null;
   const existingActive=people_assignments.filter(a=>a.person_id===id&&a.active);
   for(const a of existingActive) await saveAssignment_db({...a,active:false});
