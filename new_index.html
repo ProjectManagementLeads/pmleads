@@ -913,6 +913,7 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
       <div class="field" style="position:relative;z-index:1"><label>Notes</label><textarea id="order-notes" placeholder="e.g. Summer turn package…" style="min-height:64px"></textarea></div>
       <div class="field" style="position:relative;z-index:1"><label>Scheduled install date</label><input type="date" id="order-scheduled"></div>
       <div class="field" style="position:relative;z-index:1"><label>Install address (overrides property address on map)</label><input type="text" id="order-install-address" placeholder="e.g. 123 Main St, Columbus, OH 43215"></div>
+      <div class="field" style="position:relative;z-index:1"><label>Precise coordinates <span style="font-weight:400;font-size:.8em;opacity:.5">(right-click in Google Maps → copy coords for exact pin placement)</span></label><input type="text" id="order-coords" placeholder="e.g. 39.9612, -82.9988"></div>
       <div class="modal-actions">
         <button class="btn btn-ghost" onclick="closeModal('order-modal')">Cancel</button>
         <button class="btn btn-green" onclick="confirmAddOrder()">
@@ -2121,9 +2122,11 @@ function openEditOrder(id){
   document.getElementById('order-carpet-po').value=order.carpetPO||'';
   document.getElementById('order-hard-po').value=order.hardPO||'';
   document.getElementById('order-install-address').value=order.installAddress||'';
+  document.getElementById('order-coords').value=(order.lat&&order.lng)?`${order.lat}, ${order.lng}`:'';
+  document.getElementById('order-coords').value='';
   document.getElementById('order-modal').classList.add('open');
-}  
-async function confirmAddOrder(){
+}
+function openEditOrder(id){
   const carpet=parseInt(document.getElementById('order-carpet').value)||0;
   const hard=parseInt(document.getElementById('order-hard').value)||0;
   const date=document.getElementById('order-date').value;
@@ -2144,13 +2147,15 @@ async function confirmAddOrder(){
     order.carpetPO=document.getElementById('order-carpet-po').value.trim();
     order.hardPO=document.getElementById('order-hard-po').value.trim();
     order.installAddress=document.getElementById('order-install-address').value.trim();
+    const _oc=document.getElementById('order-coords').value.trim();if(_oc){const _op=_oc.split(',');order.lat=parseFloat(_op[0])||null;order.lng=parseFloat(_op[1])||null;}else{order.lat=null;order.lng=null;}
     closeModal('order-modal');orderEditId=null;orderSourceId=null;
     renderWins();updateWinsBadge();
     isSaving=true;await saveWin_db(order);isSaving=false;
     return;
   }
   const src=wins.find(x=>x.id===orderSourceId);if(!src)return;
-  const newOrder={...src,id:Date.now()+'',wonDate:date,carpet,hard,installs:Math.max(carpet,hard)||carpet||hard,winNotes:document.getElementById('order-notes').value.trim(),scheduledDate:document.getElementById('order-scheduled').value,carpetOrderNumber:document.getElementById('order-carpet-number').value.trim(),hardOrderNumber:document.getElementById('order-hard-number').value.trim(),carpetPO:document.getElementById('order-carpet-po').value.trim(),hardPO:document.getElementById('order-hard-po').value.trim(),installAddress:document.getElementById('order-install-address').value.trim()};
+  const _oc2=document.getElementById('order-coords').value.trim(),_op2=_oc2?_oc2.split(','):[];
+  const newOrder={...src,id:Date.now()+'',wonDate:date,carpet,hard,installs:Math.max(carpet,hard)||carpet||hard,winNotes:document.getElementById('order-notes').value.trim(),scheduledDate:document.getElementById('order-scheduled').value,carpetOrderNumber:document.getElementById('order-carpet-number').value.trim(),hardOrderNumber:document.getElementById('order-hard-number').value.trim(),carpetPO:document.getElementById('order-carpet-po').value.trim(),hardPO:document.getElementById('order-hard-po').value.trim(),installAddress:document.getElementById('order-install-address').value.trim(),lat:_oc2?parseFloat(_op2[0])||null:null,lng:_oc2?parseFloat(_op2[1])||null:null};
   wins.unshift(newOrder);
   closeModal('order-modal');orderSourceId=null;
   renderWins();updateWinsBadge();
@@ -3146,7 +3151,7 @@ function renderTreeZoom(companyId){
   container.innerHTML=html;
 }
 
-function zoomToProperty(group,lat,lng){
+async function zoomToProperty(group,lat,lng){
   installMap.flyTo([lat,lng],17,{duration:1.2,easeLinearity:0.5});
   installMap.eachLayer(l=>{if(l instanceof L.Marker||l instanceof L.CircleMarker)installMap.removeLayer(l);});
   let backBtn=document.getElementById('map-back-btn');
@@ -3161,20 +3166,24 @@ function zoomToProperty(group,lat,lng){
   backBtn.style.display='block';
   const companies=[...new Set(group.map(w=>w.company))];
   const allOrders=wins.filter(w=>companies.includes(w.company)&&w.wonDate).sort((a,b)=>a.wonDate.localeCompare(b.wonDate));
-  const fmt=d=>d?new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
+    const fmt=d=>d?new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
   const today=new Date().toISOString().slice(0,10);
+  const _resolvedCoords=await Promise.all(allOrders.map(async(w,i)=>{
+    if(w.lat&&w.lng)return{lat:w.lat,lng:w.lng,precise:true};
+    if(w.installAddress){const gc=await geocodeAddress(w.installAddress);if(gc)return{...gc,precise:true};}
+    const angle=i*2.399963,ring=i===0?0:Math.floor(i/6)+1,radius=i===0?0:ring*0.00007;
+    return{lat:lat+radius*Math.cos(angle),lng:lng+radius*Math.sin(angle),precise:false};
+  }));
   allOrders.forEach((w,i)=>{
-    const angle=i*2.399963;
-    const ring=i===0?0:Math.floor(i/6)+1;
-    const radius=i===0?0:ring*0.00007;
-    const oLat=lat+radius*Math.cos(angle);
-    const oLng=lng+radius*Math.sin(angle);
+    const{lat:oLat,lng:oLng,precise}=_resolvedCoords[i];
     const c=parseInt(w.carpet)||0,h=parseInt(w.hard)||0;
     const tot=Math.max(c,h)||c||h||(parseInt(w.installs)||0);
     const isUpcoming=w.scheduledDate&&w.scheduledDate>=today;
     const dotColor=isUpcoming?'#FFD700':'#00FFB3';
     const dateLabel=w.wonDate?new Date(w.wonDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',year:'2-digit'}):'?';
-    const icon=L.divIcon({className:'',html:`<div style="background:${dotColor};border:2px solid rgba(255,255,255,0.9);border-radius:50%;width:36px;height:36px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;color:#000;box-shadow:0 2px 10px rgba(0,0,0,.6);cursor:pointer;line-height:1.1"><div style="font-size:13px">${tot}</div><div style="font-size:7px;opacity:.75">${dateLabel}</div></div>`,iconSize:[36,36],iconAnchor:[18,18]});
+    const _border=precise?'2px solid rgba(255,255,255,0.95)':'2px dashed rgba(255,255,255,0.55)';
+    const _gpsTag=precise?'<div style="font-size:6px;opacity:.6;letter-spacing:-.2px">GPS</div>':'';
+    const icon=L.divIcon({className:'',html:`<div style="background:${dotColor};border:${_border};border-radius:50%;width:36px;height:36px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;color:#000;box-shadow:0 2px 10px rgba(0,0,0,.6);cursor:pointer;line-height:1.1"><div style="font-size:13px">${tot}</div><div style="font-size:7px;opacity:.75">${dateLabel}</div>${_gpsTag}</div>`,iconSize:[36,36],iconAnchor:[18,18]});
     const mk=L.marker([oLat,oLng],{icon}).addTo(installMap);
     let pop=`<div style="min-width:200px;max-width:260px;font-family:inherit">`;
     pop+=`<div style="font-size:13px;font-weight:900;color:#111;margin-bottom:3px">${esc(w.company)}</div>`;
