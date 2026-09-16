@@ -2899,6 +2899,8 @@ function openEditCompany(id){
   document.getElementById('company-modal-title').textContent='Edit Company';
   document.getElementById('cm-name').value=c.name;
   document.getElementById('cm-notes').value=c.notes||'';
+  document.getElementById('cm-address').value=c.address||'';
+  document.getElementById('cm-scattered').checked=!!(c.scattered_site);
   document.getElementById('cm-parent').innerHTML='<option value="">— None (top level) —</option>'+companies.filter(x=>x.id!==id).map(x=>`<option value="${x.id}"${x.id===c.parent_id?' selected':''}>${esc(x.name)}</option>`).join('');
   document.getElementById('company-modal').classList.add('open');
 }
