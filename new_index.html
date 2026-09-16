@@ -2469,8 +2469,6 @@ function setMapFilter(mode){
 function jitterRadius(z){return z>=14?0:z<=10?0.015:0.015*(14-z)/4;}
 function jitterCoords(pts,r){if(!r)return pts;const th=r*1.5;const done=new Set();for(let i=0;i<pts.length;i++){if(done.has(i))continue;const near=[i];for(let j=i+1;j<pts.length;j++){if(done.has(j))continue;if(Math.hypot(pts[i].lat-pts[j].lat,pts[i].lng-pts[j].lng)<th){near.push(j);done.add(j);}}done.add(i);if(near.length<2)continue;near.forEach((idx,k)=>{const a=(2*Math.PI*k)/near.length;pts[idx].lat+=r*Math.cos(a);pts[idx].lng+=r*Math.sin(a)*1.4;});}return pts;}
 async function renderInstallMap(){
-  if(!installMap)return;
-  installMap.eachLayer(l=>{if(l instanceof L.Marker||l instanceof L.CircleMarker)installMap.removeLayer(l);});
   const _mapBB=document.getElementById('map-back-btn');if(_mapBB)_mapBB.style.display='none';
   await new Promise(r=>setTimeout(r,80));
   if(currentSection!=='calendar')return;
@@ -2506,7 +2504,7 @@ async function renderInstallMap(){
     window._jzTimer=setTimeout(()=>{rejitterMarkers();},60);
   });
   }else{
-    const toRemove=[];installMap.eachLayer(l=>{if(l._pmInstall)installMap.removeLayer(l);});_mapMarkers=[];toRemove.forEach(l=>installMap.removeLayer(l));
+    installMap.eachLayer(l=>{if(l instanceof L.Marker||l instanceof L.CircleMarker)installMap.removeLayer(l);});_mapMarkers=[];
     setTimeout(()=>{if(installMap)installMap.invalidateSize();},50);
   }
   const statusEl=document.getElementById('map-status');
