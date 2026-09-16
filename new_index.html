@@ -915,8 +915,8 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
       <div class="field" style="position:relative;z-index:1"><label>Scheduled install date</label><input type="date" id="order-scheduled"></div>
       <div class="field" style="position:relative;z-index:1"><label>Install address (overrides property address on map)</label><input type="text" id="order-install-address" placeholder="e.g. 123 Main St, Columbus, OH 43215"></div>
       <div class="field" style="position:relative;z-index:1"><label>Precise coordinates <span style="font-weight:400;font-size:.8em;opacity:.5">(right-click in Google Maps → copy coords for exact pin placement)</span></label><input type="text" id="order-coords" placeholder="e.g. 39.9612, -82.9988"></div>
-    <div class="field" id="order-scattered-wrap" style="display:none;padding:12px 14px;border-radius:11px;background:rgba(153,0,255,0.07);border:1px solid rgba(153,0,255,0.25);cursor:pointer" onclick="document.getElementById('order-use-property-addr').click()">
-      <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer" onclick="event.stopPropagation()">
+    <div class="field" id="order-scattered-wrap" style="display:none;padding:12px 14px;border-radius:11px;background:rgba(153,0,255,0.07);border:1px solid rgba(153,0,255,0.25)">
+      <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;width:100%">
         <input type="checkbox" id="order-use-property-addr" style="width:18px;height:18px;accent-color:var(--purple);cursor:pointer;flex-shrink:0;margin-top:2px">
         <div>
           <div style="font-size:13px;font-weight:700;color:var(--ink)">Use property address for map</div>
@@ -1010,8 +1010,8 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
     </div>
         <div class="field"><label>Notes</label><textarea id="cm-notes" placeholder="e.g. Affordable housing portfolio across Ohio, central purchasing…" style="min-height:80px"></textarea></div>
     <div class="field"><label>Home office address <span style="font-weight:400;opacity:.5">(used for scattered site connector lines on map)</span></label><input id="cm-address" placeholder="e.g. 1234 Corporate Dr, Columbus, OH 43215"></div>
-    <div class="field" style="padding:12px 14px;border-radius:11px;background:rgba(153,0,255,0.07);border:1px solid rgba(153,0,255,0.25);cursor:pointer" onclick="document.getElementById('cm-scattered').click()">
-      <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer" onclick="event.stopPropagation()">
+    <div class="field" style="padding:12px 14px;border-radius:11px;background:rgba(153,0,255,0.07);border:1px solid rgba(153,0,255,0.25)">
+      <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;width:100%">
         <input type="checkbox" id="cm-scattered" style="width:18px;height:18px;accent-color:var(--purple);cursor:pointer;flex-shrink:0;margin-top:2px">
         <div>
           <div style="font-size:13px;font-weight:700;color:var(--ink)">Scattered site company</div>
