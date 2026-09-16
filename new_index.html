@@ -2469,8 +2469,9 @@ function setMapFilter(mode){
 function jitterRadius(z){return z>=14?0:z<=10?0.015:0.015*(14-z)/4;}
 function jitterCoords(pts,r){if(!r)return pts;const th=r*1.5;const done=new Set();for(let i=0;i<pts.length;i++){if(done.has(i))continue;const near=[i];for(let j=i+1;j<pts.length;j++){if(done.has(j))continue;if(Math.hypot(pts[i].lat-pts[j].lat,pts[i].lng-pts[j].lng)<th){near.push(j);done.add(j);}}done.add(i);if(near.length<2)continue;near.forEach((idx,k)=>{const a=(2*Math.PI*k)/near.length;pts[idx].lat+=r*Math.cos(a);pts[idx].lng+=r*Math.sin(a)*1.4;});}return pts;}
 async function renderInstallMap(){
-  if(currentSection!=='calendar')return;
-  const mapEl=document.getElementById('install-map');if(!mapEl)return;
+  if(!installMap)return;
+  installMap.eachLayer(l=>{if(l instanceof L.Marker||l instanceof L.CircleMarker)installMap.removeLayer(l);});
+  const _mapBB=document.getElementById('map-back-btn');if(_mapBB)_mapBB.style.display='none';
   await new Promise(r=>setTimeout(r,80));
   if(currentSection!=='calendar')return;
   const now=new Date();
@@ -2575,7 +2576,8 @@ async function renderInstallMap(){
     }
     pop+=`</div>`;
     const mk=L.marker([coords.lat,coords.lng],{icon});
-    mk._pmInstall=true;mk.bindPopup(pop,{maxWidth:320}).addTo(installMap);_mapMarkers.push(mk);
+    mk._pmInstall=true;mk.addTo(installMap);_mapMarkers.push(mk);
+    mk.on('click',()=>zoomToProperty(group,coords.lat,coords.lng));
     bounds.push([coords.lat,coords.lng]);placed++;
   }
   if(statusEl)statusEl.textContent=placed>0?`${installs.length} install${installs.length!==1?'s':''} at ${placed} location${placed!==1?'s':''} — ${filterLabel}`:'No installs could be mapped — check addresses or add coordinates in Edit Win.';
@@ -3144,6 +3146,57 @@ function renderTreeZoom(companyId){
   if(!usedRoles.length)html+=`<div style="color:#555;text-align:center;padding:48px;font-size:14px;">No people assigned yet.</div>`;
   html+=`</div>`;
   container.innerHTML=html;
+}
+
+function zoomToProperty(group,lat,lng){
+  installMap.flyTo([lat,lng],17,{duration:1.2,easeLinearity:0.5});
+  installMap.eachLayer(l=>{if(l instanceof L.Marker||l instanceof L.CircleMarker)installMap.removeLayer(l);});
+  let backBtn=document.getElementById('map-back-btn');
+  if(!backBtn){
+    backBtn=document.createElement('button');
+    backBtn.id='map-back-btn';
+    backBtn.onclick=resetMapView;
+    backBtn.style.cssText='position:absolute;top:10px;left:50px;z-index:1000;background:rgba(8,10,26,0.92);border:1px solid rgba(0,255,179,0.45);color:#00FFB3;font-size:12px;font-weight:800;font-family:inherit;padding:8px 16px;border-radius:8px;cursor:pointer;backdrop-filter:blur(8px);';
+    document.getElementById('install-map').appendChild(backBtn);
+  }
+  backBtn.textContent='← Month View';
+  backBtn.style.display='block';
+  const companies=[...new Set(group.map(w=>w.company))];
+  const allOrders=wins.filter(w=>companies.includes(w.company)&&w.wonDate).sort((a,b)=>a.wonDate.localeCompare(b.wonDate));
+  const fmt=d=>d?new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
+  const today=new Date().toISOString().slice(0,10);
+  allOrders.forEach((w,i)=>{
+    const angle=i*2.399963;
+    const ring=i===0?0:Math.floor(i/6)+1;
+    const radius=i===0?0:ring*0.00007;
+    const oLat=lat+radius*Math.cos(angle);
+    const oLng=lng+radius*Math.sin(angle);
+    const c=parseInt(w.carpet)||0,h=parseInt(w.hard)||0;
+    const tot=Math.max(c,h)||c||h||(parseInt(w.installs)||0);
+    const isUpcoming=w.scheduledDate&&w.scheduledDate>=today;
+    const dotColor=isUpcoming?'#FFD700':'#00FFB3';
+    const dateLabel=w.wonDate?new Date(w.wonDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',year:'2-digit'}):'?';
+    const icon=L.divIcon({className:'',html:`<div style="background:${dotColor};border:2px solid rgba(255,255,255,0.9);border-radius:50%;width:36px;height:36px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;color:#000;box-shadow:0 2px 10px rgba(0,0,0,.6);cursor:pointer;line-height:1.1"><div style="font-size:13px">${tot}</div><div style="font-size:7px;opacity:.75">${dateLabel}</div></div>`,iconSize:[36,36],iconAnchor:[18,18]});
+    const mk=L.marker([oLat,oLng],{icon}).addTo(installMap);
+    let pop=`<div style="min-width:200px;max-width:260px;font-family:inherit">`;
+    pop+=`<div style="font-size:13px;font-weight:900;color:#111;margin-bottom:3px">${esc(w.company)}</div>`;
+    pop+=`<div style="font-size:11px;color:#555;margin-bottom:6px">📅 ${fmt(w.wonDate)}</div>`;
+    if(c)pop+=`<div style="font-size:11px;margin-bottom:2px">🟦 Carpet: <strong>${c}</strong></div>`;
+    if(h)pop+=`<div style="font-size:11px;margin-bottom:2px">🟣 Hard: <strong>${h}</strong></div>`;
+    if(w.carpetOrderNumber)pop+=`<div style="font-size:10px;color:#666;margin-bottom:2px">C# ${esc(w.carpetOrderNumber)}</div>`;
+    if(w.hardOrderNumber)pop+=`<div style="font-size:10px;color:#666;margin-bottom:2px">H# ${esc(w.hardOrderNumber)}</div>`;
+    if(w.scheduledDate)pop+=`<div style="font-size:11px;color:#e59900;margin-bottom:4px">🗓 Sched: ${fmt(w.scheduledDate)}</div>`;
+    pop+=`<div style="margin-top:8px;display:flex;gap:5px"><button onclick="openInstallDetail(wins.find(x=>x.id==='${w.id}'))" style="flex:1;padding:6px 0;border-radius:6px;background:#e8f5ff;border:1px solid #0099cc;color:#0077aa;font-size:11px;font-weight:800;font-family:inherit;cursor:pointer">View</button><button onclick="openEditOrder('${w.id}')" style="flex:1;padding:6px 0;border-radius:6px;background:#e8fff5;border:1px solid #00cc88;color:#00aa66;font-size:11px;font-weight:800;font-family:inherit;cursor:pointer">Edit</button></div></div>`;
+    mk.bindPopup(pop,{maxWidth:280});
+  });
+  if(!allOrders.length){
+    L.marker([lat,lng],{icon:L.divIcon({className:'',html:`<div style="background:rgba(8,10,26,0.9);border:1px solid #555;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;color:#aaa;white-space:nowrap">No order history found</div>`,iconSize:[160,32],iconAnchor:[80,16]})}).addTo(installMap);
+  }
+}
+function resetMapView(){
+  const bb=document.getElementById('map-back-btn');
+  if(bb)bb.style.display='none';
+  renderInstallMap();
 }
 
 loadAll();
