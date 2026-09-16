@@ -2103,6 +2103,7 @@ function openAddOrder(id){
   document.getElementById('order-carpet-po').value='';
   document.getElementById('order-hard-po').value='';
   document.getElementById('order-install-address').value='';
+  document.getElementById('order-coords').value='';
   document.getElementById('order-modal').classList.add('open');
 }
 function openEditOrder(id){
@@ -2123,10 +2124,9 @@ function openEditOrder(id){
   document.getElementById('order-hard-po').value=order.hardPO||'';
   document.getElementById('order-install-address').value=order.installAddress||'';
   document.getElementById('order-coords').value=(order.lat&&order.lng)?`${order.lat}, ${order.lng}`:'';
-  document.getElementById('order-coords').value='';
   document.getElementById('order-modal').classList.add('open');
 }
-function openEditOrder(id){
+async function confirmAddOrder(){
   const carpet=parseInt(document.getElementById('order-carpet').value)||0;
   const hard=parseInt(document.getElementById('order-hard').value)||0;
   const date=document.getElementById('order-date').value;
