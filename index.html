@@ -61,6 +61,10 @@ body{font-family:'Inter',sans-serif;background:#010209;color:var(--ink);-webkit-
 .section-btn.active-wins{background:linear-gradient(135deg,var(--green2),var(--green));color:#03040F;box-shadow:0 0 16px rgba(0,255,179,0.4);}
 .section-btn.active-calendar{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;box-shadow:0 0 16px rgba(153,0,255,0.4);}
 .section-btn.active-installs{background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#03040F;box-shadow:0 0 16px rgba(0,180,255,0.4);}
+.section-btn.active-companies{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;box-shadow:0 0 16px rgba(153,0,255,0.4);}
+#companies-stats-bar .stat:nth-child(4)::before{background:linear-gradient(90deg,transparent,var(--pink),var(--pink3),transparent);box-shadow:0 2px 20px rgba(255,0,136,0.8)}
+#companies-stats-bar .stat:nth-child(4) .stat-bg{background:var(--pink)!important}
+#companies-stats-bar .stat:nth-child(4) .stat-val{background-image:linear-gradient(135deg,var(--pink),var(--pink3),#FFAAC8)!important}
 #installs-stats-bar::after{background:linear-gradient(90deg,var(--cyan),var(--green),var(--cyan));opacity:1.0;}
 #installs-stats-bar .stat:nth-child(1)::before,#installs-stats-bar .stat:nth-child(2)::before,#installs-stats-bar .stat:nth-child(3)::before{background:linear-gradient(90deg,transparent,var(--cyan),var(--cyan3),transparent);box-shadow:0 2px 20px rgba(0,180,255,0.8)}#installs-stats-bar .stat:nth-child(4)::before{background:linear-gradient(90deg,transparent,var(--pink),var(--pink3),transparent);box-shadow:0 2px 20px rgba(255,0,136,0.8)}
 #installs-stats-bar .stat-bg{background:var(--cyan)!important}
@@ -218,6 +222,9 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
 .modal-close:hover{background:rgba(255,0,110,0.18);border-color:rgba(255,0,110,0.5);color:var(--pink);box-shadow:0 0 16px rgba(255,0,110,0.3);transform:rotate(90deg);}
 .modal-sub{font-size:13px;color:var(--ink3);margin-bottom:26px;line-height:1.65;margin-top:6px;position:relative;z-index:1}
 .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:26px;padding-top:22px;border-top:1px solid var(--b);position:relative;z-index:1;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(1,2,12,0.92);backdrop-filter:blur(20px);z-index:100;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;cursor:default;}
+.modal-overlay.open{display:flex}
+.modal-box{margin:auto;}
 
 /* ── FORM FIELDS ── */
 .field{margin-bottom:16px;position:relative;z-index:1}
@@ -397,6 +404,12 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
           Calendar
           <span id="calendar-badge" style="display:none;background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:20px;margin-left:4px"></span>
       </button>
+      <button class="section-btn" id="toggle-companies" onclick="setSection('companies')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        Companies
+      <span id="companies-badge" style="display:none;background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:20px;margin-left:4px"></span>
+      </button>
+      <button class="section-btn" id="toggle-tree" onclick="setSection('tree')" style="position:relative;padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;background:#1a1a2e;color:#aaa;">Tree <span id="tree-badge" style="position:absolute;top:-4px;right:-4px;background:#CC00FF;color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;display:flex;align-items:center;justify-content:center;"></span></button>
     </div>
     <div class="top-actions" id="top-actions">
       <button class="btn btn-ghost-top" onclick="openAreas()">
@@ -417,6 +430,8 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
   <button class="section-btn" id="toggle-wins-mob" onclick="setSection('wins')" style="flex:1;height:42px;border-radius:0;font-size:13px;">Wins</button>
   <button class="section-btn" id="toggle-installs-mob" onclick="setSection('installs')" style="flex:1;height:42px;border-radius:0;font-size:13px;">Installs</button>
   <button class="section-btn" id="toggle-calendar-mob" onclick="setSection('calendar')" style="flex:1;height:42px;border-radius:0;font-size:13px;">Calendar</button>
+  <button class="section-btn" id="toggle-companies-mob" onclick="setSection('companies')" style="flex:1;height:42px;border-radius:0;font-size:13px;">Companies</button>
+  <button class="section-btn" id="toggle-tree-mob" onclick="setSection('tree')" style="flex:1;height:42px;border-radius:0;font-size:13px;">Tree</button>
 </div>
 
 <!-- ═══════════ LEADS SECTION ═══════════ -->
@@ -542,6 +557,19 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
   
 <!-- ═══════════ INSTALLS SECTION ═══════════ -->
 <div id="installs-section" style="display:none">
+  <div id="missing-cg-panel" style="display:none;position:relative;z-index:2;background:linear-gradient(135deg,rgba(255,0,136,0.1),rgba(153,0,255,0.07));border-bottom:2px solid rgba(255,0,136,0.4);padding:20px 28px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:22px">⚠️</span>
+        <div>
+          <div style="font-size:13px;font-weight:900;letter-spacing:.05em;background:linear-gradient(90deg,var(--pink),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-transform:uppercase">Missing CG Numbers</div>
+          <div style="font-size:12px;color:var(--ink3);margin-top:1px" id="missing-cg-subtitle"></div>
+        </div>
+      </div>
+      <button onclick="const c=document.getElementById('missing-cg-cards');const hidden=c.style.display==='none';c.style.display=hidden?'grid':'none';this.textContent=hidden?'Hide ▲':'Show ▼'" style="font-size:11px;font-weight:700;font-family:inherit;padding:5px 12px;border-radius:7px;background:rgba(255,0,136,0.12);border:1px solid rgba(255,0,136,0.3);color:var(--pink);cursor:pointer">Hide ▲</button>
+    </div>
+    <div id="missing-cg-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px"></div>
+  </div>
   <div class="stats-bar" id="installs-stats-bar">
     <div class="stat"><div class="stat-bg"></div><div class="stat-label">Total Scheduled</div><div class="stat-val" id="si-total">0</div></div>
     <div class="stat"><div class="stat-bg"></div><div class="stat-label">Today</div><div class="stat-val" id="si-today">0</div></div>
@@ -637,7 +665,8 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
       <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
         <span style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--pink)"><span style="width:9px;height:9px;border-radius:50%;background:var(--pink);display:inline-block;box-shadow:0 0 8px var(--pink)"></span>Today</span>
         <span style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--cyan)"><span style="width:9px;height:9px;border-radius:50%;background:var(--cyan);display:inline-block;box-shadow:0 0 8px var(--cyan)"></span>Upcoming</span>
-                <span style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--green2)"><span style="width:9px;height:9px;border-radius:50%;background:var(--green2);display:inline-block;box-shadow:0 0 8px var(--green2)"></span>Complete</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--green2)"><span style="width:9px;height:9px;border-radius:50%;background:var(--green2);display:inline-block;box-shadow:0 0 8px var(--green2)"></span>Complete</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#cc00ff"><span style="width:9px;height:9px;border-radius:50%;background:transparent;border:2px dashed rgba(204,0,255,0.85);display:inline-block"></span>Scattered</span>
         <button onclick="if(installMap)installMap.setView([39.9612,-82.9988],10)" style="font-size:11px;font-weight:700;font-family:inherit;padding:5px 12px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);color:var(--ink3);cursor:pointer;transition:all .15s" onmouseover="this.style.color='var(--ink)';this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.color='var(--ink3)';this.style.background='rgba(255,255,255,0.07)'">⌖ Columbus</button>
       </div>
     </div>
@@ -662,6 +691,45 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
   </div>
 </div>
   
+<!-- ═══════════ COMPANIES SECTION ═══════════ -->
+<div id="companies-section" style="display:none">
+  <div class="stats-bar" id="companies-stats-bar">
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label">Companies</div><div class="stat-val" id="sc-total">0</div></div>
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label">Contacts</div><div class="stat-val" id="sc-contacts">0</div></div>
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label">Won Properties</div><div class="stat-val" id="sc-won">0</div></div>
+    <div class="stat"><div class="stat-bg"></div><div class="stat-label">In Pipeline</div><div class="stat-val" id="sc-pipeline">0</div></div>
+  </div>
+  <div class="toolbar" style="justify-content:space-between">
+    <div class="search-wrap" style="max-width:360px">
+      <span class="search-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+      <input class="search-input" id="companies-search" placeholder="Search companies…" oninput="renderCompanies()">
+    </div>
+    <button class="btn btn-glow" onclick="openAddCompany()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Company
+    </button>
+  </div>
+  <div id="companies-detail-view" style="display:none;padding:22px 28px 80px;position:relative;z-index:2"></div>
+  <div id="companies-grid-view" style="padding:22px 28px 80px;position:relative;z-index:2">
+    <div id="companies-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px"></div>
+  </div>
+</div>
+  
+<!-- TREE SECTION -->
+<div id="tree-section" style="display:none;padding:16px;max-width:1200px;margin:0 auto;">
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+    <div class="stat-card"><div class="stat-value" id="st-total">0</div><div class="stat-label">Total People</div></div>
+    <div class="stat-card"><div class="stat-value" id="st-companies">0</div><div class="stat-label">Companies</div></div>
+    <div class="stat-card"><div class="stat-value" id="st-pms">0</div><div class="stat-label">PMs</div></div>
+    <div class="stat-card"><div class="stat-value" id="st-linked">0</div><div class="stat-label">Linked</div></div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+    <input id="tree-search" type="text" placeholder="Search people or company..." oninput="renderTree()" style="flex:1;min-width:200px;padding:8px 12px;border-radius:8px;border:1px solid #333;background:#1a1a2e;color:#e0e0e0;font-size:14px;">
+    <button onclick="openAddPerson()" style="padding:8px 16px;border-radius:8px;background:linear-gradient(135deg,#CC00FF,#9900EE);color:#fff;border:none;cursor:pointer;font-size:14px;font-weight:600;">+ Add Person</button>
+  </div>
+  <div id="tree-container"></div>
+</div>
+
 <!-- ADD/EDIT LEAD MODAL -->
 <div class="overlay" id="lead-modal">
   <div class="modal">
@@ -846,6 +914,16 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
       <div class="field" style="position:relative;z-index:1"><label>Notes</label><textarea id="order-notes" placeholder="e.g. Summer turn package…" style="min-height:64px"></textarea></div>
       <div class="field" style="position:relative;z-index:1"><label>Scheduled install date</label><input type="date" id="order-scheduled"></div>
       <div class="field" style="position:relative;z-index:1"><label>Install address (overrides property address on map)</label><input type="text" id="order-install-address" placeholder="e.g. 123 Main St, Columbus, OH 43215"></div>
+      <div class="field" style="position:relative;z-index:1"><label>Precise coordinates <span style="font-weight:400;font-size:.8em;opacity:.5">(right-click in Google Maps → copy coords for exact pin placement)</span></label><input type="text" id="order-coords" placeholder="e.g. 39.9612, -82.9988"></div>
+    <div class="field" id="order-scattered-wrap" style="display:none;padding:12px 14px;border-radius:11px;background:rgba(153,0,255,0.07);border:1px solid rgba(153,0,255,0.25);cursor:pointer" onclick="document.getElementById('order-use-property-addr').click()">
+      <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer">
+        <input type="checkbox" id="order-use-property-addr" style="width:18px;height:18px;accent-color:var(--purple);cursor:pointer;flex-shrink:0;margin-top:2px" onclick="event.stopPropagation()">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--ink)">Use property address for map</div>
+          <div style="font-size:11px;color:var(--ink4);margin-top:2px;line-height:1.5">Show this install at the property address instead of the company's home office.</div>
+        </div>
+      </label>
+    </div>
       <div class="modal-actions">
         <button class="btn btn-ghost" onclick="closeModal('order-modal')">Cancel</button>
         <button class="btn btn-green" onclick="confirmAddOrder()">
@@ -863,6 +941,117 @@ tr:hover .area-chip{background:rgba(255,255,255,0.1)}
     </div>
   </div>
   
+<!-- ADD/EDIT PERSON MODAL -->
+<div id="person-modal" class="modal-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal-box" style="max-width:540px;background:rgba(8,10,26,0.97);border:1px solid rgba(255,255,255,0.1);border-radius:22px;padding:32px;width:calc(100%-40px);margin:20px auto;position:relative;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <h2 id="person-modal-title" style="margin:0;font-size:18px;font-weight:800;color:#fff;">Add Person</h2>
+      <button onclick="document.getElementById('person-modal').classList.remove('open')" style="background:none;border:none;color:#aaa;font-size:22px;cursor:pointer;">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <label style="font-size:12px;font-weight:700;letter-spacing:.1em;color:#8AAACE;text-transform:uppercase;">Name *</label>
+      <input id="pm-name" type="text" placeholder="Full name" style="padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.13);background:rgba(255,255,255,0.05);color:#fff;font-size:14px;font-family:inherit;outline:none;">
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;">
+          <label style="font-size:12px;font-weight:700;letter-spacing:.1em;color:#8AAACE;text-transform:uppercase;display:block;margin-bottom:6px;">Phone</label>
+                    <input id="pm-phone" type="text" placeholder="Phone" oninput="this.value=formatPhoneProgressive(this.value)" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.13);background:rgba(255,255,255,0.05);color:#fff;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+        </div>
+        <div style="flex:1;">
+          <label style="font-size:12px;font-weight:700;letter-spacing:.1em;color:#8AAACE;text-transform:uppercase;display:block;margin-bottom:6px;">Email</label>
+          <input id="pm-email" type="text" placeholder="Email" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.13);background:rgba(255,255,255,0.05);color:#fff;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+        </div>
+      </div>
+      <label style="font-size:12px;font-weight:700;letter-spacing:.1em;color:#8AAACE;text-transform:uppercase;">Notes</label>
+      <textarea id="pm-notes" rows="2" placeholder="Any notes..." style="padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.13);background:rgba(255,255,255,0.05);color:#fff;font-size:14px;font-family:inherit;outline:none;resize:vertical;"></textarea>
+      <hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:4px 0;">
+      <div style="font-size:13px;font-weight:700;color:#CC00FF;letter-spacing:.05em;">ASSIGNMENT</div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;">
+          <label style="font-size:12px;font-weight:700;letter-spacing:.1em;color:#8AAACE;text-transform:uppercase;display:block;margin-bottom:6px;">Company</label>
+          <select id="pm-company" onchange="populateReportsToSelect(this.value,document.getElementById('pm-reports-to'),null)" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.13);background:rgba(8,10,26,0.97);color:#fff;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+            <option value="">— None —</option>
+          </select>
+        </div>
+        <div style="flex:1;">
+          <label style="font-size:12px;font-weight:700;letter-spacing:.1em;color:#8AAACE;text-transform:uppercase;display:block;margin-bottom:6px;">Role</label>
+          <select id="pm-role" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.13);background:rgba(8,10,26,0.97);color:#fff;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+            <option value="National Lead">National Lead</option>
+            <option value="Regional Manager">Regional Manager</option>
+            <option value="PM" selected>PM</option>
+            <option value="Maintenance">Maintenance</option>
+            <option value="Contact">Contact</option>
+          </select>
+        </div>
+      </div>
+      <label style="font-size:12px;font-weight:700;letter-spacing:.1em;color:#8AAACE;text-transform:uppercase;">Reports To <span style="color:rgba(255,255,255,0.3);font-weight:400;text-transform:none;letter-spacing:0;">(optional — link later)</span></label>
+      <select id="pm-reports-to" style="padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.13);background:rgba(8,10,26,0.97);color:#fff;font-size:14px;font-family:inherit;outline:none;">
+        <option value="">— None / Link Later —</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08);">
+      <button onclick="document.getElementById('person-modal').classList.remove('open')" style="padding:10px 20px;border-radius:10px;background:rgba(255,255,255,0.07);color:#aaa;border:1px solid rgba(255,255,255,0.13);cursor:pointer;font-family:inherit;font-size:14px;">Cancel</button>
+      <button onclick="savePerson()" style="padding:10px 20px;border-radius:10px;background:linear-gradient(135deg,#CC00FF,#9900EE);color:#fff;border:none;cursor:pointer;font-weight:700;font-size:14px;font-family:inherit;">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT COMPANY MODAL -->
+<div class="overlay" id="company-modal" onclick="bgClose(event,'company-modal')">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <span class="modal-title" id="company-modal-title">Add Company</span>
+      <button class="modal-close" onclick="closeModal('company-modal')">×</button>
+    </div>
+    <p class="modal-sub">Track a management company's portfolio and build your org chart.</p>
+    <div class="field"><label>Company name *</label><input id="cm-name" placeholder="e.g. Woda Cooper"></div>
+    <div class="field">
+      <label>Parent company <span style="font-weight:400;opacity:.5">(optional — for subsidiaries)</span></label>
+      <select id="cm-parent"><option value="">— None (top level) —</option></select>
+    </div>
+        <div class="field"><label>Notes</label><textarea id="cm-notes" placeholder="e.g. Affordable housing portfolio across Ohio, central purchasing…" style="min-height:80px"></textarea></div>
+    <div class="field"><label>Home office address <span style="font-weight:400;opacity:.5">(used for scattered site connector lines on map)</span></label><input id="cm-address" placeholder="e.g. 1234 Corporate Dr, Columbus, OH 43215"></div>
+    <div class="field" style="padding:12px 14px;border-radius:11px;background:rgba(153,0,255,0.07);border:1px solid rgba(153,0,255,0.25);cursor:pointer" onclick="document.getElementById('cm-scattered').click()">
+      <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer">
+        <input type="checkbox" id="cm-scattered" style="width:18px;height:18px;accent-color:var(--purple);cursor:pointer;flex-shrink:0;margin-top:2px" onclick="event.stopPropagation()">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--ink)">Scattered site company</div>
+          <div style="font-size:11px;color:var(--ink4);margin-top:2px;line-height:1.5">Installs happen at multiple locations. Each order shows its own dot on the overview map with a connector line to this company's home office.</div>
+        </div>
+      </label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('company-modal')">Cancel</button>
+      <button class="btn btn-glow" onclick="saveCompany()">Save company</button>
+    </div>
+  </div>
+</div>
+  
+<!-- ADD/EDIT CONTACT MODAL -->
+<div class="overlay" id="contact-modal" onclick="bgClose(event,'contact-modal')">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <span class="modal-title" id="contact-modal-title">Add Person</span>
+      <button class="modal-close" onclick="closeModal('contact-modal')">×</button>
+    </div>
+    <div class="field"><label>Name *</label><input id="ct-name" placeholder="e.g. Linda Chen"></div>
+    <div class="field"><label>Title</label><input id="ct-title" placeholder="e.g. Regional Vice President"></div>
+    <div class="field-row">
+      <div class="field"><label>Phone</label><input id="ct-phone" type="tel" placeholder="(614) 555-0100" oninput="this.value=formatPhone(this.value)"></div>
+      <div class="field"><label>Email</label><input id="ct-email" type="email" placeholder="linda@company.com"></div>
+    </div>
+    <div class="field">
+      <label>Reports to <span style="font-weight:400;opacity:.5">(optional)</span></label>
+      <select id="ct-reports-to"><option value="">— Top level (no manager) —</option></select>
+    </div>
+    <div class="field"><label>Previous employers <span style="font-weight:400;opacity:.5">(optional)</span></label><input id="ct-prev" placeholder="e.g. Oakwood Management 2019–2022"></div>
+    <div class="field"><label>Notes</label><textarea id="ct-notes" placeholder="e.g. Key decision maker for all Columbus properties…" style="min-height:64px"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('contact-modal')">Cancel</button>
+      <button class="btn btn-glow" onclick="saveContact()">Save person</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── Stars ──
 (function(){
@@ -893,6 +1082,7 @@ async function sbSignOut(){await sb.auth.signOut();}
 function _showApp(){
   document.getElementById('auth-overlay').style.display='none';
   const b=document.getElementById('signout-btn');if(b)b.style.display='inline-flex';
+  loadAll();
 }
 function _hideApp(){
   document.getElementById('auth-overlay').style.display='flex';
@@ -900,6 +1090,7 @@ function _hideApp(){
 }
 document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('auth-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+  document.getElementById('pm-phone').addEventListener('input',function(){this.value=formatPhoneProgressive(this.value);});
   sb.auth.getSession().then(({data:{session}})=>{session?_showApp():_hideApp();});
   sb.auth.onAuthStateChange((_,session)=>{session?_showApp():_hideApp();});
 });
@@ -922,18 +1113,40 @@ let wSortCol="wonDate",wSortDir=-1;
 let dragSrcIdx=null;
 let currentSection="leads";
 let isSaving=false;
-
+let companies=[], company_contacts=[];
+let editCompanyId=null, editContactId=null, contactForCompanyId=null;
+let activeCompanyId=null;
+let people=[], people_assignments=[];
+let editPersonId=null;
+let activeTreeCompanyId=null;
+  
 // ── Loading overlay ──
 function showLoading(){const el=document.getElementById('loading-overlay');if(el)el.style.display='flex';}
 function hideLoading(){const el=document.getElementById('loading-overlay');if(el)el.style.display='none';}
 
 // ── DB mappers ──
+function dbToPerson(r){return{id:r.id,name:r.name||'',email:r.email||'',phone:r.phone||'',notes:r.notes||''};}
+function personToDB(p){return{id:p.id,name:p.name,email:p.email||null,phone:p.phone||null,notes:p.notes||null};}
+function dbToAssignment(r){return{id:r.id,person_id:r.person_id,company_id:r.company_id||null,property_name:r.property_name||'',role:r.role||'Contact',active:r.active!==false,reports_to:r.reports_to||null};}
+function assignmentToDB(a){return{id:a.id,person_id:a.person_id,company_id:a.company_id||null,property_name:a.property_name||null,role:a.role||'Contact',active:a.active!==false,reports_to:a.reports_to||null};}
+function dbToCompany(r){return{id:r.id,name:r.name||'',parent_id:r.parent_id||null,notes:r.notes||'',scattered_site:r.scattered_site||false,address:r.address||''};}
+function companyToDB(c){return{id:c.id,name:c.name,parent_id:c.parent_id||null,notes:c.notes||null,scattered_site:c.scattered_site||false,address:c.address||null};}
+function dbToContact(r){return{id:r.id,company_id:r.company_id,name:r.name||'',title:r.title||'',phone:r.phone||'',email:r.email||'',reports_to:r.reports_to||null,previous_employers:r.previous_employers||'',notes:r.notes||''};}
+function contactToDB(c){return{id:c.id,company_id:c.company_id,name:c.name,title:c.title||null,phone:c.phone||null,email:c.email||null,reports_to:c.reports_to||null,previous_employers:c.previous_employers||null,notes:c.notes||null};}
 function dbToLead(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,style:r.style||'',area:r.area||'Other',status:r.status||'New',notes:r.notes||'',mgmt:r.mgmt||''};}
 function leadToDB(l){return{id:l.id,company:l.company,contact:l.contact,phone:l.phone,email:l.email,address:l.address,units:l.units||0,style:l.style,area:l.area,status:l.status,notes:l.notes,mgmt:l.mgmt||''};}
-function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,installs:r.installs||0,carpet:r.carpet||0,hard:r.hard||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||'',mgmt:r.mgmt||'',scheduledDate:r.scheduled_date||'',carpetOrderNumber:r.carpet_order_number||'',hardOrderNumber:r.hard_order_number||'',propertyPO:r.property_po||'',carpetPO:r.carpet_po||'',hardPO:r.hard_po||'',installAddress:r.install_address||'',lat:r.lat||null,lng:r.lng||null};}
-function winToDB(w){return{id:w.id,company:w.company,contact:w.contact,phone:w.phone,email:w.email,address:w.address,units:w.units||0,installs:w.installs||0,carpet:w.carpet||0,hard:w.hard||0,style:w.style,area:w.area,won_date:w.wonDate,win_notes:w.winNotes,mgmt:w.mgmt||'',scheduled_date:w.scheduledDate||null,carpet_order_number:w.carpetOrderNumber||null,hard_order_number:w.hardOrderNumber||null,property_po:w.propertyPO||null,carpet_po:w.carpetPO||null,hard_po:w.hardPO||null,install_address:w.installAddress||null,lat:w.lat||null,lng:w.lng||null};}
+function dbToWin(r){return{id:r.id,company:r.company||'',contact:r.contact||'',phone:r.phone||'',email:r.email||'',address:r.address||'',units:r.units||0,installs:r.installs||0,carpet:r.carpet||0,hard:r.hard||0,style:r.style||'',area:r.area||'Other',wonDate:r.won_date||'',winNotes:r.win_notes||'',mgmt:r.mgmt||'',scheduledDate:r.scheduled_date||'',carpetOrderNumber:r.carpet_order_number||'',hardOrderNumber:r.hard_order_number||'',propertyPO:r.property_po||'',carpetPO:r.carpet_po||'',hardPO:r.hard_po||'',installAddress:r.install_address||'',lat:r.lat||null,lng:r.lng||null,use_property_address:r.use_property_address||false};}
+function winToDB(w){return{id:w.id,company:w.company,contact:w.contact,phone:w.phone,email:w.email,address:w.address,units:w.units||0,installs:w.installs||0,carpet:w.carpet||0,hard:w.hard||0,style:w.style,area:w.area,won_date:w.wonDate,win_notes:w.winNotes,mgmt:w.mgmt||'',scheduled_date:w.scheduledDate||null,carpet_order_number:w.carpetOrderNumber||null,hard_order_number:w.hardOrderNumber||null,property_po:w.propertyPO||null,carpet_po:w.carpetPO||null,hard_po:w.hardPO||null,install_address:w.installAddress||null,lat:w.lat||null,lng:w.lng||null,use_property_address:w.use_property_address||false};}
 
   // ── Supabase CRUD ──
+async function savePerson_db(obj){try{await sb.from('people').upsert(personToDB(obj));}catch(e){console.error('savePerson_db',e);}}
+async function deletePerson_db(id){try{await sb.from('people').delete().eq('id',id);}catch(e){console.error('deletePerson_db',e);}}
+async function saveAssignment_db(obj){try{await sb.from('people_assignments').upsert(assignmentToDB(obj));}catch(e){console.error('saveAssignment_db',e);}}
+async function deleteAssignment_db(id){try{await sb.from('people_assignments').delete().eq('id',id);}catch(e){console.error('deleteAssignment_db',e);}}
+async function saveCompany_db(obj){try{await sb.from('companies').upsert(companyToDB(obj));}catch(e){console.error('saveCompany_db',e);}}
+async function deleteCompany_db(id){try{await sb.from('companies').delete().eq('id',id);}catch(e){console.error('deleteCompany_db',e);}}
+async function saveContact_db(obj){try{await sb.from('company_contacts').upsert(contactToDB(obj));}catch(e){console.error('saveContact_db',e);}}
+async function deleteContact_db(id){try{await sb.from('company_contacts').delete().eq('id',id);}catch(e){console.error('deleteContact_db',e);}}
 async function saveLead_db(obj){try{await sb.from('leads').upsert(leadToDB(obj));}catch(e){console.error('saveLead_db',e);}}
 async function deleteLead_db(id){try{await sb.from('leads').delete().eq('id',id);}catch(e){console.error('deleteLead_db',e);}}
 async function saveWin_db(obj){try{await sb.from('wins').upsert(winToDB(obj));}catch(e){console.error('saveWin_db',e);}}
@@ -959,7 +1172,7 @@ async function loadAll(){
     // Load areas
     const areasRes = await sb.from('areas').select('list').eq('id',1).maybeSingle();
     console.log('areas result:', areasRes.error, areasRes.data);
-    if(areasRes.data && Array.isArray(areasRes.data.list) && areasRes.data.list.length > 0){
+        if(areasRes.data && Array.isArray(areasRes.data.list) && areasRes.data.list.length > 0){
       areas = areasRes.data.list;
       console.log('areas loaded:', areas.length, 'areas');
     } else {
@@ -967,6 +1180,14 @@ async function loadAll(){
       areas = [...DEFAULT_AREAS];
       await saveAreas_db(areas);
     }
+    const companiesRes = await sb.from('companies').select('*').order('name');
+    const contactsRes = await sb.from('company_contacts').select('*').order('name');
+    if(companiesRes.data) companies = companiesRes.data.map(dbToCompany);
+    if(contactsRes.data) company_contacts = contactsRes.data.map(dbToContact);
+    const peopleRes=await sb.from('people').select('*').order('name');
+    const assignmentsRes=await sb.from('people_assignments').select('*');
+    if(peopleRes.data) people=peopleRes.data.map(dbToPerson);
+    if(assignmentsRes.data) people_assignments=assignmentsRes.data.map(dbToAssignment);
   } catch(e){
     console.error('loadAll error:', e);
     if(!areas.length) areas = [...DEFAULT_AREAS];
@@ -975,6 +1196,9 @@ async function loadAll(){
   render();
   if(currentSection==='wins') renderWins();
   if(currentSection==='calendar') renderInstallMap();
+  if(currentSection==='companies') renderCompanies();
+  if(currentSection==='tree') renderTree();
+  updateWinsBadge();
   updateWinsBadge();
 }
 
@@ -995,6 +1219,18 @@ sb.channel(channelId)
   .on('postgres_changes',{event:'DELETE',schema:'public',table:'wins'},scheduleReload)
   .on('postgres_changes',{event:'INSERT',schema:'public',table:'areas'},scheduleReload)
   .on('postgres_changes',{event:'UPDATE',schema:'public',table:'areas'},scheduleReload)
+  .on('postgres_changes',{event:'INSERT',schema:'public',table:'companies'},scheduleReload)
+  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'companies'},scheduleReload)
+  .on('postgres_changes',{event:'DELETE',schema:'public',table:'companies'},scheduleReload)
+  .on('postgres_changes',{event:'INSERT',schema:'public',table:'company_contacts'},scheduleReload)
+  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'company_contacts'},scheduleReload)
+  .on('postgres_changes',{event:'DELETE',schema:'public',table:'company_contacts'},scheduleReload)
+  .on('postgres_changes',{event:'INSERT',schema:'public',table:'people'},scheduleReload)
+  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'people'},scheduleReload)
+  .on('postgres_changes',{event:'DELETE',schema:'public',table:'people'},scheduleReload)
+  .on('postgres_changes',{event:'INSERT',schema:'public',table:'people_assignments'},scheduleReload)
+  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'people_assignments'},scheduleReload)
+  .on('postgres_changes',{event:'DELETE',schema:'public',table:'people_assignments'},scheduleReload)
   .subscribe((status)=>{ console.log('Realtime status:', status); });
 
 function save(){} // no-op — all saves go direct to Supabase now
@@ -1006,21 +1242,27 @@ function setSection(s){
   document.getElementById('wins-section').style.display=s==='wins'?'':'none';
   document.getElementById('installs-section').style.display=s==='installs'?'':'none';
   document.getElementById('calendar-section').style.display=s==='calendar'?'':'none';
-  // Desktop toggle
+  document.getElementById('companies-section').style.display=s==='companies'?'':'none';
+  document.getElementById('tree-section').style.display=s==='tree'?'':'none';
   document.getElementById('toggle-leads').className='section-btn'+(s==='leads'?' active-leads':'');
   document.getElementById('toggle-wins').className='section-btn'+(s==='wins'?' active-wins':'');
   document.getElementById('toggle-installs').className='section-btn'+(s==='installs'?' active-installs':'');
   document.getElementById('toggle-calendar').className='section-btn'+(s==='calendar'?' active-calendar':'');
-  // Mobile toggle
+  document.getElementById('toggle-companies').className='section-btn'+(s==='companies'?' active-companies':'');
+  document.getElementById('toggle-tree').className='section-btn'+(s==='tree'?' active-installs':'');
   document.getElementById('toggle-leads-mob').className='section-btn'+(s==='leads'?' active-leads':'');
   document.getElementById('toggle-wins-mob').className='section-btn'+(s==='wins'?' active-wins':'');
   document.getElementById('toggle-installs-mob').className='section-btn'+(s==='installs'?' active-installs':'');
   document.getElementById('toggle-calendar-mob').className='section-btn'+(s==='calendar'?' active-calendar':'');
-  // Top actions — hide Areas/Add when not on leads
+  document.getElementById('toggle-companies-mob').className='section-btn'+(s==='companies'?' active-companies':'');
+  const toggleTreeMob=document.getElementById('toggle-tree-mob');
+  if(toggleTreeMob) toggleTreeMob.className='section-btn'+(s==='tree'?' active-installs':'');
   document.getElementById('top-actions').style.display=s==='leads'?'flex':'none';
   if(s==='wins') renderWins();
   else if(s==='installs') renderInstalls();
   else if(s==='calendar') renderCalendar();
+  else if(s==='companies') renderCompanies();
+  else if(s==='tree') renderTree();
   else render();
 }
 
@@ -1385,6 +1627,12 @@ function formatPhone(v){
   if(d.length===10) return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;
   if(d.length===11&&d[0]==='1') return `(${d.slice(1,4)}) ${d.slice(4,7)}-${d.slice(7)}`;
   return v||'';
+}
+function formatPhoneProgressive(v){
+  const d=(v||'').replace(/\D/g,'').slice(0,10);
+  if(d.length<4) return d;
+  if(d.length<7) return `(${d.slice(0,3)}) ${d.slice(3)}`;
+  return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;
 }
 function esc(s){return(s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function populateAreaSelect(){document.getElementById('f-area').innerHTML=areas.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('');}
@@ -1875,7 +2123,18 @@ function openAddOrder(id){
   document.getElementById('order-carpet-po').value='';
   document.getElementById('order-hard-po').value='';
   document.getElementById('order-install-address').value='';
+  document.getElementById('order-coords').value='';
+  document.getElementById('order-use-property-addr').checked=false;
+  _updateOrderScatteredWrap();
   document.getElementById('order-modal').classList.add('open');
+}
+function _updateOrderScatteredWrap(){
+  const _sel=document.getElementById('order-company-select');
+  const _nm=document.getElementById('order-modal-name');
+  const coName=(_sel&&_sel.style.display!=='none'?_sel.value:'')||(_nm?_nm.textContent:'');
+  const _co=companies.find(c=>c.name===coName);
+  const wrap=document.getElementById('order-scattered-wrap');
+  if(wrap)wrap.style.display=(_co&&_co.scattered_site)?'':'none';
 }
 function openEditOrder(id){
   const order=wins.find(x=>x.id===id);if(!order)return;
@@ -1894,8 +2153,11 @@ function openEditOrder(id){
   document.getElementById('order-carpet-po').value=order.carpetPO||'';
   document.getElementById('order-hard-po').value=order.hardPO||'';
   document.getElementById('order-install-address').value=order.installAddress||'';
+  document.getElementById('order-coords').value=(order.lat&&order.lng)?`${order.lat}, ${order.lng}`:'';
+  document.getElementById('order-use-property-addr').checked=!!(order.use_property_address);
+  _updateOrderScatteredWrap();
   document.getElementById('order-modal').classList.add('open');
-}  
+}
 async function confirmAddOrder(){
   const carpet=parseInt(document.getElementById('order-carpet').value)||0;
   const hard=parseInt(document.getElementById('order-hard').value)||0;
@@ -1917,13 +2179,16 @@ async function confirmAddOrder(){
     order.carpetPO=document.getElementById('order-carpet-po').value.trim();
     order.hardPO=document.getElementById('order-hard-po').value.trim();
     order.installAddress=document.getElementById('order-install-address').value.trim();
+    const _oc=document.getElementById('order-coords').value.trim();if(_oc){const _op=_oc.split(',');order.lat=parseFloat(_op[0])||null;order.lng=parseFloat(_op[1])||null;}else{order.lat=null;order.lng=null;}
+    order.use_property_address=document.getElementById('order-use-property-addr').checked;
     closeModal('order-modal');orderEditId=null;orderSourceId=null;
     renderWins();updateWinsBadge();
     isSaving=true;await saveWin_db(order);isSaving=false;
     return;
   }
   const src=wins.find(x=>x.id===orderSourceId);if(!src)return;
-  const newOrder={...src,id:Date.now()+'',wonDate:date,carpet,hard,installs:Math.max(carpet,hard)||carpet||hard,winNotes:document.getElementById('order-notes').value.trim(),scheduledDate:document.getElementById('order-scheduled').value,carpetOrderNumber:document.getElementById('order-carpet-number').value.trim(),hardOrderNumber:document.getElementById('order-hard-number').value.trim(),carpetPO:document.getElementById('order-carpet-po').value.trim(),hardPO:document.getElementById('order-hard-po').value.trim(),installAddress:document.getElementById('order-install-address').value.trim()};
+  const _oc2=document.getElementById('order-coords').value.trim(),_op2=_oc2?_oc2.split(','):[];
+  const newOrder={...src,id:Date.now()+'',wonDate:date,carpet,hard,installs:Math.max(carpet,hard)||carpet||hard,winNotes:document.getElementById('order-notes').value.trim(),scheduledDate:document.getElementById('order-scheduled').value,carpetOrderNumber:document.getElementById('order-carpet-number').value.trim(),hardOrderNumber:document.getElementById('order-hard-number').value.trim(),carpetPO:document.getElementById('order-carpet-po').value.trim(),hardPO:document.getElementById('order-hard-po').value.trim(),installAddress:document.getElementById('order-install-address').value.trim(),lat:_oc2?parseFloat(_op2[0])||null:null,lng:_oc2?parseFloat(_op2[1])||null:null,use_property_address:document.getElementById('order-use-property-addr').checked};
   wins.unshift(newOrder);
   closeModal('order-modal');orderSourceId=null;
   renderWins();updateWinsBadge();
@@ -1948,7 +2213,36 @@ async function deleteOrder(id){
 }
   
 // ── Installs ──
+function getMissingCGWarnings(){
+  const cutoff=new Date();cutoff.setHours(0,0,0,0);cutoff.setDate(cutoff.getDate()-3);
+  return wins.filter(w=>{
+    if(!w.scheduledDate)return false;
+    if(w.carpetOrderNumber||w.hardOrderNumber)return false;
+    return new Date(w.scheduledDate+'T12:00:00')<=cutoff;
+  });
+}
+function renderMissingCGPanel(){
+  const missing=getMissingCGWarnings();
+  const panel=document.getElementById('missing-cg-panel');
+  const cards=document.getElementById('missing-cg-cards');
+  const sub=document.getElementById('missing-cg-subtitle');
+  if(!missing.length){if(panel)panel.style.display='none';return;}
+  if(panel)panel.style.display='block';
+  if(sub)sub.textContent=`${missing.length} install${missing.length!==1?'s':''} completed 3+ days ago with no CG order number`;
+  if(cards)cards.innerHTML=missing.map(w=>{
+    const dateStr=new Date(w.scheduledDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const daysAgo=Math.floor((new Date()-new Date(w.scheduledDate+'T12:00:00'))/(1000*60*60*24));
+    return`<div style="background:rgba(255,0,136,0.07);border:1px solid rgba(255,0,136,0.3);border-radius:12px;padding:14px">
+      <div style="font-size:14px;font-weight:800;color:var(--ink);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(w.company)}</div>
+      <div style="font-size:11px;color:var(--ink3);margin-bottom:8px">Installed ${dateStr}</div>
+      <div style="font-size:28px;font-weight:900;color:var(--pink);line-height:1;margin-bottom:1px">${daysAgo} days</div>
+      <div style="font-size:10px;color:var(--ink4);margin-bottom:10px">without a CG #</div>
+      <button onclick="openEditOrder('${w.id}')" style="width:100%;padding:8px;border-radius:8px;background:linear-gradient(135deg,var(--pink),var(--purple));border:none;color:#fff;font-size:11px;font-weight:800;font-family:inherit;cursor:pointer">✏️ Add CG Number</button>
+    </div>`;
+  }).join('');
+}
 function renderInstalls(){
+  renderMissingCGPanel();
   setChartMode('units');renderWinsChart();
   const today=new Date().toISOString().split('T')[0];
   const in30=new Date();in30.setDate(in30.getDate()+30);
@@ -2213,8 +2507,7 @@ function setMapFilter(mode){
 function jitterRadius(z){return z>=14?0:z<=10?0.015:0.015*(14-z)/4;}
 function jitterCoords(pts,r){if(!r)return pts;const th=r*1.5;const done=new Set();for(let i=0;i<pts.length;i++){if(done.has(i))continue;const near=[i];for(let j=i+1;j<pts.length;j++){if(done.has(j))continue;if(Math.hypot(pts[i].lat-pts[j].lat,pts[i].lng-pts[j].lng)<th){near.push(j);done.add(j);}}done.add(i);if(near.length<2)continue;near.forEach((idx,k)=>{const a=(2*Math.PI*k)/near.length;pts[idx].lat+=r*Math.cos(a);pts[idx].lng+=r*Math.sin(a)*1.4;});}return pts;}
 async function renderInstallMap(){
-  if(currentSection!=='calendar')return;
-  const mapEl=document.getElementById('install-map');if(!mapEl)return;
+  const _mapBB=document.getElementById('map-back-btn');if(_mapBB)_mapBB.style.display='none';
   await new Promise(r=>setTimeout(r,80));
   if(currentSection!=='calendar')return;
   const now=new Date();
@@ -2236,6 +2529,7 @@ async function renderInstallMap(){
     installs=wins.filter(w=>w.scheduledDate&&w.scheduledDate.startsWith(monthStr)&&(w.address||w.installAddress));
     filterLabel=monthLabel;
   }
+  installs=installs.filter(w=>(parseInt(w.carpet)||0)+(parseInt(w.hard)||0)>0);
   const subtitleEl=document.getElementById('map-filter-subtitle');
   if(subtitleEl)subtitleEl.textContent=filterLabel;
   if(!installMap){
@@ -2249,27 +2543,49 @@ async function renderInstallMap(){
     window._jzTimer=setTimeout(()=>{rejitterMarkers();},60);
   });
   }else{
-    const toRemove=[];installMap.eachLayer(l=>{if(l._pmInstall)installMap.removeLayer(l);});_mapMarkers=[];toRemove.forEach(l=>installMap.removeLayer(l));
+    installMap.eachLayer(l=>{if(l instanceof L.Marker||l instanceof L.CircleMarker)installMap.removeLayer(l);});_mapMarkers=[];
     setTimeout(()=>{if(installMap)installMap.invalidateSize();},50);
   }
   const statusEl=document.getElementById('map-status');
     if(!installs.length){if(statusEl)statusEl.textContent=mapFilterMode==='order'?'No installs found for that order #.':`No installs with addresses for ${filterLabel}.`;return;}
   if(statusEl)statusEl.textContent=`Mapping ${installs.length} install${installs.length!==1?'s':''} for ${filterLabel}…`;
   const addrGroups={};
-  for(const w of installs){const addr=w.installAddress||w.address;const gk=w.company+'⌿'+addr;if(!addrGroups[gk])addrGroups[gk]={addr,group:[]};addrGroups[gk].group.push(w);}
-      const bounds=[];let placed=0;const unmapped=[];
-  const _pts=[];
-  for(const {addr,group} of Object.values(addrGroups)){
-    let coords=await geocodeAddress(addr);
-    if(!coords){const fb=wins.find(w=>w.company===group[0].company&&w.lat&&w.lng);if(fb)coords={lat:fb.lat,lng:fb.lng};}
-    if(!coords){unmapped.push(group[0].company);continue;}
-    _pts.push({lat:coords.lat,lng:coords.lng,group});
+  for(const w of installs){
+    const _co=companies.find(c=>c.name===w.company);
+    const _isSc=_co&&_co.scattered_site&&!w.use_property_address;
+    const addr=w.installAddress||w.address;
+    const gk=_isSc?('_sc_'+w.id):(w.company+'⌿'+addr);
+    if(!addrGroups[gk])addrGroups[gk]={addr,group:[],scattered:_isSc,homeOfficeAddr:_isSc?(_co.address||null):null,mgmtKey:_isSc?w.company:null};
+    addrGroups[gk].group.push(w);
   }
-  _mapPtsRaw=_pts.map(p=>({lat:p.lat,lng:p.lng,group:p.group}));
+    const bounds=[];let placed=0;const unmapped=[];
+  const _pts=[];
+  for(const {addr,group,scattered,homeOfficeAddr,mgmtKey} of Object.values(addrGroups)){
+    let coords=null;
+    const _fw=group[0];
+    if(_fw.lat&&_fw.lng){coords={lat:_fw.lat,lng:_fw.lng};}
+    if(!coords){coords=await geocodeAddress(addr);}
+    if(!coords){const fb=wins.find(w=>w.company===_fw.company&&w.lat&&w.lng);if(fb)coords={lat:fb.lat,lng:fb.lng};}
+    if(!coords){unmapped.push(_fw.company);continue;}
+    _pts.push({lat:coords.lat,lng:coords.lng,group,scattered:!!scattered,homeOfficeAddr:homeOfficeAddr||null,mgmtKey:mgmtKey||null});
+  }
+  _mapPtsRaw=_pts.map(p=>({lat:p.lat,lng:p.lng,group:p.group,scattered:p.scattered,homeOfficeAddr:p.homeOfficeAddr,mgmtKey:p.mgmtKey}));
   const _r=jitterRadius(installMap.getZoom());
   jitterCoords(_pts,_r);
-  for(const {lat:_lat,lng:_lng,group} of _pts){
+  // pre-build home-office cache for connector lines
+  const _hoCache={};
+  for(const _p of _pts){
+    if(_p.scattered&&_p.homeOfficeAddr&&_p.mgmtKey&&!_hoCache[_p.mgmtKey]){
+      const _hc=await geocodeAddress(_p.homeOfficeAddr);
+      if(_hc)_hoCache[_p.mgmtKey]=_hc;
+    }
+  }
+  for(const {lat:_lat,lng:_lng,group,scattered,mgmtKey} of _pts){
     const coords={lat:_lat,lng:_lng};
+    if(scattered&&mgmtKey&&_hoCache[mgmtKey]){
+      const _ho=_hoCache[mgmtKey];
+      L.polyline([[coords.lat,coords.lng],[_ho.lat,_ho.lng]],{color:'rgba(204,0,255,0.45)',weight:1.5,dashArray:'4 4'}).addTo(installMap);
+    }
     const hasToday=group.some(w=>w.scheduledDate===today);
     const hasFuture=group.some(w=>w.scheduledDate>today);
     const hasPast=group.some(w=>w.scheduledDate<today);
@@ -2282,7 +2598,7 @@ async function renderInstallMap(){
     const sz=hasToday?44:group.length>1?38:32;
     const fz=hasToday?10:9;
     const icon=L.divIcon({
-      html:`<div style="width:${sz}px;height:${sz}px;background:${color};border:2.5px solid rgba(255,255,255,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${fz}px;font-weight:900;color:#000;line-height:1.2;text-align:center;box-shadow:0 0 14px ${glowColor}99;cursor:pointer;white-space:nowrap">${lbl||'●'}</div>`,
+      html:`<div style="width:${sz}px;height:${sz}px;background:${color};border:${scattered?'2.5px dashed rgba(204,0,255,0.85)':'2.5px solid rgba(255,255,255,0.9)'};border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${fz}px;font-weight:900;color:#000;line-height:1.2;text-align:center;box-shadow:0 0 14px ${glowColor}99;cursor:pointer;white-space:nowrap">${lbl||'●'}</div>`,
       iconSize:[sz,sz],iconAnchor:[sz/2,sz/2],className:''
     });
     let pop=`<div style="font-family:Inter,sans-serif;min-width:210px;padding:4px 2px">`;
@@ -2319,7 +2635,8 @@ async function renderInstallMap(){
     }
     pop+=`</div>`;
     const mk=L.marker([coords.lat,coords.lng],{icon});
-    mk._pmInstall=true;mk.bindPopup(pop,{maxWidth:320}).addTo(installMap);_mapMarkers.push(mk);
+    mk._pmInstall=true;mk.addTo(installMap);_mapMarkers.push(mk);
+    mk.on('click',()=>zoomToProperty(group,coords.lat,coords.lng));
     bounds.push([coords.lat,coords.lng]);placed++;
   }
   if(statusEl)statusEl.textContent=placed>0?`${installs.length} install${installs.length!==1?'s':''} at ${placed} location${placed!==1?'s':''} — ${filterLabel}`:'No installs could be mapped — check addresses or add coordinates in Edit Win.';
@@ -2327,6 +2644,627 @@ async function renderInstallMap(){
   if(warnEl){if(unmapped.length){warnEl.style.display='block';warnEl.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Couldn't map: <strong>${[...new Set(unmapped)].join(', ')}</strong> — open Edit Win and add Lat/Lng coordinates for these properties.`;}else{warnEl.style.display='none';}}
     if(!_mapZooming){if(bounds.length===1)installMap.setView(bounds[0],14);else if(bounds.length>1)installMap.fitBounds(bounds,{padding:[40,40]});}
   }
+// ── Companies ──
+function getCompanyPortfolio(name){
+  const n=name.toLowerCase();
+  const won=[...new Set(wins.filter(w=>w.mgmt&&w.mgmt.toLowerCase()===n).map(w=>w.company))];
+  const pipeline=[...new Set(leads.filter(l=>l.mgmt&&l.mgmt.toLowerCase()===n).map(l=>l.company))].filter(p=>!won.map(x=>x.toLowerCase()).includes(p.toLowerCase()));
+  return{won,pipeline};
+}
+function getLastActivity(name){
+  const n=name.toLowerCase();
+  const cw=wins.filter(w=>w.mgmt&&w.mgmt.toLowerCase()===n&&w.wonDate);
+  if(!cw.length)return null;
+  return cw.sort((a,b)=>b.wonDate.localeCompare(a.wonDate))[0].wonDate;
+}
+function renderCompaniesStats(){
+  let tw=0,tp=0;
+  companies.forEach(c=>{const p=getCompanyPortfolio(c.name);tw+=p.won.length;tp+=p.pipeline.length;});
+  document.getElementById('sc-total').textContent=companies.length;
+  document.getElementById('sc-contacts').textContent=company_contacts.length;
+  document.getElementById('sc-won').textContent=tw;
+  document.getElementById('sc-pipeline').textContent=tp;
+  const b=document.getElementById('companies-badge');
+  if(b){b.style.display=companies.length?'inline':'none';b.textContent=companies.length;}
+}
+function renderCompanies(){
+  companies=[...new Map(companies.map(c=>[c.id,c])).values()];
+  renderCompaniesStats();
+  if(activeCompanyId){showCompanyDetail(activeCompanyId);return;}
+  document.getElementById('companies-detail-view').style.display='none';
+  document.getElementById('companies-grid-view').style.display='block';
+  const q=(document.getElementById('companies-search')?.value||'').toLowerCase();
+  const filtered=companies.filter(c=>!c.parent_id&&(!q||c.name.toLowerCase().includes(q)));
+  const grid=document.getElementById('companies-grid');
+  const knownNames=new Set(companies.map(c=>c.name.toLowerCase()));
+  const implied=[...new Set([...leads,...wins].map(x=>x.mgmt).filter(m=>m&&!knownNames.has(m.toLowerCase())))].sort();
+  if(!filtered.length&&!implied.length){
+    grid.innerHTML=`<div style="grid-column:1/-1"><div class="empty"><span class="empty-icon-wrap" style="font-size:52px;display:block;margin-bottom:18px">🏢</span><div class="empty-title">${companies.length?'No matches':'No companies yet'}</div><div class="empty-sub">${companies.length?'Try adjusting your search.':'Hit "Add Company" to start.'}</div></div></div>`;
+    return;
+  }
+  grid.innerHTML=filtered.map(c=>{
+    const pf=getCompanyPortfolio(c.name);
+    const cts=company_contacts.filter(ct=>ct.company_id===c.id);
+    const kids=companies.filter(x=>x.parent_id===c.id);
+    const ld=getLastActivity(c.name);
+    const ls=ld?new Date(ld+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):null;
+    return`<div onclick="openCompanyDetail('${c.id}')" style="background:rgba(8,10,24,0.88);border:1px solid rgba(255,255,255,0.12);border-radius:18px;padding:20px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='rgba(153,0,255,0.5)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:16px;font-weight:900;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.name)}</div>
+          ${c.scattered_site?`<span style="display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:800;letter-spacing:.08em;padding:2px 8px;border-radius:20px;background:rgba(153,0,255,0.15);color:#cc00ff;border:1px solid rgba(153,0,255,0.3);margin-top:3px;text-transform:uppercase">◈ Scattered</span>`:''}
+          ${kids.length?`<div style="font-size:11px;color:var(--purple3);margin-top:2px">${kids.map(k=>`<span onclick="event.stopPropagation();openCompanyDetail('${k.id}')" style="cursor:pointer;font-weight:700;text-decoration:underline">${esc(k.name)}</span>`).join(', ')}</div>`:''}
+        </div>
+        <button onclick="event.stopPropagation();openEditCompany('${c.id}')" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:var(--ink3);font-size:11px;font-weight:700;font-family:inherit;padding:5px 10px;border-radius:7px;cursor:pointer;flex-shrink:0;margin-left:10px">Edit</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:12px">
+        <div style="flex:1;text-align:center;padding:8px 4px;border-radius:9px;background:rgba(0,255,179,0.08);border:1px solid rgba(0,255,179,0.2)"><div style="font-size:20px;font-weight:900;color:var(--green)">${pf.won.length}</div><div style="font-size:9px;font-weight:800;color:var(--green);opacity:.7;text-transform:uppercase;letter-spacing:.08em">Won</div></div>
+        <div style="flex:1;text-align:center;padding:8px 4px;border-radius:9px;background:rgba(255,0,136,0.08);border:1px solid rgba(255,0,136,0.2)"><div style="font-size:20px;font-weight:900;color:var(--pink)">${pf.pipeline.length}</div><div style="font-size:9px;font-weight:800;color:var(--pink);opacity:.7;text-transform:uppercase;letter-spacing:.08em">Pipeline</div></div>
+        <div style="flex:1;text-align:center;padding:8px 4px;border-radius:9px;background:rgba(0,180,255,0.08);border:1px solid rgba(0,180,255,0.2)"><div style="font-size:20px;font-weight:900;color:var(--cyan)">${cts.length}</div><div style="font-size:9px;font-weight:800;color:var(--cyan);opacity:.7;text-transform:uppercase;letter-spacing:.08em">PMs</div></div>
+      </div>
+      ${pf.won.length?`<div style="margin-bottom:8px"><div style="font-size:9px;font-weight:800;letter-spacing:.1em;color:var(--green);text-transform:uppercase;margin-bottom:4px">Won Properties</div>${pf.won.slice(0,4).map(co=>`<div style="font-size:12px;color:var(--ink2);padding:2px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">🟢 ${esc(co)}</div>`).join('')}${pf.won.length>4?`<div style="font-size:11px;color:var(--ink4)">+${pf.won.length-4} more</div>`:''}</div>`:''}
+      ${pf.pipeline.length?`<div style="margin-bottom:8px"><div style="font-size:9px;font-weight:800;letter-spacing:.1em;color:var(--pink);text-transform:uppercase;margin-bottom:4px">Pipeline</div>${pf.pipeline.slice(0,3).map(co=>`<div style="font-size:12px;color:var(--ink2);padding:2px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">◎ ${esc(co)}</div>`).join('')}${pf.pipeline.length>3?`<div style="font-size:11px;color:var(--ink4)">+${pf.pipeline.length-3} more</div>`:''}</div>`:''}
+      ${!pf.won.length&&!pf.pipeline.length?`<div style="font-size:12px;color:var(--ink4);margin-bottom:8px;font-style:italic">No properties linked yet — set this company's name in the Management Company field on your wins/leads.</div>`:''}
+      ${cts.length?`<div style="display:flex;gap:5px;flex-wrap:wrap;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06);margin-bottom:8px">${cts.slice(0,2).map(ct=>`<span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:rgba(153,0,255,0.12);color:var(--purple3);border:1px solid rgba(153,0,255,0.25)">${esc(ct.name)}${ct.title?' · '+esc(ct.title):''}</span>`).join('')}${cts.length>2?`<span style="font-size:11px;color:var(--ink4);padding:3px 6px">+${cts.length-2} more</span>`:''}</div>`:''}
+      <div style="font-size:11px;color:var(--ink4);border-top:1px solid rgba(255,255,255,0.06);padding-top:8px">${ls?`Last order: <span style="color:var(--green);font-weight:700">${ls}</span>`:'No orders yet'}</div>
+    </div>`;
+  }).join('')+(implied.length?`<div style="grid-column:1/-1;margin-top:4px"><div style="font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--ink4);text-transform:uppercase;margin-bottom:10px">From your leads/wins — not yet added as companies</div><div style="display:flex;flex-wrap:wrap;gap:8px">${implied.map(m=>`<button onclick="quickAddCompany('${m.replace(/'/g,"\\'")}')" style="font-size:12px;font-weight:700;font-family:inherit;padding:7px 14px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.2);color:var(--ink3);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(153,0,255,0.5)';this.style.color='var(--purple3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='var(--ink3)'">+ ${esc(m)}</button>`).join('')}</div></div>`:'');
+}
+function openCompanyDetail(id){activeCompanyId=id;renderCompanies();}
+function populateContactReportsTo(excludeId=null){
+  const sel=document.getElementById('ct-reports-to');
+  if(!sel)return;
+  const opts=company_contacts.filter(c=>c.company_id===contactForCompanyId&&c.id!==excludeId);
+  sel.innerHTML='<option value="">— None —</option>'+opts.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+}
+function openAddContactFromRecord(cid,name,phone,email){
+  contactForCompanyId=cid;
+  editContactId=null;
+  document.getElementById('contact-modal').classList.add('open');
+  document.getElementById('ct-name').value=name||'';
+  document.getElementById('ct-title').value='';
+  document.getElementById('ct-phone').value=phone||'';
+  document.getElementById('ct-email').value=email||'';
+  document.getElementById('ct-reports-to').value='';
+  document.getElementById('ct-prev').value='';
+  document.getElementById('ct-notes').value='';
+  populateContactReportsTo();
+}
+function showFamilyTree(fromId){
+  // Walk up to root (no DB calls — pure memory)
+  let node=companies.find(c=>c.id===fromId);
+  const visited=new Set();
+  while(node&&node.parent_id&&!visited.has(node.id)){
+    visited.add(node.id);
+    const par=companies.find(c=>c.id===node.parent_id);
+    if(!par)break;
+    node=par;
+  }
+  const root=node||companies.find(c=>c.id===fromId);
+  if(!root)return;
+
+  // Single O(n) pass — build mgmt+contact → [property names] map
+  const cpMap=new Map();
+  [...leads,...wins].forEach(r=>{
+    if(!r.mgmt||!r.contact||!r.company)return;
+    const k=r.mgmt.toLowerCase()+'||'+r.contact.toLowerCase().trim();
+    if(!cpMap.has(k))cpMap.set(k,[]);
+    if(!cpMap.get(k).includes(r.company))cpMap.get(k).push(r.company);
+  });
+
+  function renderPerson(ct,companyName){
+    const props=cpMap.get(companyName.toLowerCase()+'||'+ct.name.toLowerCase().trim())||[];
+    return '<div style="margin:5px 0 5px 20px;display:flex;gap:8px;align-items:flex-start">'+
+      '<div style="width:1px;min-height:24px;background:rgba(0,180,255,0.25);flex-shrink:0;margin-top:8px"></div>'+
+      '<div style="padding:8px 12px;border-radius:9px;background:rgba(0,180,255,0.06);border:1px solid rgba(0,180,255,0.18);flex:1">'+
+        '<span style="font-weight:700;color:var(--ink);font-size:13px">'+esc(ct.name)+'</span>'+
+        (ct.title?'<span style="font-size:11px;color:var(--ink3);margin-left:8px">'+esc(ct.title)+'</span>':'')+
+        (props.length?'<div style="font-size:11px;color:var(--cyan);margin-top:3px">'+props.join(' · ')+'</div>':'')+
+      '</div>'+
+    '</div>';
+  }
+
+  function renderCompany(co,depth){
+    if(depth>12)return '';
+    const isHere=co.id===fromId;
+    const cts=company_contacts.filter(c=>c.company_id===co.id);
+    const kids=companies.filter(c=>c.parent_id===co.id);
+    return '<div style="margin-left:'+(depth*28)+'px;margin-bottom:10px">'+
+      '<div onclick="openCompanyDetail(\''+co.id+'\')" style="display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:11px;background:'+(isHere?'rgba(153,0,255,0.2)':'rgba(153,0,255,0.07)')+';border:1px solid '+(isHere?'var(--purple)':'rgba(153,0,255,0.2)')+';cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity=\'.7\'" onmouseout="this.style.opacity=\'1\'">'+
+        '<span>🏢</span>'+
+        '<span style="font-weight:800;color:var(--ink);font-size:14px">'+esc(co.name)+'</span>'+
+        (isHere?'<span style="font-size:10px;padding:2px 8px;border-radius:20px;background:var(--purple);color:#fff;font-weight:800">YOU ARE HERE</span>':'')+
+      '</div>'+
+      cts.map(ct=>renderPerson(ct,co.name)).join('')+
+      kids.map(k=>renderCompany(k,depth+1)).join('')+
+    '</div>';
+  }
+
+  const c=companies.find(x=>x.id===fromId);
+  const dv=document.getElementById('companies-detail-view');
+  document.getElementById('companies-grid-view').style.display='none';
+  dv.style.display='block';
+  dv.innerHTML=
+    '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px">'+
+      '<button onclick="openCompanyDetail(\''+fromId+'\')" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;font-family:inherit;padding:8px 14px;border-radius:9px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:var(--ink3);cursor:pointer">← '+esc(c?c.name:'Company')+'</button>'+
+      '<div style="font-size:22px;font-weight:900;color:var(--ink);flex:1">Family Tree</div>'+
+    '</div>'+
+    '<div style="font-size:12px;color:var(--ink4);margin-bottom:20px">Click any company to view its detail. Rooted at top of hierarchy.</div>'+
+    renderCompany(root,0);
+}
+function closeCompanyDetail(){activeCompanyId=null;renderCompanies();}
+function showCompanyDetail(id){
+  const c=companies.find(x=>x.id===id);if(!c)return;
+  document.getElementById('companies-grid-view').style.display='none';
+  const dv=document.getElementById('companies-detail-view');dv.style.display='block';
+  const pf=getCompanyPortfolio(c.name);
+  const cts=company_contacts.filter(ct=>ct.company_id===id);
+  const par=c.parent_id?companies.find(x=>x.id===c.parent_id):null;
+  const kids=companies.filter(x=>x.parent_id===id);
+  const ld=getLastActivity(c.name);
+  const ls=ld?new Date(ld+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):null;
+    const _pmRecs=[...leads,...wins].filter(r=>r.mgmt&&r.mgmt.toLowerCase()===c.name.toLowerCase()&&r.contact&&r.contact.trim());
+  const _pmMap=new Map();
+  _pmRecs.forEach(r=>{const k=r.contact.toLowerCase().trim();if(!_pmMap.has(k))_pmMap.set(k,{name:r.contact,phone:r.phone||'',email:r.email||'',props:[]});const prop=r.company||'';if(prop&&!_pmMap.get(k).props.includes(prop))_pmMap.get(k).props.push(prop);});
+  const pmList=[..._pmMap.values()];
+  window._coPMs=pmList;
+  dv.innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px">
+      <button onclick="closeCompanyDetail()" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;font-family:inherit;padding:8px 14px;border-radius:9px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:var(--ink3);cursor:pointer">← All Companies</button>
+      <div style="font-size:22px;font-weight:900;color:var(--ink);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.name)}</div>
+      <button onclick="showFamilyTree('${id}')" style="font-size:12px;font-weight:700;font-family:inherit;padding:8px 14px;border-radius:9px;background:linear-gradient(135deg,var(--purple),var(--purple2));border:none;color:#fff;cursor:pointer;box-shadow:0 0 12px rgba(153,0,255,0.3)">🌳 Family Tree</button>
+      <button onclick="openEditCompany('${id}')" style="font-size:12px;font-weight:700;font-family:inherit;padding:8px 14px;border-radius:9px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:var(--ink3);cursor:pointer">Edit</button>
+      <button onclick="deleteCompany('${id}')" style="font-size:12px;font-weight:700;font-family:inherit;padding:8px 14px;border-radius:9px;background:rgba(255,68,102,0.1);border:1px solid rgba(255,68,102,0.3);color:var(--pink);cursor:pointer">Delete</button>
+    </div>
+    ${par||kids.length||c.notes?`<div style="background:rgba(153,0,255,0.06);border:1px solid rgba(153,0,255,0.25);border-radius:14px;padding:16px 20px;margin-bottom:20px">${par?`<div style="font-size:12px;color:var(--purple3);margin-bottom:6px">↑ Part of <strong style="cursor:pointer;text-decoration:underline" onclick="openCompanyDetail('${par.id}')">${esc(par.name)}</strong></div>`:''} ${kids.length?`<div style="font-size:12px;color:var(--ink3);margin-bottom:${c.notes?6:0}px">Subsidiaries: ${kids.map(k=>`<span onclick="openCompanyDetail('${k.id}')" style="cursor:pointer;color:var(--purple3);font-weight:700">${esc(k.name)}</span>`).join(', ')}</div>`:''} ${c.notes?`<div style="font-size:13px;color:var(--ink2);line-height:1.6;white-space:pre-wrap">${esc(c.notes)}</div>`:''}</div>`:''}
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
+      <div style="padding:16px;border-radius:12px;background:rgba(0,255,179,0.08);border:1px solid rgba(0,255,179,0.2);text-align:center"><div style="font-size:36px;font-weight:900;color:var(--green)">${pf.won.length}</div><div style="font-size:10px;font-weight:800;color:var(--green);opacity:.7;text-transform:uppercase;letter-spacing:.1em;margin-top:4px">Won</div></div>
+      <div style="padding:16px;border-radius:12px;background:rgba(255,0,136,0.08);border:1px solid rgba(255,0,136,0.2);text-align:center"><div style="font-size:36px;font-weight:900;color:var(--pink)">${pf.pipeline.length}</div><div style="font-size:10px;font-weight:800;color:var(--pink);opacity:.7;text-transform:uppercase;letter-spacing:.1em;margin-top:4px">Pipeline</div></div>
+      <div style="padding:16px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);text-align:center"><div style="font-size:14px;font-weight:800;color:var(--ink);padding-top:8px">${ls||'—'}</div><div style="font-size:10px;font-weight:800;color:var(--ink4);text-transform:uppercase;letter-spacing:.1em;margin-top:4px">Last Order</div></div>
+    </div>
+    <div style="margin-bottom:28px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-size:12px;font-weight:800;letter-spacing:.1em;color:var(--purple3);text-transform:uppercase">Org Chart</div>
+        <button onclick="openAddContact('${id}')" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;font-family:inherit;padding:8px 14px;border-radius:9px;background:linear-gradient(135deg,var(--pink),var(--purple));border:none;color:#fff;cursor:pointer;box-shadow:0 0 20px rgba(255,0,110,0.3)">+ Add Person</button>
+      </div>
+      ${cts.length?renderOrgChart(cts,id):`<div style="text-align:center;padding:32px;border:1px dashed rgba(153,0,255,0.25);border-radius:14px;color:var(--ink4);font-size:13px">No contacts yet.<br><br><button onclick="openAddContact('${id}')" style="margin-top:8px;font-size:13px;font-weight:700;font-family:inherit;padding:10px 20px;border-radius:9px;background:linear-gradient(135deg,var(--pink),var(--purple));border:none;color:#fff;cursor:pointer">+ Add First Person</button></div>`}
+    </div>
+    <div>
+      <div style="font-size:12px;font-weight:800;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:14px">Portfolio</div>
+      ${pf.won.length?`<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--green);text-transform:uppercase;margin-bottom:8px">Won (${pf.won.length})</div>${pf.won.map(co=>`<div onclick="setSection('wins')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;background:rgba(0,255,179,0.06);border:1px solid rgba(0,255,179,0.2);margin-bottom:6px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(0,255,179,0.1)'" onmouseout="this.style.background='rgba(0,255,179,0.06)'"><span style="flex:1;font-size:13px;font-weight:700;color:var(--ink)">${esc(co)}</span><span class="win-badge" style="font-size:10px">🏆 Won</span></div>`).join('')}</div>`:''}
+      ${pf.pipeline.length?`<div><div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--pink);text-transform:uppercase;margin-bottom:8px">In Pipeline (${pf.pipeline.length})</div>${pf.pipeline.map(co=>`<div onclick="setSection('leads')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;background:rgba(255,0,136,0.06);border:1px solid rgba(255,0,136,0.2);margin-bottom:6px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(255,0,136,0.1)'" onmouseout="this.style.background='rgba(255,0,136,0.06)'"><span style="flex:1;font-size:13px;font-weight:700;color:var(--ink)">${esc(co)}</span><span style="font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px;background:rgba(255,0,136,0.15);color:var(--pink)">Pipeline</span></div>`).join('')}</div>`:''}
+      ${!pf.won.length&&!pf.pipeline.length?`<div style="color:var(--ink4);font-size:13px;padding:16px;border:1px dashed rgba(255,255,255,0.1);border-radius:10px">No properties linked yet. Add this company's name to the "Management Company" field on leads and wins to see them here.</div>`:''}
+    </div>
+    ${pmList.length?`<div style="margin-top:28px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="font-size:12px;font-weight:800;letter-spacing:.1em;color:var(--cyan);text-transform:uppercase">Property Contacts from Records</div>
+        <span style="font-size:11px;color:var(--ink4)">${pmList.length} PM${pmList.length!==1?'s':''}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px">
+        ${pmList.map((pm,i)=>`<div style="background:rgba(0,180,255,0.06);border:1px solid rgba(0,180,255,0.18);border-radius:10px;padding:14px">
+          <div style="font-weight:700;color:var(--ink);margin-bottom:5px">${esc(pm.name)}</div>
+          ${pm.phone?`<div style="font-size:12px;color:var(--ink3);margin-bottom:3px">📞 ${esc(pm.phone)}</div>`:''}
+          ${pm.email?`<div style="font-size:12px;color:var(--ink3);margin-bottom:6px">✉️ ${esc(pm.email)}</div>`:''}
+          <div style="font-size:11px;color:var(--cyan);opacity:.65;margin-bottom:10px">${pm.props.slice(0,3).map(p=>esc(p)).join(' · ')}${pm.props.length>3?' +more':''}</div>
+          <button onclick="openAddContactFromRecord('${id}',window._coPMs[${i}].name,window._coPMs[${i}].phone,window._coPMs[${i}].email)" style="font-size:11px;font-weight:700;font-family:inherit;padding:5px 12px;border-radius:7px;background:rgba(153,0,255,0.25);border:1px solid var(--purple);color:var(--purple2);cursor:pointer;width:100%">+ Add to Org Chart</button>
+        </div>`).join('')}
+      </div>
+    </div>`:''}`;
+}
+function renderOrgChart(contacts,companyId){
+  const ids=new Set(contacts.map(c=>c.id));
+  const roots=contacts.filter(c=>!c.reports_to||!ids.has(c.reports_to));
+  function node(ct,depth){
+    const kids=contacts.filter(c=>c.reports_to===ct.id);
+    return`<div style="margin-left:${depth*32}px;position:relative;margin-bottom:10px">
+      ${depth>0?`<div style="position:absolute;left:-18px;top:22px;width:16px;height:1px;background:rgba(153,0,255,0.25)"></div><div style="position:absolute;left:-18px;top:0;bottom:50%;width:1px;background:rgba(153,0,255,0.15)"></div>`:''}
+      <div style="background:rgba(153,0,255,0.08);border:1px solid rgba(153,0,255,${depth===0?'0.45':'0.22'});border-radius:13px;padding:14px 16px;display:flex;align-items:center;gap:12px">
+        <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,rgba(153,0,255,0.4),rgba(255,0,136,0.2));display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;color:var(--purple3);flex-shrink:0">${esc(ct.name.charAt(0).toUpperCase())}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:800;color:var(--ink)">${esc(ct.name)}</div>
+          ${ct.title?`<div style="font-size:12px;color:var(--purple3);font-weight:600;margin-top:1px">${esc(ct.title)}</div>`:''}
+          <div style="display:flex;gap:12px;margin-top:5px;flex-wrap:wrap">
+            ${ct.phone?`<a href="tel:${ct.phone.replace(/\D/g,'')}" onclick="event.stopPropagation()" style="font-size:11px;color:var(--cyan);text-decoration:none;font-weight:600">${esc(ct.phone)}</a>`:''}
+            ${ct.email?`<a href="mailto:${ct.email}" onclick="event.stopPropagation()" style="font-size:11px;color:var(--cyan);text-decoration:none;font-weight:600">${esc(ct.email)}</a>`:''}
+          </div>
+          ${ct.previous_employers?`<div style="font-size:10px;color:var(--ink4);margin-top:3px">Previously: ${esc(ct.previous_employers)}</div>`:''}
+          ${ct.notes?`<div style="font-size:11px;color:var(--ink3);margin-top:3px;line-height:1.5">${esc(ct.notes)}</div>`:''}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
+          <button onclick="openAddContact('${companyId}','${ct.id}')" style="background:rgba(0,255,179,0.1);border:1px solid rgba(0,255,179,0.25);color:var(--green);font-size:10px;font-weight:700;font-family:inherit;padding:5px 9px;border-radius:7px;cursor:pointer" title="Add direct report">+</button>
+          <button onclick="openEditContact('${ct.id}')" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:var(--ink3);font-size:10px;font-weight:700;font-family:inherit;padding:5px 9px;border-radius:7px;cursor:pointer">Edit</button>
+          <button onclick="deleteContact('${ct.id}')" style="background:rgba(255,68,102,0.08);border:1px solid rgba(255,68,102,0.2);color:var(--pink);font-size:10px;font-weight:700;font-family:inherit;padding:5px 9px;border-radius:7px;cursor:pointer">✕</button>
+        </div>
+      </div>
+      ${kids.map(k=>node(k,depth+1)).join('')}
+    </div>`;
+  }
+  return roots.map(r=>node(r,0)).join('');
+}
+// ── Companies CRUD ──
+function openAddCompany(){
+  editCompanyId=null;
+  document.getElementById('company-modal-title').textContent='Add Company';
+  document.getElementById('cm-name').value='';
+  document.getElementById('cm-notes').value='';
+  document.getElementById('cm-address').value='';
+  document.getElementById('cm-scattered').checked=false;
+  document.getElementById('cm-parent').innerHTML='<option value="">— None (top level) —</option>'+companies.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  document.getElementById('company-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('cm-name').focus(),60);
+}
+function openEditCompany(id){
+  const c=companies.find(x=>x.id===id);if(!c)return;
+  editCompanyId=id;
+  document.getElementById('company-modal-title').textContent='Edit Company';
+  document.getElementById('cm-name').value=c.name;
+  document.getElementById('cm-notes').value=c.notes||'';
+  document.getElementById('cm-parent').innerHTML='<option value="">— None (top level) —</option>'+companies.filter(x=>x.id!==id).map(x=>`<option value="${x.id}"${x.id===c.parent_id?' selected':''}>${esc(x.name)}</option>`).join('');
+  document.getElementById('company-modal').classList.add('open');
+}
+async function saveCompany(){
+  if(isSaving)return;
+  const name=document.getElementById('cm-name').value.trim();if(!name)return;
+  const obj={id:editCompanyId||crypto.randomUUID(),name,parent_id:document.getElementById('cm-parent').value||null,notes:document.getElementById('cm-notes').value.trim(),address:document.getElementById('cm-address').value.trim()||null,scattered_site:document.getElementById('cm-scattered').checked};
+  if(editCompanyId){const i=companies.findIndex(x=>x.id===editCompanyId);if(i>-1)companies[i]=obj;}else companies.push(obj);
+  closeModal('company-modal');renderCompanies();
+  isSaving=true;await saveCompany_db(obj);isSaving=false;
+  companies=[...new Map(companies.map(c=>[c.id,c])).values()];renderCompanies();
+}
+async function deleteCompany(id){
+  const c=companies.find(x=>x.id===id);if(!c)return;
+  if(!confirm(`Delete "${c.name}" and all its contacts?`))return;
+  companies=companies.filter(x=>x.id!==id);
+  company_contacts=company_contacts.filter(x=>x.company_id!==id);
+  activeCompanyId=null;renderCompanies();
+  isSaving=true;await deleteCompany_db(id);isSaving=false;
+}
+async function quickAddCompany(name){
+  if(companies.find(c=>c.name.toLowerCase()===name.toLowerCase()))return;
+  const obj={id:crypto.randomUUID(),name,parent_id:null,notes:''};
+  companies.push(obj);renderCompanies();
+  isSaving=true;await saveCompany_db(obj);isSaving=false;
+}
+function openAddContact(companyId,reportsTo){
+  editContactId=null;contactForCompanyId=companyId;
+  document.getElementById('contact-modal-title').textContent='Add Person';
+  ['ct-name','ct-title','ct-phone','ct-email','ct-prev','ct-notes'].forEach(i=>document.getElementById(i).value='');
+  const cts=company_contacts.filter(c=>c.company_id===companyId);
+  document.getElementById('ct-reports-to').innerHTML='<option value="">— Top level (no manager) —</option>'+cts.map(c=>`<option value="${c.id}"${c.id===reportsTo?' selected':''}>${esc(c.name)}${c.title?' — '+esc(c.title):''}</option>`).join('');
+  document.getElementById('contact-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('ct-name').focus(),60);
+}
+function openEditContact(id){
+  const ct=company_contacts.find(x=>x.id===id);if(!ct)return;
+  editContactId=id;contactForCompanyId=ct.company_id;
+  document.getElementById('contact-modal-title').textContent='Edit Person';
+  document.getElementById('ct-name').value=ct.name||'';
+  document.getElementById('ct-title').value=ct.title||'';
+  document.getElementById('ct-phone').value=ct.phone||'';
+  document.getElementById('ct-email').value=ct.email||'';
+  document.getElementById('ct-prev').value=ct.previous_employers||'';
+  document.getElementById('ct-notes').value=ct.notes||'';
+  const cts=company_contacts.filter(c=>c.company_id===ct.company_id&&c.id!==id);
+  document.getElementById('ct-reports-to').innerHTML='<option value="">— Top level (no manager) —</option>'+cts.map(c=>`<option value="${c.id}"${c.id===ct.reports_to?' selected':''}>${esc(c.name)}${c.title?' — '+esc(c.title):''}</option>`).join('');
+  document.getElementById('contact-modal').classList.add('open');
+}
+async function saveContact(){
+  const name=document.getElementById('ct-name').value.trim();if(!name)return;
+  const obj={id:editContactId||crypto.randomUUID(),company_id:contactForCompanyId,name,title:document.getElementById('ct-title').value.trim(),phone:formatPhone(document.getElementById('ct-phone').value.trim()),email:document.getElementById('ct-email').value.trim(),reports_to:document.getElementById('ct-reports-to').value||null,previous_employers:document.getElementById('ct-prev').value.trim(),notes:document.getElementById('ct-notes').value.trim()};
+  if(editContactId){const i=company_contacts.findIndex(x=>x.id===editContactId);if(i>-1)company_contacts[i]=obj;}else company_contacts.push(obj);
+  closeModal('contact-modal');
+  if(activeCompanyId)showCompanyDetail(activeCompanyId);
+  isSaving=true;await saveContact_db(obj);isSaving=false;
+}
+async function deleteContact(id){
+  const ct=company_contacts.find(x=>x.id===id);if(!ct)return;
+  if(!confirm(`Remove "${ct.name}"?`))return;
+  company_contacts.forEach(c=>{if(c.reports_to===id)c.reports_to=null;});
+  company_contacts=company_contacts.filter(x=>x.id!==id);
+  if(activeCompanyId)showCompanyDetail(activeCompanyId);
+  isSaving=true;await deleteContact_db(id);isSaving=false;
+}
+// ── TREE (ORG CHART) ──────────────────────────────────────
+const ROLE_ORDER=['National Lead','Regional Manager','PM','Maintenance','Contact'];
+function getRoleColor(role){
+  return{'National Lead':'#FF0088','Regional Manager':'#CC00FF','PM':'#00B4FF','Maintenance':'#00FFB3','Contact':'#888888'}[role]||'#888888';
+}
+
+function renderTreeStats(){
+  const active=people_assignments.filter(a=>a.active);
+  const coIds=new Set(active.map(a=>a.company_id).filter(Boolean));
+  const pms=active.filter(a=>a.role==='PM').length;
+  const linked=active.filter(a=>a.reports_to).length;
+  const t=document.getElementById('st-total');if(t)t.textContent=people.length;
+  const c=document.getElementById('st-companies');if(c)c.textContent=coIds.size;
+  const p=document.getElementById('st-pms');if(p)p.textContent=pms;
+  const l=document.getElementById('st-linked');if(l)l.textContent=linked;
+  const badge=document.getElementById('tree-badge');
+  if(badge) badge.textContent=people.length||'';
+}
+
+function renderPersonNode(personId,companyId,depth,renderedIds){
+  if(renderedIds.has(personId)) return '';
+  renderedIds.add(personId);
+  const p=people.find(x=>x.id===personId);
+  const a=people_assignments.find(x=>x.person_id===personId&&x.company_id===companyId&&x.active);
+  if(!p||!a) return '';
+  const directReports=people_assignments.filter(x=>x.reports_to===personId&&x.company_id===companyId&&x.active);
+  const roleColor=getRoleColor(a.role);
+  const initials=p.name.split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2);
+  const childrenHTML=directReports.map(child=>renderPersonNode(child.person_id,companyId,depth+1,renderedIds)).join('');
+  const pName=p.name.toLowerCase().trim();
+  const wonSet=new Set(wins.filter(w=>w.contact&&w.contact.toLowerCase().trim()===pName).map(w=>w.company));
+  const pipeArr=leads.filter(l=>l.contact&&l.contact.toLowerCase().trim()===pName&&!wonSet.has(l.company)).map(l=>l.company);
+  const propsHTML=(wonSet.size||pipeArr.length)?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:7px;">${[...wonSet].map(co=>`<span style="font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;background:rgba(0,255,179,0.1);color:var(--green);border:1px solid rgba(0,255,179,0.25);">🟢 ${esc(co)}</span>`).join('')}${pipeArr.map(co=>`<span style="font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;background:rgba(255,0,136,0.08);color:var(--pink);border:1px solid rgba(255,0,136,0.2);">◎ ${esc(co)}</span>`).join('')}</div>`:'';
+  return `<div style="padding-left:${depth*28}px;margin-bottom:6px;">
+    <div style="display:flex;align-items:flex-start;gap:8px;padding:8px 12px;background:rgba(8,10,26,0.88);border-left:3px solid ${roleColor};border-radius:0 8px 8px 0;">
+      <div style="width:34px;height:34px;border-radius:50%;background:${roleColor}22;border:2px solid ${roleColor};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:${roleColor};flex-shrink:0;margin-top:2px;">${initials}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;">${esc(p.name)}</div>
+        <div style="font-size:11px;color:${roleColor};margin-top:1px;">${esc(a.role)}${a.property_name?' — '+esc(a.property_name):''}</div>
+        ${p.phone||p.email?`<div style="font-size:11px;color:#555;margin-top:1px;">${[p.phone,p.email].filter(Boolean).map(v=>esc(v)).join(' · ')}</div>`:''}
+        ${propsHTML}
+      </div>
+      <div style="display:flex;gap:4px;flex-shrink:0;margin-top:2px;">
+        <button onclick="openEditPerson('${p.id}')" style="padding:3px 8px;border-radius:5px;background:rgba(204,0,255,0.1);color:#CC00FF;border:1px solid #CC00FF;cursor:pointer;font-size:11px;font-family:inherit;">Edit</button>
+        <button onclick="deletePerson('${p.id}')" style="padding:3px 8px;border-radius:5px;background:rgba(255,0,136,0.1);color:#FF0088;border:1px solid #FF0088;cursor:pointer;font-size:11px;font-family:inherit;">✕</button>
+      </div>
+    </div>
+    ${childrenHTML}
+  </div>`;
+}
+
+function renderTree(){
+  renderTreeStats();
+  const container=document.getElementById('tree-container');
+  if(!container) return;
+  if(activeTreeCompanyId){renderTreeZoom(activeTreeCompanyId);return;}
+  const q=(document.getElementById('tree-search')||{}).value?.toLowerCase()||'';
+  const activeA=people_assignments.filter(a=>a.active);
+  const coIds=[...new Set(activeA.map(a=>a.company_id).filter(Boolean))];
+  const matchesPerson=p=>!q||p.name.toLowerCase().includes(q)||(p.email||'').toLowerCase().includes(q)||(p.phone||'').includes(q);
+  const sortedCoIds=coIds.slice().sort((a,b)=>{
+    const ca=companies.find(c=>c.id===a);const cb=companies.find(c=>c.id===b);
+    return(ca?.name||'').localeCompare(cb?.name||'');
+  });
+  let html='';
+  sortedCoIds.forEach(companyId=>{
+    const co=companies.find(c=>c.id===companyId);if(!co)return;
+    const compA=activeA.filter(a=>a.company_id===companyId);
+    const compPeople=compA.map(a=>people.find(p=>p.id===a.person_id)).filter(Boolean);
+    if(q&&!compPeople.some(matchesPerson)&&!co.name.toLowerCase().includes(q))return;
+    const compPersonIds=new Set(compA.map(a=>a.person_id));
+    const roots=compA.filter(a=>!a.reports_to||!compPersonIds.has(a.reports_to));
+    roots.sort((a,b)=>ROLE_ORDER.indexOf(a.role)-ROLE_ORDER.indexOf(b.role));
+    const renderedIds=new Set();
+    const nodesHTML=roots.map(a=>renderPersonNode(a.person_id,companyId,0,renderedIds)).join('');
+    const orphans=compA.filter(a=>!renderedIds.has(a.person_id));
+    const orphansHTML=orphans.length?`<div style="margin-top:8px;padding:8px 12px;font-size:12px;color:#555;border:1px dashed #333;border-radius:8px;">⚠ Unlinked: ${orphans.map(a=>{const p=people.find(x=>x.id===a.person_id);return`<span style="cursor:pointer;color:#aaa;" onclick="openEditPerson('${a.person_id}')">${p?esc(p.name):'?'}</span>`;}).join(', ')}</div>`:'';
+    html+=`<div style="background:rgba(8,10,24,0.88);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="cursor:pointer;" onclick="zoomToTreeCompany('${companyId}')">
+          <div style="font-size:16px;font-weight:800;color:#CC00FF;">${esc(co.name)} <span style="font-size:11px;opacity:.45;">↗ zoom</span></div>
+          <div style="font-size:12px;color:#555;margin-top:2px;">${compPeople.length} ${compPeople.length===1?'person':'people'}</div>
+        </div>
+        <button onclick="event.stopPropagation();openAddPersonForCompany('${companyId}')" style="padding:6px 14px;border-radius:8px;background:linear-gradient(135deg,#CC00FF,#9900EE);color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;">+ Add</button>
+      </div>
+      ${nodesHTML||'<div style="color:#555;font-size:13px;padding:8px 0;">No people yet.</div>'}
+      ${orphansHTML}
+    </div>`;
+  });
+  const noCoA=activeA.filter(a=>!a.company_id);
+  if(noCoA.length){
+    const renderedIds=new Set();
+    const ncHTML=noCoA.map(a=>renderPersonNode(a.person_id,null,0,renderedIds)).join('');
+    html+=`<div style="background:rgba(8,10,26,0.88);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px;margin-bottom:16px;"><div style="font-size:15px;font-weight:700;color:#555;margin-bottom:12px;">No Company Assigned</div>${ncHTML}</div>`;
+  }
+  if(!html) html='<div style="color:#555;text-align:center;padding:48px;">No people yet — click "+ Add Person" to get started.</div>';
+  container.innerHTML=html;
+}
+
+function populateCompanySelect(selectId,selectedId){
+  const sel=document.getElementById(selectId);if(!sel)return;
+  const opts=companies.filter(c=>!c.parent_id).sort((a,b)=>a.name.localeCompare(b.name));
+  sel.innerHTML='<option value="">— None —</option>'+opts.map(c=>`<option value="${c.id}"${c.id===selectedId?' selected':''}>${esc(c.name)}</option>`).join('');
+}
+
+function populateReportsToSelect(companyId,sel,selectedId){
+  if(!sel)return;
+  sel.innerHTML='<option value="">— None / Link Later —</option>';
+  if(!companyId)return;
+  const compA=people_assignments.filter(a=>a.company_id===companyId&&a.active);
+  const compPeople=compA.map(a=>people.find(p=>p.id===a.person_id)).filter(p=>p&&p.id!==editPersonId);
+  compPeople.sort((a,b)=>a.name.localeCompare(b.name));
+  compPeople.forEach(p=>{
+    const role=compA.find(a=>a.person_id===p.id)?.role||'';
+    const opt=document.createElement('option');
+    opt.value=p.id;opt.textContent=`${p.name}${role?' ('+role+')':''}`;
+    if(p.id===selectedId)opt.selected=true;
+    sel.appendChild(opt);
+  });
+}
+
+function openAddPerson(){
+  editPersonId=null;
+  document.getElementById('person-modal-title').textContent='Add Person';
+  document.getElementById('pm-name').value='';document.getElementById('pm-phone').value='';
+  document.getElementById('pm-email').value='';document.getElementById('pm-notes').value='';
+  document.getElementById('pm-role').value='PM';
+  populateCompanySelect('pm-company',null);
+  populateReportsToSelect('',document.getElementById('pm-reports-to'),null);
+  document.getElementById('person-modal').classList.add('open');
+}
+
+function openAddPersonForCompany(companyId){
+  editPersonId=null;
+  document.getElementById('person-modal-title').textContent='Add Person';
+  document.getElementById('pm-name').value='';document.getElementById('pm-phone').value='';
+  document.getElementById('pm-email').value='';document.getElementById('pm-notes').value='';
+  document.getElementById('pm-role').value='PM';
+  populateCompanySelect('pm-company',companyId);
+  populateReportsToSelect(companyId,document.getElementById('pm-reports-to'),null);
+  document.getElementById('person-modal').classList.add('open');
+}
+
+function openEditPerson(id){
+  const p=people.find(x=>x.id===id);if(!p)return;
+  editPersonId=id;
+  document.getElementById('person-modal-title').textContent='Edit Person';
+  document.getElementById('pm-name').value=p.name;document.getElementById('pm-phone').value=p.phone||'';
+  document.getElementById('pm-email').value=p.email||'';document.getElementById('pm-notes').value=p.notes||'';
+  const active=people_assignments.find(a=>a.person_id===id&&a.active);
+  populateCompanySelect('pm-company',active?.company_id||null);
+  document.getElementById('pm-role').value=active?.role||'PM';
+  populateReportsToSelect(active?.company_id||'',document.getElementById('pm-reports-to'),active?.reports_to||null);
+  document.getElementById('person-modal').classList.add('open');
+}
+
+async function savePerson(){
+  if(isSaving)return;
+  const name=document.getElementById('pm-name').value.trim();
+  if(!name){alert('Name is required.');return;}
+  isSaving=true;
+  const id=editPersonId||crypto.randomUUID();
+  const personObj={id,name,phone:document.getElementById('pm-phone').value.trim(),email:document.getElementById('pm-email').value.trim(),notes:document.getElementById('pm-notes').value.trim()};
+  await savePerson_db(personObj);
+  const companyId=document.getElementById('pm-company').value||null;
+  const role=document.getElementById('pm-role').value||'PM';
+  const propertyName=null;
+  const reportsTo=document.getElementById('pm-reports-to').value||null;
+  const existingActive=people_assignments.filter(a=>a.person_id===id&&a.active);
+  for(const a of existingActive) await saveAssignment_db({...a,active:false});
+  if(companyId||propertyName||role){
+    await saveAssignment_db({id:crypto.randomUUID(),person_id:id,company_id:companyId,property_name:propertyName,role,active:true,reports_to:reportsTo});
+  }
+  isSaving=false;
+  document.getElementById('person-modal').classList.remove('open');
+  await loadAll();
+}
+
+async function deletePerson(id){
+  if(!confirm('Delete this person and all their assignments?'))return;
+  await deletePerson_db(id);
+  await loadAll();
+}
+
+function zoomToTreeCompany(id){activeTreeCompanyId=id;renderTree();}
+
+function renderTreeZoom(companyId){
+  const co=companies.find(c=>c.id===companyId);
+  const container=document.getElementById('tree-container');
+  if(!co||!container)return;
+  const activeA=people_assignments.filter(a=>a.company_id===companyId&&a.active);
+  const roleColors={'National Lead':'#FF0088','Regional Manager':'#CC00FF','PM':'#00B4FF','Maintenance':'#00FFB3','Contact':'#888888'};
+  const byRole={};
+  ROLE_ORDER.forEach(r=>{byRole[r]=[];});
+  activeA.forEach(a=>{
+    const p=people.find(x=>x.id===a.person_id);if(!p)return;
+    const r=ROLE_ORDER.includes(a.role)?a.role:'Contact';
+    byRole[r].push({p,a});
+  });
+  const usedRoles=ROLE_ORDER.filter(r=>byRole[r].length>0);
+  function personCard(p,a){
+  const color=roleColors[a.role]||'#888';
+  const initials=p.name.split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2);
+  const pName=p.name.toLowerCase().trim();
+  // Collect properties from all three sources
+  const propMap=new Map();
+  if(a.property_name)propMap.set(a.property_name,'won');
+  wins.filter(w=>w.contact&&w.contact.toLowerCase().trim()===pName).forEach(w=>{if(!propMap.has(w.company))propMap.set(w.company,'won');});
+  leads.filter(l=>l.contact&&l.contact.toLowerCase().trim()===pName).forEach(l=>{if(!propMap.has(l.company))propMap.set(l.company,'pipe');});
+  const chipsHTML=propMap.size?`<div style="display:flex;flex-wrap:wrap;gap:3px;justify-content:center;margin-bottom:8px;max-width:220px;">${[...propMap.entries()].map(([co,type])=>type==='won'?`<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(0,255,179,0.12);color:var(--green);border:1px solid rgba(0,255,179,0.3);">🟢 ${esc(co)}</span>`:`<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(255,0,136,0.08);color:var(--pink);border:1px solid rgba(255,0,136,0.2);">◎ ${esc(co)}</span>`).join('')}</div>`:'';
+  return `<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;max-width:220px;">
+      ${chipsHTML}
+      <div style="background:rgba(8,10,26,0.95);border:1px solid ${color}55;border-top:3px solid ${color};border-radius:12px;padding:14px 12px;min-width:150px;width:100%;text-align:center;">
+        <div style="width:44px;height:44px;border-radius:50%;background:${color}22;border:2px solid ${color};display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:${color};margin:0 auto 8px;">${initials}</div>
+        <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:3px;">${esc(p.name)}</div>
+        ${p.phone?`<div style="font-size:10px;color:#666;">${esc(p.phone)}</div>`:''}
+        <div style="display:flex;gap:4px;justify-content:center;margin-top:9px;">
+          <button onclick="openEditPerson('${p.id}')" style="padding:3px 9px;border-radius:6px;background:rgba(204,0,255,0.1);color:#CC00FF;border:1px solid #CC00FF;cursor:pointer;font-size:10px;font-family:inherit;">Edit</button>
+          <button onclick="deletePerson('${p.id}')" style="padding:3px 9px;border-radius:6px;background:rgba(255,0,136,0.1);color:#FF0088;border:1px solid #FF0088;cursor:pointer;font-size:10px;font-family:inherit;">✕</button>
+        </div>
+      </div>
+    </div>`;
+  }
+  let html=`<div style="max-width:960px;margin:0 auto;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px;flex-wrap:wrap;">
+      <button onclick="activeTreeCompanyId=null;renderTree()" style="padding:7px 16px;border-radius:9px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:#aaa;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;">← Back</button>
+      <div style="font-size:22px;font-weight:900;color:#CC00FF;">${esc(co.name)}</div>
+      <button onclick="openAddPersonForCompany('${companyId}')" style="margin-left:auto;padding:7px 16px;border-radius:9px;background:linear-gradient(135deg,#CC00FF,#9900EE);color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;">+ Add Person</button>
+    </div>`;
+  usedRoles.forEach((role,idx)=>{
+    const color=roleColors[role]||'#888';
+    const members=byRole[role];
+    if(idx>0){
+      const prevColor=roleColors[usedRoles[idx-1]]||'#888';
+      html+=`<div style="display:flex;justify-content:center;"><div style="width:2px;height:36px;background:linear-gradient(180deg,${prevColor}88,${color}88);"></div></div>`;
+    }
+    html+=`<div style="display:flex;flex-direction:column;align-items:center;margin-bottom:4px;">
+      <div style="font-size:10px;font-weight:900;letter-spacing:.15em;color:${color};text-transform:uppercase;margin-bottom:14px;padding:5px 18px;border-radius:20px;background:${color}18;border:1px solid ${color}44;">${role}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;">${members.map(({p,a})=>personCard(p,a)).join('')}</div>
+    </div>`;
+  });
+  if(!usedRoles.length)html+=`<div style="color:#555;text-align:center;padding:48px;font-size:14px;">No people assigned yet.</div>`;
+  html+=`</div>`;
+  container.innerHTML=html;
+}
+
+async function zoomToProperty(group,lat,lng){
+  installMap.flyTo([lat,lng],17,{duration:1.2,easeLinearity:0.5});
+  installMap.eachLayer(l=>{if(l instanceof L.Marker||l instanceof L.CircleMarker)installMap.removeLayer(l);});
+  let backBtn=document.getElementById('map-back-btn');
+  if(!backBtn){
+    backBtn=document.createElement('button');
+    backBtn.id='map-back-btn';
+    backBtn.onclick=resetMapView;
+    backBtn.style.cssText='position:absolute;top:10px;left:50px;z-index:1000;background:rgba(8,10,26,0.92);border:1px solid rgba(0,255,179,0.45);color:#00FFB3;font-size:12px;font-weight:800;font-family:inherit;padding:8px 16px;border-radius:8px;cursor:pointer;backdrop-filter:blur(8px);';
+    document.getElementById('install-map').appendChild(backBtn);
+  }
+  backBtn.textContent='← Month View';
+  backBtn.style.display='block';
+  const companies=[...new Set(group.map(w=>w.company))];
+  const allOrders=wins.filter(w=>companies.includes(w.company)&&w.wonDate&&(parseInt(w.carpet)||0)+(parseInt(w.hard)||0)>0).sort((a,b)=>a.wonDate.localeCompare(b.wonDate));
+    const fmt=d=>d?new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
+  const today=new Date().toISOString().slice(0,10);
+  const _resolvedCoords=await Promise.all(allOrders.map(async(w,i)=>{
+    if(w.lat&&w.lng)return{lat:w.lat,lng:w.lng,precise:true};
+    if(w.installAddress){const gc=await geocodeAddress(w.installAddress);if(gc)return{...gc,precise:true};}
+    const angle=i*2.399963,ring=i===0?0:Math.floor(i/6)+1,radius=i===0?0:ring*0.00007;
+    return{lat:lat+radius*Math.cos(angle),lng:lng+radius*Math.sin(angle),precise:false};
+  }));
+  allOrders.forEach((w,i)=>{
+    const{lat:oLat,lng:oLng,precise}=_resolvedCoords[i];
+    const c=parseInt(w.carpet)||0,h=parseInt(w.hard)||0;
+    const tot=Math.max(c,h)||c||h||(parseInt(w.installs)||0);
+    const isUpcoming=w.scheduledDate&&w.scheduledDate>=today;
+    const dotColor=isUpcoming?'#FF0088':'#00FFB3';
+    const dateLabel=w.wonDate?new Date(w.wonDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',year:'2-digit'}):'?';
+    const _border=precise?'2px solid rgba(255,255,255,0.95)':'2px dashed rgba(255,255,255,0.55)';
+    const _gpsTag=precise?'<div style="font-size:6px;opacity:.6;letter-spacing:-.2px">GPS</div>':'';
+    const icon=L.divIcon({className:'',html:`<div style="background:${dotColor};border:${_border};border-radius:50%;width:36px;height:36px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;color:#000;box-shadow:0 2px 10px rgba(0,0,0,.6);cursor:pointer;line-height:1.1"><div style="font-size:13px">${tot}</div><div style="font-size:7px;opacity:.75">${dateLabel}</div>${_gpsTag}</div>`,iconSize:[36,36],iconAnchor:[18,18]});
+    const mk=L.marker([oLat,oLng],{icon}).addTo(installMap);
+    let pop=`<div style="min-width:200px;max-width:260px;font-family:inherit">`;
+    pop+=`<div style="font-size:13px;font-weight:900;color:#111;margin-bottom:3px">${esc(w.company)}</div>`;
+    pop+=`<div style="font-size:11px;color:#555;margin-bottom:6px">📅 ${fmt(w.wonDate)}</div>`;
+    if(c)pop+=`<div style="font-size:11px;margin-bottom:2px">🟦 Carpet: <strong>${c}</strong></div>`;
+    if(h)pop+=`<div style="font-size:11px;margin-bottom:2px">🟣 Hard: <strong>${h}</strong></div>`;
+    if(w.carpetOrderNumber)pop+=`<div style="font-size:10px;color:#666;margin-bottom:2px">C# ${esc(w.carpetOrderNumber)}</div>`;
+    if(w.hardOrderNumber)pop+=`<div style="font-size:10px;color:#666;margin-bottom:2px">H# ${esc(w.hardOrderNumber)}</div>`;
+    if(w.scheduledDate)pop+=`<div style="font-size:11px;color:#e59900;margin-bottom:4px">🗓 Sched: ${fmt(w.scheduledDate)}</div>`;
+    pop+=`<div style="margin-top:8px;display:flex;gap:5px"><button onclick="openInstallDetail(wins.find(x=>x.id==='${w.id}'))" style="flex:1;padding:6px 0;border-radius:6px;background:#e8f5ff;border:1px solid #0099cc;color:#0077aa;font-size:11px;font-weight:800;font-family:inherit;cursor:pointer">View</button><button onclick="openEditOrder('${w.id}')" style="flex:1;padding:6px 0;border-radius:6px;background:#e8fff5;border:1px solid #00cc88;color:#00aa66;font-size:11px;font-weight:800;font-family:inherit;cursor:pointer">Edit</button></div></div>`;
+    mk.bindPopup(pop,{maxWidth:280});
+  });
+  if(!allOrders.length){
+    L.marker([lat,lng],{icon:L.divIcon({className:'',html:`<div style="background:rgba(8,10,26,0.9);border:1px solid #555;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;color:#aaa;white-space:nowrap">No order history found</div>`,iconSize:[160,32],iconAnchor:[80,16]})}).addTo(installMap);
+  }
+}
+function resetMapView(){
+  const bb=document.getElementById('map-back-btn');
+  if(bb)bb.style.display='none';
+  renderInstallMap();
+}
+
 loadAll();
 </script>
 <!-- Loading overlay -->
