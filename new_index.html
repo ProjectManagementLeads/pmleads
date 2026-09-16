@@ -2527,8 +2527,9 @@ async function renderInstallMap(){
     filterLabel=from&&to?`${from} → ${to}`:from?`From ${from}`:to?`Until ${to}`:'All time';
   } else {
     installs=wins.filter(w=>w.scheduledDate&&w.scheduledDate.startsWith(monthStr)&&(w.address||w.installAddress));
-    filterLabel=monthLabel;
+        filterLabel=monthLabel;
   }
+  installs=installs.filter(w=>(w.carpet||0)+(w.hard||0)>0);
   const subtitleEl=document.getElementById('map-filter-subtitle');
   if(subtitleEl)subtitleEl.textContent=filterLabel;
   if(!installMap){
