@@ -3179,7 +3179,7 @@ async function zoomToProperty(group,lat,lng){
     const c=parseInt(w.carpet)||0,h=parseInt(w.hard)||0;
     const tot=Math.max(c,h)||c||h||(parseInt(w.installs)||0);
     const isUpcoming=w.scheduledDate&&w.scheduledDate>=today;
-    const dotColor=isUpcoming?'#FFD700':'#00FFB3';
+    const dotColor=isUpcoming?'#FF0088':'#00FFB3';
     const dateLabel=w.wonDate?new Date(w.wonDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',year:'2-digit'}):'?';
     const _border=precise?'2px solid rgba(255,255,255,0.95)':'2px dashed rgba(255,255,255,0.55)';
     const _gpsTag=precise?'<div style="font-size:6px;opacity:.6;letter-spacing:-.2px">GPS</div>':'';
